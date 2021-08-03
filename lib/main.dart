@@ -1,9 +1,10 @@
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
-import 'package:topi/Constaints.dart';
+import 'package:topi/CategoryList.dart';
+import 'package:topi/SongsList.dart';
+import 'package:topi/constants.dart';
 import 'package:topi/starter.dart';
 
 void main() {
@@ -21,21 +22,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
       routes: {
         '/starter': (context) => StartScreen(),
+        '/songs_list': (context) => SongsList(),
       },
-      home: SplashScreen(),
+      home: CategoryList(),
     );
   }
 }
 
-class SplashScreen extends StatefulWidget {
-
+class MainScreen extends StatefulWidget {
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin{
+class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin{
 
   bool isClick=false;
   bool isVisible=false;
@@ -65,8 +67,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   void initState() {
     // TODO: implement initState
-
-    animationController = AnimationController(vsync: this, duration: Duration(seconds: 25),
+    animationController = AnimationController(vsync: this, duration: Duration(seconds: 20),
     );
     animationController.addListener(() {
       setState(() {
