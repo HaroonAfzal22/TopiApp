@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:topi/CategoryList.dart';
+import 'package:topi/GetImage.dart';
+import 'package:topi/ShareFile.dart';
 import 'package:topi/SongsList.dart';
 import 'package:topi/constants.dart';
 import 'package:topi/starter.dart';
@@ -11,9 +14,10 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Color(0xffFCCC44),
     statusBarIconBrightness:
-        Brightness.light, //or set color with: Color(0xFF0000FF)
+        Brightness.dark,
   ));
   runApp(MyApp());
+
   // color used code  #FCCC44 as like yellow, #FC9425 like orange,#DC3843 like red
 }
 
@@ -26,6 +30,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/starter': (context) => StartScreen(),
         '/songs_list': (context) => SongsList(),
+        '/image_pickers': (context) => ImagePickers(),
+        '/share_file': (context) => DemoApp(),
       },
       home: CategoryList(),
     );

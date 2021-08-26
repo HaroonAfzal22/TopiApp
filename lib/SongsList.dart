@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:horizontal_card_pager/card_item.dart';
 import 'package:horizontal_card_pager/horizontal_card_pager.dart';
+import 'package:topi/Gradient.dart';
 import 'package:topi/ListCards.dart';
 
 class SongsList extends StatefulWidget {
@@ -123,54 +124,62 @@ class _SongsListState extends State<SongsList> {
     ];
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          physics: ScrollPhysics(),
-          children: [
-            SizedBox(height: 8,),
-            Container(
-              height: 100,
-              child: ListView.builder(
-               physics: ScrollPhysics(),
-                scrollDirection: Axis.horizontal,
-                itemCount: europeanCountries.length,
-                itemBuilder: (context, index) {
-                  return ListCards(
-                      text: europeanCountries[index],
-                      images:CachedNetworkImage(
-                        key: UniqueKey(),
-                        fit: BoxFit.fill,
-                        imageUrl: europeanFlags[index],
-                        width: 50,
-                        height: 50,
-                      ),
-                      onClicks: (){
-                    print('click at ${europeanCountries[index]}');
-                  });
-                },
+        child: BackgroundGradient(
+          childView : ListView(
+            physics: ScrollPhysics(),
+            children: [
+              SizedBox(height: 8,),
+              Container(
+                height: 100,
+                child: ListView.builder(
+                 physics: ScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: europeanCountries.length,
+                  itemBuilder: (context, index) {
+                    return ListCards(
+                        text: europeanCountries[index],
+                        images:CachedNetworkImage(
+                          key: UniqueKey(),
+                          fit: BoxFit.fill,
+                          imageUrl: europeanFlags[index],
+                          width: 50,
+                          height: 50,
+                        ),
+                        onClicks: (){
+                          Navigator.pushNamed(context, '/image_pickers');
+                      print('click at ${europeanCountries[index]}');
+                    });
+                  },
+                ),
               ),
-            ),
-            SizedBox(height: 8,),
-            Container(
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: BouncingScrollPhysics(),
-                itemCount: europeanFlags.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      leading:CachedNetworkImage(
-                        width: 50,
-                        height: 50,
-                        key: UniqueKey(),
-                        imageUrl: europeanFlags[index],
+              SizedBox(height: 8,),
+              Container(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: BouncingScrollPhysics(),
+                  itemCount: europeanFlags.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap:(){
+                        Navigator.pushNamed(context, '/share_file');
+                      } ,
+                      child: Card(
+                        child: ListTile(
+                          leading:CachedNetworkImage(
+                            width: 50,
+                            height: 50,
+                            key: UniqueKey(),
+                            imageUrl: europeanFlags[index],
+                          ),
+                          title: Text(europeanCountries[index]),
+                        ),
                       ),
-                      title: Text(europeanCountries[index]),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

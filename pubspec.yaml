@@ -33,6 +33,13 @@ dependencies:
   liquid_progress_indicator: ^0.4.0
   cached_network_image: ^3.1.0
   horizontal_card_pager: ^1.1.1
+  image_cropper: ^1.4.1
+  lottie: ^1.1.0
+  share_plus: ^2.1.4
+  fluttertoast: ^8.0.8
+  path_provider: ^2.0.2
+  chewie: ^1.2.2
+  video_player: ^2.1.14
 
 
 
