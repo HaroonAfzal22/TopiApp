@@ -101,7 +101,6 @@ class DemoAppState extends State<DemoApp> {
 
     if (imagePaths.isNotEmpty) {
       await Share.shareFiles(imagePaths,
-          text: text,
           subject: subject,
           sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     } else {
@@ -110,4 +109,5 @@ class DemoAppState extends State<DemoApp> {
           sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     }
   }
+
 }

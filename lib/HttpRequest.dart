@@ -21,25 +21,24 @@ class HttpRequest {
       var length = await image.length();
       var request = MultipartRequest('POST', uri)
         ..files.add(
-         MultipartFile(
+          MultipartFile(
             'file1',
             stream,
             length,
-            filename:image.path,
-           contentType: MediaType('Content-Type',"multipart/form-data"),
+            filename: image.path,
+            contentType: MediaType('Content-Type', "multipart/form-data"),
           ),
         );
       var response = await request.send();
       if (response.statusCode == 200) {
         final directory = await getExternalStorageDirectory();
         var file = File('${directory!.path}/video.mp4');
-        var bytes= <int>[];
+        var bytes = <int>[];
         response.stream.listen((value) {
           bytes.addAll(value);
-        },onDone: ()async{
+        }, onDone: () async {
           await file.writeAsBytes(bytes);
         });
-        print('quick response is ${file.path}');
         return file;
       } else if (response.statusCode == 401) {
         // removeAccount(context);
