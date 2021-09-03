@@ -13,11 +13,10 @@ class BackgroundGradient extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
               begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              colors: [Color(0xffDC3843),Color(0xffFC9425),  Color(0xffFCCC44)]),
+              end: Alignment.topRight, colors:[Colors.black87,Colors.black87]),
         ),
         child:childView,
     );
   }
 }
-
+//  [Color(0xffDC3843),Color(0xffFC9425),  Color(0xffFCCC44)]

@@ -11,6 +11,7 @@ import 'package:http_parser/http_parser.dart';
 import 'HttpLinks.dart';
 
 class HttpRequest {
+  List<File>value=[];
   //for login link
   Future postImage(BuildContext context, var image) async {
     try {
@@ -32,14 +33,21 @@ class HttpRequest {
       var response = await request.send();
       if (response.statusCode == 200) {
         final directory = await getExternalStorageDirectory();
-        var file = File('${directory!.path}/video.mp4');
+        final director = (await getApplicationDocumentsDirectory()).path;
+        //var file = File('${directory!.path}/video.mp4');
+        var files= File('${director}/video.mp4');
+        //var files= File('/storage/emulated/0/Download/video$count.mp4');
         var bytes = <int>[];
         response.stream.listen((value) {
           bytes.addAll(value);
         }, onDone: () async {
-          await file.writeAsBytes(bytes);
+          //await file.writeAsBytes(bytes);
+          await files.writeAsBytes(bytes);
+       //   value.add(file);
+          value.add(files);
         });
-        return file;
+      //  print('path is ${files.path}');
+        return files;
       } else if (response.statusCode == 401) {
         // removeAccount(context);
         toastShow('Authorization Failure');
@@ -221,4 +229,7 @@ class HttpRequest {
     Navigator.pushReplacementNamed(context, '/');
   }*/
 
+
+
 }
+

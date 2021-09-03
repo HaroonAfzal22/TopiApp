@@ -31,7 +31,7 @@ toastShow(text){
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
       backgroundColor:
-      Color(0xff18726a),
-      textColor: Colors.white,
+      Colors.white,
+      textColor: Color(0xffFC9425),
       fontSize: 12.0);
 }

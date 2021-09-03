@@ -12,9 +12,9 @@ import 'package:topi/starter.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Color(0xffFCCC44),
+    statusBarColor: Colors.black,
     statusBarIconBrightness:
-        Brightness.dark,
+        Brightness.light,
   ));
   runApp(MyApp());
 

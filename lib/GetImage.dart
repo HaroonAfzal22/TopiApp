@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
@@ -24,7 +27,7 @@ class _ImagePickersState extends State<ImagePickers> {
   late AppState state;
   File? imageFile;
   bool isLoading = false;
-  List<String> imagePaths=[];
+  var imagePaths;
 
   @override
   void initState() {
@@ -37,8 +40,17 @@ class _ImagePickersState extends State<ImagePickers> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Image Pick & Crop'),
-        flexibleSpace: kStatusGradient,
+        backgroundColor: Colors.black87,
+        brightness: Brightness.dark,
+        elevation: 0.0,
+        title: Text(
+          'Topi',
+          style: TextStyle(
+              color: Color(0xffFCCC44),
+              fontSize: 30,
+              fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
       ),
       body: BackgroundGradient(
         childView: Center(
@@ -60,9 +72,6 @@ class _ImagePickersState extends State<ImagePickers> {
         onPressed: () {
           if (state == AppState.free)
             _pickImage();
-          else if (state == AppState.picked)
-            _cropImage();
-          else if (state == AppState.cropped) _clearImage();
         },
         child: _buildButtonIcon(),
       ),
@@ -72,10 +81,6 @@ class _ImagePickersState extends State<ImagePickers> {
   Widget _buildButtonIcon() {
     if (state == AppState.free)
       return Icon(Icons.add);
-    else if (state == AppState.picked)
-      return Icon(Icons.crop);
-    else if (state == AppState.cropped)
-      return Icon(Icons.clear);
     else
       return Container();
   }
@@ -103,12 +108,15 @@ class _ImagePickersState extends State<ImagePickers> {
       });
       imageFile = croppedFile;
       HttpRequest request = HttpRequest();
+      int count =1;
       var result = await request.postImage(context, imageFile);
       if (result != null) {
-        setState(() {
-          imagePaths.add(result);
+        setState(()  {
+          count++;
+         imagePaths=result.path;
           isLoading = false;
           _onWillPop();
+          _clearImage();
         });
       } else {
         setState(() {
@@ -185,8 +193,8 @@ class _ImagePickersState extends State<ImagePickers> {
 
   void _onShare(BuildContext context) async {
     final box = context.findRenderObject() as RenderBox?;
-    if (imagePaths.isNotEmpty) {
-      await Share.shareFiles(imagePaths,
+    if (imagePaths!=null) {
+      await Share.shareFiles(['$imagePaths'],
           sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     } else {
       await Share.share(imageFile.toString(),
