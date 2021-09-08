@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:topi/CategoryList.dart';
+import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/GetImage.dart';
 import 'package:topi/ShareFile.dart';
 import 'package:topi/SongsList.dart';
@@ -12,7 +13,7 @@ import 'package:topi/starter.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.black,
+    statusBarColor: Colors.transparent,
     statusBarIconBrightness:
         Brightness.light,
   ));
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         '/songs_list': (context) => SongsList(),
         '/image_pickers': (context) => ImagePickers(),
         '/share_file': (context) => DemoApp(),
+        '/video_players': (context) => VideoPlayers(),
       },
       home: CategoryList(),
     );

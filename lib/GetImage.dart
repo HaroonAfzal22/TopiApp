@@ -1,16 +1,20 @@
-import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
+import 'package:chewie/chewie.dart';
+import 'package:external_path/external_path.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/HttpRequest.dart';
 import 'package:topi/constants.dart';
+import 'package:video_player/video_player.dart';
 
 class ImagePickers extends StatefulWidget {
   @override
@@ -27,13 +31,30 @@ class _ImagePickersState extends State<ImagePickers> {
   late AppState state;
   File? imageFile;
   bool isLoading = false;
+  bool isPlaying = false;
   var imagePaths;
+  int pos = 0;
+  List userAnswer = [
+    'Transmitting particles through radio waves...',
+    'Generating Fractal resonance harmonics...',
+    'Downloading your mystical creation...',
+  ];
+
+  late Timer _timer,timer;
 
   @override
   void initState() {
     super.initState();
     state = AppState.free;
-
+    _timer = Timer.periodic(Duration(seconds: 3), (_) {
+      setState(() {
+        if (pos < 2) {
+          pos++;
+        } else {
+          pos = 0;
+        }
+      });
+    });
   }
 
   @override
@@ -43,12 +64,11 @@ class _ImagePickersState extends State<ImagePickers> {
         backgroundColor: Colors.black87,
         brightness: Brightness.dark,
         elevation: 0.0,
-        title: Text(
-          'Topi',
-          style: TextStyle(
-              color: Color(0xffFCCC44),
-              fontSize: 30,
-              fontWeight: FontWeight.bold),
+        title: Image.asset(
+          'assets/topi.png',
+          fit: BoxFit.contain,
+          width: 80,
+          height: 80,
         ),
         centerTitle: true,
       ),
@@ -56,11 +76,37 @@ class _ImagePickersState extends State<ImagePickers> {
         childView: Center(
           child: imageFile != null
               ? isLoading
-                  ? Center(
-                      child: Lottie.asset('assets/waiting.json',
+                  ? Container(
+                      margin: EdgeInsets.only(top: 60.0),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Container(
+                              child: Lottie.asset('assets/waiting.json',
+                                  repeat: true, reverse: true, animate: true),
+                            ),
+                            AnimatedSwitcher(
+                              duration: Duration(milliseconds: 900),
+                              transitionBuilder:
+                                  (Widget child, Animation<double> animation) {
+                                return ScaleTransition(
+                                    scale: animation, child: child);
+                              },
+                              child: Text(
+                                '${userAnswer[pos]}',
+                                key: ValueKey<String>(userAnswer[pos]),
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Container(
+                      child: Lottie.asset('assets/upload_file.json',
                           repeat: true, reverse: true, animate: true),
                     )
-                  : Image.file(imageFile!)
               : Container(
                   child: Lottie.asset('assets/upload_file.json',
                       repeat: true, reverse: true, animate: true),
@@ -70,19 +116,17 @@ class _ImagePickersState extends State<ImagePickers> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.deepOrange,
         onPressed: () {
-          if (state == AppState.free)
-            _pickImage();
+          _pickImage();
         },
         child: _buildButtonIcon(),
       ),
     );
+
   }
 
+
   Widget _buildButtonIcon() {
-    if (state == AppState.free)
-      return Icon(Icons.add);
-    else
-      return Container();
+    return Icon(Icons.add);
   }
 
   Future<Null> _pickImage() async {
@@ -108,29 +152,32 @@ class _ImagePickersState extends State<ImagePickers> {
       });
       imageFile = croppedFile;
       HttpRequest request = HttpRequest();
-      int count =1;
       var result = await request.postImage(context, imageFile);
       if (result != null) {
-        setState(()  {
-          count++;
-         imagePaths=result.path;
-          isLoading = false;
-          _onWillPop();
-          _clearImage();
+        timer = Timer.periodic(Duration(seconds: 1), (_) async {
+          var dir = await getExternalStorageDirectory();
+          List values = await dir!.list().toList();
+          for(int i=0;i<values.length;i++){
+            if(values[i].toString().contains(result.path.toString())){
+              timer.cancel();
+               Future.delayed(Duration(seconds: 5), () {
+                Navigator.pushNamed(context, '/video_players', arguments: {
+                  'file': '${result.path}',
+                });
+                isLoading = false;
+              });
+            }
+          }
         });
       } else {
         setState(() {
           toastShow('Unable to Load!Check Internet Connectivity');
           isLoading = false;
+          _clearImage();
         });
       }
-      print('response is ${result}');
-      setState(() {
-        state = AppState.cropped;
-      });
     }
   }
-
   void _clearImage() {
     imageFile = null;
     setState(() {
@@ -138,14 +185,14 @@ class _ImagePickersState extends State<ImagePickers> {
     });
   }
 
-  Future<bool> _onWillPop() async {
+  Future<bool> _onWillPop(image) async {
     if (Platform.isIOS) {
       return await showDialog(
               context: context,
               builder: (context) => CupertinoAlertDialog(
                     title: Text('Are you sure?'),
                     content: Container(
-                      child: Image.file(imageFile!),
+                      child: Image.file(image),
                     ),
                     actions: <Widget>[
                       CupertinoDialogAction(
@@ -164,25 +211,23 @@ class _ImagePickersState extends State<ImagePickers> {
             context: context,
             builder: (context) => AlertDialog(
               backgroundColor: Color(0xffe8f6fa),
-              actionsPadding:EdgeInsets.symmetric(horizontal:  24.0),
+              actionsPadding: EdgeInsets.symmetric(horizontal: 24.0),
               content: Container(
-                child: Image.file(imageFile!),
+                height: 150,
+                child: _onPlay(context, File(image)),
               ),
               actions: <Widget>[
                 ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: new Text('Play'),
-                  style: ButtonStyle(backgroundColor:MaterialStateProperty.all(Colors.red) ),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(false),
+                  onPressed: () => _onSave(context),
                   child: new Text('Save'),
-                  style: ButtonStyle(backgroundColor:MaterialStateProperty.all(Colors.red) ),
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.red)),
                 ),
                 ElevatedButton(
                   onPressed: () => _onShare(context),
                   child: new Text('Share'),
-                  style: ButtonStyle(backgroundColor:MaterialStateProperty.all(Colors.red) ),
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.red)),
                 ),
               ],
             ),
@@ -191,15 +236,38 @@ class _ImagePickersState extends State<ImagePickers> {
     }
   }
 
+  _onPlay(BuildContext context, file) {
+    /* chewiePlayer(
+      videoPlayerController: VideoPlayerController.file(file),
+    );*/
+    print('isCalled $file');
+  }
+
   void _onShare(BuildContext context) async {
     final box = context.findRenderObject() as RenderBox?;
-    if (imagePaths!=null) {
+    if (imagePaths != null) {
       await Share.shareFiles(['$imagePaths'],
           sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     } else {
       await Share.share(imageFile.toString(),
           sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     }
+  }
+
+  void _onSave(BuildContext context) async {
+    var dir = await ExternalPath.getExternalStoragePublicDirectory(
+        ExternalPath.DIRECTORY_DOWNLOADS);
+    /* var path = await File(
+      imagePaths.toString().substring(0, imagePaths.toString().length - 9),
+    ).rename('/storage/emulated/0/Downloads/');*/
+    //print('new path is $path');
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  timer.cancel();
   }
 
 }

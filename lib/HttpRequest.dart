@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:topi/constants.dart';
@@ -10,13 +7,14 @@ import 'package:http_parser/http_parser.dart';
 
 import 'HttpLinks.dart';
 
+int count = 1;
+
 class HttpRequest {
-  List<File>value=[];
   //for login link
+
   Future postImage(BuildContext context, var image) async {
     try {
       Uri uri = Uri.parse(HttpLinks.localUrl);
-
       var stream = ByteStream(image.openRead());
       stream.cast();
       var length = await image.length();
@@ -33,21 +31,17 @@ class HttpRequest {
       var response = await request.send();
       if (response.statusCode == 200) {
         final directory = await getExternalStorageDirectory();
-        final director = (await getApplicationDocumentsDirectory()).path;
-        //var file = File('${directory!.path}/video.mp4');
-        var files= File('${director}/video.mp4');
-        //var files= File('/storage/emulated/0/Download/video$count.mp4');
+        var file = File('${directory!.path}/video$count.mp4');
         var bytes = <int>[];
         response.stream.listen((value) {
           bytes.addAll(value);
         }, onDone: () async {
-          //await file.writeAsBytes(bytes);
-          await files.writeAsBytes(bytes);
-       //   value.add(file);
-          value.add(files);
+          count++;
+          await file.writeAsBytes(bytes);
         });
-      //  print('path is ${files.path}');
-        return files;
+
+        return file;
+
       } else if (response.statusCode == 401) {
         // removeAccount(context);
         toastShow('Authorization Failure');
@@ -229,7 +223,4 @@ class HttpRequest {
     Navigator.pushReplacementNamed(context, '/');
   }*/
 
-
-
 }
-

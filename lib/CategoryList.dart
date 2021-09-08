@@ -5,6 +5,8 @@ import 'package:topi/Gradient.dart';
 import 'package:topi/constants.dart';
 
 class CategoryList extends StatelessWidget {
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,13 +14,10 @@ class CategoryList extends StatelessWidget {
         backgroundColor: Colors.black87,
         brightness: Brightness.dark,
         elevation: 0.0,
-
-        title: Text(
-          'Topi',
-          style: TextStyle(
-              color: Color(0xffFCCC44),
-              fontSize: 30,
-              fontWeight: FontWeight.bold),
+        title: Image.asset('assets/topi.png',
+          fit: BoxFit.contain,
+          width: 80,
+          height: 80,
         ),
         centerTitle: true,
       ),
@@ -58,7 +57,7 @@ class CategoryList extends StatelessWidget {
                           shrinkWrap: true,
                           children: [
                             Container(
-                              height: 20,
+                              height: 27,
                               width: double.maxFinite,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -69,17 +68,20 @@ class CategoryList extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              child: Text(
-                                'solo'.toUpperCase(),
-                                style: TextStyle(
-                                    color: Color(0xffFCCC44),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 6.0),
+                                child: Text(
+                                  'solo'.toUpperCase(),
+                                  style: TextStyle(
+                                      color: Color(0xffFCCC44),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                             Container(
-                              height: 22,
+                              height: 25,
                               width: double.maxFinite,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -115,7 +117,7 @@ class CategoryList extends StatelessWidget {
                   onTap: () {
                     print('combo card click');
                     //Navigator.pushNamed(context, '/songs_list');
-                  toastShow('Coming Soon..');
+                    snackShow(context, 'Coming Soon..');
                   },
                   child: Card(
                     clipBehavior: Clip.antiAlias,
@@ -139,7 +141,7 @@ class CategoryList extends StatelessWidget {
                           shrinkWrap: true,
                           children: [
                             Container(
-                              height: 22,
+                              height: 27,
                               width: double.maxFinite,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -150,17 +152,20 @@ class CategoryList extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              child: Text(
-                                'combo'.toUpperCase(),
-                                style: TextStyle(
-                                    color: Colors.orangeAccent,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 6.0),
+                                child: Text(
+                                  'combo'.toUpperCase(),
+                                  style: TextStyle(
+                                      color: Colors.orangeAccent,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                             Container(
-                              height: 20,
+                              height: 25,
                               width: double.maxFinite,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -215,7 +220,7 @@ class CategoryList extends StatelessWidget {
                           shrinkWrap: true,
                           children: [
                             Container(
-                              height: 22,
+                              height: 27,
                               width: double.maxFinite,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -226,17 +231,20 @@ class CategoryList extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              child: Text(
-                                'Group'.toUpperCase(),
-                                style: TextStyle(
-                                    color: Colors.orangeAccent,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 6.0),
+                                child: Text(
+                                  'Group'.toUpperCase(),
+                                  style: TextStyle(
+                                      color: Colors.orangeAccent,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                             Container(
-                              height: 22,
+                              height: 25,
                               width: double.maxFinite,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -263,7 +271,7 @@ class CategoryList extends StatelessWidget {
                   ),
                   onTap: () {
                     print('group card click');
-                    toastShow('Coming Soon..');
+                    snackShow(context, 'Coming Soon..');
                     // Navigator.pushNamed(context, '/songs_list');
                   },
                 ),
