@@ -154,6 +154,7 @@ class _ImagePickersState extends State<ImagePickers> {
       HttpRequest request = HttpRequest();
       var result = await request.postImage(context, imageFile);
       if (result != null) {
+
         timer = Timer.periodic(Duration(seconds: 1), (_) async {
           var dir = await getExternalStorageDirectory();
           List values = await dir!.list().toList();

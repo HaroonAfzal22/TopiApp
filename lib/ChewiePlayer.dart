@@ -28,7 +28,6 @@ class _chewiePlayerState extends State<chewiePlayer> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     setData();
   }
 
@@ -37,7 +36,7 @@ class _chewiePlayerState extends State<chewiePlayer> {
         videoPlayerController: widget.videoPlayerController,
         autoPlay: true,
         autoInitialize: true,
-        showControls: false,
+        showControls: true,
         errorBuilder: (context, error) {
           return Center(
             child: Text(
@@ -54,12 +53,31 @@ class _chewiePlayerState extends State<chewiePlayer> {
       children: [
         Expanded(
           flex: 1,
-          child: Chewie(
-            controller: _chewieController,
+          child: Container(
+            child: Text(
+              'Became a Star',
+              style: TextStyle(
+                color: Colors.orangeAccent,
+                fontSize: 30.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
         Expanded(
-          flex: 1,
+          flex: 3,
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              border: Border.all(color: Colors.white)
+            ),
+            child: Chewie(
+              controller: _chewieController,
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 3,
           child: widget.childView,
         ),
       ],
@@ -103,7 +121,6 @@ class _VideoPlayersState extends State<VideoPlayers> {
 
     if (args['file'] != null) {
       imagePaths = args['file'];
-
     }
 
     return Scaffold(
@@ -126,7 +143,6 @@ class _VideoPlayersState extends State<VideoPlayers> {
                   child: spinkit,
                 )
               : Container(
-                  margin: EdgeInsets.symmetric(vertical: 26.0),
                   child: chewiePlayer(
                     videoPlayerController:
                         VideoPlayerController.file(File(imagePaths)),
@@ -138,14 +154,9 @@ class _VideoPlayersState extends State<VideoPlayers> {
                             child: Container(
                               margin: EdgeInsets.symmetric(horizontal: 8.0),
                               child: OutlinedButton(
-                                style: ButtonStyle(
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                  ),
-                                  backgroundColor: MaterialStateProperty.all(
-                                      Colors.redAccent),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                      width: 1.0, color: Colors.redAccent),
                                 ),
                                 onPressed: () {
                                   _onSave(context, imagePaths);
@@ -153,8 +164,8 @@ class _VideoPlayersState extends State<VideoPlayers> {
                                 child: Text(
                                   'Save',
                                   style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
+                                    color: Colors.orange,
+                                    fontSize: 18.0,
                                   ),
                                 ),
                               ),
@@ -163,21 +174,18 @@ class _VideoPlayersState extends State<VideoPlayers> {
                           Expanded(
                             child: Container(
                               child: OutlinedButton(
-                                style: ButtonStyle(
-                                    shape: MaterialStateProperty.all(
-                                        RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12.0))),
-                                    backgroundColor: MaterialStateProperty.all(
-                                        Colors.redAccent)),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                      width: 1.0, color: Colors.redAccent),
+                                ),
                                 onPressed: () {
                                   _onShare(context, imagePaths.toString());
                                 },
                                 child: Text(
                                   'Share',
                                   style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14.0,
+                                    color: Colors.orange,
+                                    fontSize: 18.0,
                                   ),
                                 ),
                               ),
@@ -198,7 +206,7 @@ class _VideoPlayersState extends State<VideoPlayers> {
 
     var newString = image.split('files');
     if (await Permission.storage.request().isGranted &&
-        await Permission.accessMediaLocation.request().isGranted ) {
+        await Permission.accessMediaLocation.request().isGranted) {
       var dir = await ExternalPath.getExternalStoragePublicDirectory(
           ExternalPath.DIRECTORY_DOWNLOADS);
       var paths = await File(image).rename('$dir${newString[1]}');
