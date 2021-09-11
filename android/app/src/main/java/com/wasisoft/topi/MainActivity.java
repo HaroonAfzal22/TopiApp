@@ -1,4 +1,4 @@
-package com.wasisoft.topi;
+package com.topi.ai;
 
 import io.flutter.embedding.android.FlutterActivity;
 

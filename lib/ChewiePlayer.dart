@@ -35,8 +35,8 @@ class _chewiePlayerState extends State<chewiePlayer> {
     _chewieController = ChewieController(
         videoPlayerController: widget.videoPlayerController,
         autoPlay: true,
+        looping: true,
         autoInitialize: true,
-        showControls: true,
         errorBuilder: (context, error) {
           return Center(
             child: Text(

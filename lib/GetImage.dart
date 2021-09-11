@@ -46,15 +46,21 @@ class _ImagePickersState extends State<ImagePickers> {
   void initState() {
     super.initState();
     state = AppState.free;
+
+    setTimer();
+      }
+  setTimer(){
     _timer = Timer.periodic(Duration(seconds: 3), (_) {
       setState(() {
-        if (pos < 2) {
-          pos++;
-        } else {
-          pos = 0;
-        }
+
+      if (pos < 2) {
+        pos++;
+      } else {
+        pos = 0;
+      }
       });
     });
+
   }
 
   @override
@@ -154,22 +160,28 @@ class _ImagePickersState extends State<ImagePickers> {
       HttpRequest request = HttpRequest();
       var result = await request.postImage(context, imageFile);
       if (result != null) {
-
-        timer = Timer.periodic(Duration(seconds: 1), (_) async {
-          var dir = await getExternalStorageDirectory();
-          List values = await dir!.list().toList();
-          for(int i=0;i<values.length;i++){
-            if(values[i].toString().contains(result.path.toString())){
-              timer.cancel();
-               Future.delayed(Duration(seconds: 5), () {
-                Navigator.pushNamed(context, '/video_players', arguments: {
-                  'file': '${result.path}',
+        if(result==504){
+          snackShow(context, '$result Server Error ');
+          setState(() {
+            isLoading=false;
+          });
+        }else {
+          timer = Timer.periodic(Duration(seconds: 1), (_) async {
+            var dir = await getExternalStorageDirectory();
+            List values = await dir!.list().toList();
+            for (int i = 0; i < values.length; i++) {
+              if (values[i].toString().contains(result.path.toString())) {
+                timer.cancel();
+                Future.delayed(Duration(seconds: 5), () {
+                  Navigator.pushNamed(context, '/video_players', arguments: {
+                    'file': '${result.path}',
+                  });
+                  isLoading = false;
                 });
-                isLoading = false;
-              });
+              }
             }
-          }
-        });
+          });
+        }
       } else {
         setState(() {
           toastShow('Unable to Load!Check Internet Connectivity');
