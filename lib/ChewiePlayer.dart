@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path/path.dart' as path;
 import 'package:chewie/chewie.dart';
 import 'package:external_path/external_path.dart';
@@ -35,8 +36,6 @@ class _chewiePlayerState extends State<chewiePlayer> {
     _chewieController = ChewieController(
         videoPlayerController: widget.videoPlayerController,
         autoPlay: true,
-        looping: true,
-        autoInitialize: true,
         errorBuilder: (context, error) {
           return Center(
             child: Text(
@@ -86,9 +85,9 @@ class _chewiePlayerState extends State<chewiePlayer> {
 
   @override
   void dispose() {
+    super.dispose();
     widget.videoPlayerController.dispose();
     _chewieController.dispose();
-    super.dispose();
   }
 }
 
@@ -101,28 +100,12 @@ late var imagePaths;
 bool isLoading = false;
 
 class _VideoPlayersState extends State<VideoPlayers> {
-/*
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getPath();
-  }
-
-  getPath() async {
-    var dir = await getExternalStorageDirectory();
-    await dir!.list().toList().then((value) => print('value is $value'));
-  }
-*/
-
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
-
     if (args['file'] != null) {
       imagePaths = args['file'];
     }
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
@@ -204,15 +187,15 @@ class _VideoPlayersState extends State<VideoPlayers> {
   void _onSave(BuildContext context, image) async {
     //getPath();
 
-    var newString = image.split('files');
+    //var newString = image.split('files');
     if (await Permission.storage.request().isGranted &&
         await Permission.accessMediaLocation.request().isGranted) {
-      var dir = await ExternalPath.getExternalStoragePublicDirectory(
-          ExternalPath.DIRECTORY_DOWNLOADS);
-      var paths = await File(image).rename('$dir${newString[1]}');
-      print('new path is $paths ');
+    //  var dir = await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS);
+      //var paths = await File(image).rename('$dir${newString[1]}');
+      File value = File('$image');
+    var paths=  await GallerySaver.saveVideo(value.path);
       if (paths.toString().isNotEmpty) {
-        toastShow('Saved!');
+        toastShow('Video Saved!');
       }
     } else {
       await [
@@ -228,9 +211,6 @@ class _VideoPlayersState extends State<VideoPlayers> {
       await Share.shareFiles(['$image'],
           sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     }
-    /*else {
-      await Share.share(imageFile.toString(),
-          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
-    }*/
+
   }
 }

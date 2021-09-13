@@ -22,7 +22,25 @@ class _SongsListState extends State<SongsList> {
     'Coming Soon...',
     'Coming Soon...',
     'Coming Soon...',
-    ];
+  ];
+  final songsList = [
+    'Title: Bamboleo',
+    'Title: Munda Shehar Lahore da',
+    'Title: Patla Lak way',
+    'Title: Pani Pani',
+    'Title: Athra Style Jatta',
+    'Title: Eid Mubarak',
+    'Title: Tera Suit',
+  ];
+  final singersList = [
+    'Artist: Gipsy Kings',
+    'Artist: Naseebo Lal',
+    'Artist: Naseebo Lal',
+    'Artist: Yo Yo Honey Singh',
+    'Artist: Sidhu Moosewala',
+    'Artist: Aayat Arif',
+    'Artist: Tony Kakkar',
+  ];
   final europeanFlags = [
     'https://st2.depositphotos.com/1023173/6070/v/950/depositphotos_60708117-stock-illustration-red-hash-on-yellow.jpg',
     'https://st3.depositphotos.com/6736296/33335/v/1600/depositphotos_333352716-stock-illustration-tik-tok-logo-editorial-vector.jpg',
@@ -53,12 +71,6 @@ class _SongsListState extends State<SongsList> {
   }
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -78,7 +90,91 @@ class _SongsListState extends State<SongsList> {
         onPressed: isEnabled
             ? () {
                 player.fixedPlayer!.stop();
-                Navigator.pushNamed(context, '/image_pickers');
+                if (isClick.toList().elementAt(0) == true) {
+                  setState(() {
+                    isClick[0] = false;
+                    selected[0] = false;
+                    clickIcon(0);
+                    isEnabled=false;
+
+                  });
+
+                  Navigator.pushNamed(context, '/image_pickers', arguments: {
+                    'song_name': 'bamboleo',
+                  });
+                } else if (isClick.toList().elementAt(1) == true) {
+                  setState(() {
+                    isClick[1] = false;
+                    selected[1] = false;
+                    clickIcon(1);
+                    isEnabled=false;
+
+                  });
+
+                  Navigator.pushNamed(context, '/image_pickers', arguments: {
+                    'song_name': 'munda_lahori',
+                  });
+                } else if (isClick.toList().elementAt(2) == true) {
+                  setState(() {
+                    isClick[2] = false;
+                    selected[2] = false;
+                    clickIcon(2);
+                    isEnabled=false;
+
+                  });
+
+                  Navigator.pushNamed(context, '/image_pickers', arguments: {
+                    'song_name': 'patla_lak',
+                  });
+                } else if (isClick.toList().elementAt(3) == true) {
+                 setState(() {
+                   isClick[3] = false;
+                   selected[3] = false;
+                   clickIcon(3);
+                   isEnabled=false;
+
+                 });
+
+                  Navigator.pushNamed(context, '/image_pickers', arguments: {
+                    'song_name': 'pani_pani',
+                  });
+                } else if (isClick.toList().elementAt(4) == true) {
+                 setState(() {
+                   isClick[4] = false;
+                   selected[4] = false;
+                   clickIcon(4);
+                   isEnabled=false;
+
+                 });
+
+                  Navigator.pushNamed(context, '/image_pickers', arguments: {
+                    'song_name': 'athra_style',
+                  });
+                } else if (isClick.toList().elementAt(5) == true) {
+
+               setState(() {
+                 isClick[5] = false;
+                 selected[5] = false;
+                 clickIcon(5);
+                 isEnabled=false;
+
+               });
+
+                  Navigator.pushNamed(context, '/image_pickers', arguments: {
+                    'song_name': 'eid_mubarak',
+                  });
+                } else if (isClick.toList().elementAt(6) == true) {
+                  setState(() {
+                    isClick[6] = false;
+                    selected[6] = false;
+                    clickIcon(6);
+                    isEnabled=false;
+
+                  });
+                  Navigator.pushNamed(context, '/image_pickers', arguments: {
+                    'song_name': 'tera_suit',
+                  });
+                }
               }
             : () {
                 snackShow(context, 'please choose song first...');
@@ -140,11 +236,12 @@ class _SongsListState extends State<SongsList> {
                           if (isClick[index] == true) {
                             isClick[index] = false;
                             selected[index] = false;
+                            isEnabled = false;
                           } else {
                             isClick[index] = true;
                             selected[index] = true;
                             isEnabled = true;
-                            if (isClick.toList().elementAt(1) ||
+                            /* if (isClick.toList().elementAt(1) ||
                                 isClick.toList().elementAt(2) ||
                                 isClick.toList().elementAt(3) ||
                                 isClick.toList().elementAt(4) ||
@@ -152,11 +249,23 @@ class _SongsListState extends State<SongsList> {
                                 isClick.toList().elementAt(6)) {
                               isEnabled = false;
                               snackShow(context, 'Coming Soon...');
-                            }
+                            }*/
                           }
                         });
                         if (isClick.toList().elementAt(0) == true) {
-                          player.play('songs.mp3');
+                          player.play('bamboleo.mp3');
+                        } else if (isClick.toList().elementAt(1) == true) {
+                          player.play('munda_shahar.mp3');
+                        } else if (isClick.toList().elementAt(2) == true) {
+                          player.play('patla_lak.mp3');
+                        } else if (isClick.toList().elementAt(3) == true) {
+                          player.play('pani_pani.mp3');
+                        } else if (isClick.toList().elementAt(4) == true) {
+                          player.play('athra_style.mp3');
+                        } else if (isClick.toList().elementAt(5) == true) {
+                          player.play('eid_mubarak.mp3');
+                        } else if (isClick.toList().elementAt(6) == true) {
+                          player.play('tera_suit.mp3');
                         } else {
                           player.fixedPlayer!.stop();
                         }
@@ -196,16 +305,18 @@ class _SongsListState extends State<SongsList> {
                                           margin: EdgeInsets.symmetric(
                                               vertical: 12.0),
                                           child: Text(
-                                            europeanCountries[index],
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            songsList[index],
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16.0),
                                           ),
                                         ),
                                         Container(
                                           child: Center(
                                             child: Text(
-                                              europeanCountries[index],
+                                              singersList[index],
                                               style: TextStyle(
+                                                  fontSize: 12.0,
                                                   color: Colors.white),
                                             ),
                                           ),

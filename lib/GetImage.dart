@@ -41,7 +41,7 @@ class _ImagePickersState extends State<ImagePickers> {
   ];
 
   late Timer _timer,timer;
-
+  var songs;
   @override
   void initState() {
     super.initState();
@@ -52,7 +52,6 @@ class _ImagePickersState extends State<ImagePickers> {
   setTimer(){
     _timer = Timer.periodic(Duration(seconds: 3), (_) {
       setState(() {
-
       if (pos < 2) {
         pos++;
       } else {
@@ -65,6 +64,13 @@ class _ImagePickersState extends State<ImagePickers> {
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
+      if(args!=null){
+        setState(() {
+        songs=  args['song_name'];
+        });
+      }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
@@ -157,40 +163,272 @@ class _ImagePickersState extends State<ImagePickers> {
         isLoading = true;
       });
       imageFile = croppedFile;
-      HttpRequest request = HttpRequest();
-      var result = await request.postImage(context, imageFile);
-      if (result != null) {
-        if(result==504){
-          snackShow(context, '$result Server Error ');
-          setState(() {
-            isLoading=false;
-          });
-        }else {
-          timer = Timer.periodic(Duration(seconds: 1), (_) async {
-            var dir = await getExternalStorageDirectory();
-            List values = await dir!.list().toList();
-            for (int i = 0; i < values.length; i++) {
-              if (values[i].toString().contains(result.path.toString())) {
-                timer.cancel();
-                Future.delayed(Duration(seconds: 5), () {
-                  Navigator.pushNamed(context, '/video_players', arguments: {
-                    'file': '${result.path}',
-                  });
-                  isLoading = false;
-                });
-              }
-            }
-          });
-        }
-      } else {
-        setState(() {
-          toastShow('Unable to Load!Check Internet Connectivity');
-          isLoading = false;
-          _clearImage();
-        });
+      if(songs=='bamboleo'){
+        print('0 is $songs');
+        predictSong();
+      }else if(songs=='munda_lahori'){
+        print('1 is $songs');
+        oneNpSong();
+      }
+      else if(songs=='patla_lak'){
+        print('2 is $songs');
+        twoNpSong();
+      }else if(songs=='pani_pani'){
+        print('3 is $songs');
+        threeNpSong();
+      }else if(songs=='athra_style'){
+        print('4 is $songs');
+        fourNpSong();
+      }else if(songs=='eid_mubarak'){
+        print('5 is $songs');
+        fiveNpSong();
+      }else if(songs=='tera_suit'){
+        print('6 is $songs');
+        sixNpSong();
       }
     }
   }
+
+  predictSong()async{
+    HttpRequest request = HttpRequest();
+    var result = await request.predictNp(context, imageFile);
+    if (result != null) {
+      if(result==504){
+        snackShow(context, '$result Server Error ');
+        setState(() {
+          isLoading=false;
+        });
+      }else {
+        timer = Timer.periodic(Duration(seconds: 1), (_) async {
+          var dir = await getExternalStorageDirectory();
+          List values = await dir!.list().toList();
+          for (int i = 0; i < values.length; i++) {
+            if (values[i].toString().contains(result.path.toString())) {
+              timer.cancel();
+              Future.delayed(Duration(seconds: 10), () {
+                Navigator.pushNamed(context, '/video_players', arguments: {
+                  'file': '${result.path}',
+                });
+                isLoading = false;
+              });
+            }
+          }
+        });
+      }
+    } else {
+      setState(() {
+        toastShow('Unable to Load!Check Internet Connectivity');
+        isLoading = false;
+        _clearImage();
+      });
+    }
+  }
+  oneNpSong()async{
+    HttpRequest request = HttpRequest();
+    var result = await request.oneNp(context, imageFile);
+    if (result != null) {
+      if(result==504){
+        snackShow(context, '$result Server Error ');
+        setState(() {
+          isLoading=false;
+        });
+      }else {
+        timer = Timer.periodic(Duration(seconds: 1), (_) async {
+          var dir = await getExternalStorageDirectory();
+          List values = await dir!.list().toList();
+          for (int i = 0; i < values.length; i++) {
+            if (values[i].toString().contains(result.path.toString())) {
+              timer.cancel();
+              Future.delayed(Duration(seconds: 10), () {
+                Navigator.pushNamed(context, '/video_players', arguments: {
+                  'file': '${result.path}',
+                });
+                isLoading = false;
+              });
+            }
+          }
+        });
+      }
+    } else {
+      setState(() {
+        toastShow('Unable to Load!Check Internet Connectivity');
+        isLoading = false;
+        _clearImage();
+      });
+    }
+  }
+  twoNpSong()async{
+    HttpRequest request = HttpRequest();
+    var result = await request.twoNp(context, imageFile);
+    if (result != null) {
+      if(result==504){
+        snackShow(context, '$result Server Error ');
+        setState(() {
+          isLoading=false;
+        });
+      }else {
+        timer = Timer.periodic(Duration(seconds: 1), (_) async {
+          var dir = await getExternalStorageDirectory();
+          List values = await dir!.list().toList();
+          for (int i = 0; i < values.length; i++) {
+            if (values[i].toString().contains(result.path.toString())) {
+              timer.cancel();
+              Future.delayed(Duration(seconds: 10), () {
+                Navigator.pushNamed(context, '/video_players', arguments: {
+                  'file': '${result.path}',
+                });
+                isLoading = false;
+              });
+            }
+          }
+        });
+      }
+    } else {
+      setState(() {
+        toastShow('Unable to Load!Check Internet Connectivity');
+        isLoading = false;
+        _clearImage();
+      });
+    }
+  }
+  threeNpSong()async{
+    HttpRequest request = HttpRequest();
+    var result = await request.threeNp(context, imageFile);
+    if (result != null) {
+      if(result==504){
+        snackShow(context, '$result Server Error ');
+        setState(() {
+          isLoading=false;
+        });
+      }else {
+        timer = Timer.periodic(Duration(seconds: 1), (_) async {
+          var dir = await getExternalStorageDirectory();
+          List values = await dir!.list().toList();
+          for (int i = 0; i < values.length; i++) {
+            if (values[i].toString().contains(result.path.toString())) {
+              timer.cancel();
+              Future.delayed(Duration(seconds:10), () {
+                Navigator.pushNamed(context, '/video_players', arguments: {
+                  'file': '${result.path}',
+                });
+                isLoading = false;
+              });
+            }
+          }
+        });
+      }
+    } else {
+      setState(() {
+        toastShow('Unable to Load!Check Internet Connectivity');
+        isLoading = false;
+        _clearImage();
+      });
+    }
+  }
+  fourNpSong()async{
+    HttpRequest request = HttpRequest();
+    var result = await request.fourNp(context, imageFile);
+    if (result != null) {
+      if(result==504){
+        snackShow(context, '$result Server Error ');
+        setState(() {
+          isLoading=false;
+        });
+      }else {
+        timer = Timer.periodic(Duration(seconds: 1), (_) async {
+          var dir = await getExternalStorageDirectory();
+          List values = await dir!.list().toList();
+          for (int i = 0; i < values.length; i++) {
+            if (values[i].toString().contains(result.path.toString())) {
+              timer.cancel();
+              Future.delayed(Duration(seconds: 10), () {
+                Navigator.pushNamed(context, '/video_players', arguments: {
+                  'file': '${result.path}',
+                });
+                isLoading = false;
+              });
+            }
+          }
+        });
+      }
+    } else {
+      setState(() {
+        toastShow('Unable to Load!Check Internet Connectivity');
+        isLoading = false;
+        _clearImage();
+      });
+    }
+  }
+  fiveNpSong()async{
+    HttpRequest request = HttpRequest();
+    var result = await request.fiveNp(context, imageFile);
+    if (result != null) {
+      if(result==504){
+        snackShow(context, '$result Server Error ');
+        setState(() {
+          isLoading=false;
+        });
+      }else {
+        timer = Timer.periodic(Duration(seconds: 1), (_) async {
+          var dir = await getExternalStorageDirectory();
+          List values = await dir!.list().toList();
+          for (int i = 0; i < values.length; i++) {
+            if (values[i].toString().contains(result.path.toString())) {
+              timer.cancel();
+              Future.delayed(Duration(seconds: 10), () {
+                Navigator.pushNamed(context, '/video_players', arguments: {
+                  'file': '${result.path}',
+                });
+                isLoading = false;
+              });
+            }
+          }
+        });
+      }
+    } else {
+      setState(() {
+        toastShow('Unable to Load!Check Internet Connectivity');
+        isLoading = false;
+        _clearImage();
+      });
+    }
+  }
+  sixNpSong()async{
+    HttpRequest request = HttpRequest();
+    var result = await request.sixNp(context, imageFile);
+    if (result != null) {
+      if(result==504){
+        snackShow(context, '$result Server Error ');
+        setState(() {
+          isLoading=false;
+        });
+      }else {
+        timer = Timer.periodic(Duration(seconds: 1), (_) async {
+          var dir = await getExternalStorageDirectory();
+          List values = await dir!.list().toList();
+          for (int i = 0; i < values.length; i++) {
+            if (values[i].toString().contains(result.path.toString())) {
+              timer.cancel();
+              Future.delayed(Duration(seconds: 10), () {
+                Navigator.pushNamed(context, '/video_players', arguments: {
+                  'file': '${result.path}',
+                });
+                isLoading = false;
+              });
+            }
+          }
+        });
+      }
+    } else {
+      setState(() {
+        toastShow('Unable to Load!Check Internet Connectivity');
+        isLoading = false;
+        _clearImage();
+      });
+    }
+  }
+
+
   void _clearImage() {
     imageFile = null;
     setState(() {
@@ -281,6 +519,7 @@ class _ImagePickersState extends State<ImagePickers> {
     // TODO: implement dispose
     super.dispose();
   timer.cancel();
+  _timer.cancel();
   }
 
 }

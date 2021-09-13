@@ -12,7 +12,7 @@ int count = 1;
 class HttpRequest {
   //for login link
 
-  Future postImage(BuildContext context, var image) async {
+  Future predictNp(BuildContext context, var image) async {
     try {
       Uri uri = Uri.parse(HttpLinks.localUrl);
       var stream = ByteStream(image.openRead());
@@ -53,6 +53,260 @@ class HttpRequest {
       print(e);
     }
   }
+  Future oneNp(BuildContext context, var image) async {
+    try {
+      Uri uri = Uri.parse(HttpLinks.oneUrl);
+      var stream = ByteStream(image.openRead());
+      stream.cast();
+      var length = await image.length();
+      var request = MultipartRequest('POST', uri)
+        ..files.add(
+          MultipartFile(
+            'file1',
+            stream,
+            length,
+            filename: image.path,
+            contentType: MediaType('Content-Type', "multipart/form-data"),
+          ),
+        );
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        final directory = await getExternalStorageDirectory();
+        var file = File('${directory!.path}/video$count.mp4');
+        var bytes = <int>[];
+        response.stream.listen((value) {
+          bytes.addAll(value);
+        }, onDone: () async {
+          count++;
+          await file.writeAsBytes(bytes);
+        });
+        print('fiile is $file');
+        return file;
+
+      } else if (response.statusCode == 401) {
+        // removeAccount(context);
+        toastShow('Authorization Failure');
+      } else {
+        print(response.statusCode);
+        return response.statusCode;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  Future twoNp(BuildContext context, var image) async {
+    try {
+      Uri uri = Uri.parse(HttpLinks.twoUrl);
+      var stream = ByteStream(image.openRead());
+      stream.cast();
+      var length = await image.length();
+      var request = MultipartRequest('POST', uri)
+        ..files.add(
+          MultipartFile(
+            'file1',
+            stream,
+            length,
+            filename: image.path,
+            contentType: MediaType('Content-Type', "multipart/form-data"),
+          ),
+        );
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        final directory = await getExternalStorageDirectory();
+        var file = File('${directory!.path}/video$count.mp4');
+        var bytes = <int>[];
+        response.stream.listen((value) {
+          bytes.addAll(value);
+        }, onDone: () async {
+          count++;
+          await file.writeAsBytes(bytes);
+        });
+        print('fiile is $file');
+        return file;
+
+      } else if (response.statusCode == 401) {
+        // removeAccount(context);
+        toastShow('Authorization Failure');
+      } else {
+        print(response.statusCode);
+        return response.statusCode;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  Future threeNp(BuildContext context, var image) async {
+    try {
+      Uri uri = Uri.parse(HttpLinks.threeUrl);
+      var stream = ByteStream(image.openRead());
+      stream.cast();
+      var length = await image.length();
+      var request = MultipartRequest('POST', uri)
+        ..files.add(
+          MultipartFile(
+            'file1',
+            stream,
+            length,
+            filename: image.path,
+            contentType: MediaType('Content-Type', "multipart/form-data"),
+          ),
+        );
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        final directory = await getExternalStorageDirectory();
+        var file = File('${directory!.path}/video$count.mp4');
+        var bytes = <int>[];
+        response.stream.listen((value) {
+          bytes.addAll(value);
+        }, onDone: () async {
+          count++;
+          await file.writeAsBytes(bytes);
+        });
+        print('fiile is $file');
+        return file;
+
+      } else if (response.statusCode == 401) {
+        // removeAccount(context);
+        toastShow('Authorization Failure');
+      } else {
+        print(response.statusCode);
+        return response.statusCode;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  Future fourNp(BuildContext context, var image) async {
+    try {
+      Uri uri = Uri.parse(HttpLinks.fourUrl);
+      var stream = ByteStream(image.openRead());
+      stream.cast();
+      var length = await image.length();
+      var request = MultipartRequest('POST', uri)
+        ..files.add(
+          MultipartFile(
+            'file1',
+            stream,
+            length,
+            filename: image.path,
+            contentType: MediaType('Content-Type', "multipart/form-data"),
+          ),
+        );
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        final directory = await getExternalStorageDirectory();
+        var file = File('${directory!.path}/video$count.mp4');
+        var bytes = <int>[];
+        response.stream.listen((value) {
+          bytes.addAll(value);
+        }, onDone: () async {
+          count++;
+          await file.writeAsBytes(bytes);
+        });
+        print('fiile is $file');
+        return file;
+
+      } else if (response.statusCode == 401) {
+        // removeAccount(context);
+        toastShow('Authorization Failure');
+      } else {
+        print(response.statusCode);
+        return response.statusCode;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  Future fiveNp(BuildContext context, var image) async {
+    try {
+      Uri uri = Uri.parse(HttpLinks.fiveUrl);
+      var stream = ByteStream(image.openRead());
+      stream.cast();
+      var length = await image.length();
+      var request = MultipartRequest('POST', uri)
+        ..files.add(
+          MultipartFile(
+            'file1',
+            stream,
+            length,
+            filename: image.path,
+            contentType: MediaType('Content-Type', "multipart/form-data"),
+          ),
+        );
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        final directory = await getExternalStorageDirectory();
+        var file = File('${directory!.path}/video$count.mp4');
+        var bytes = <int>[];
+        response.stream.listen((value) {
+          bytes.addAll(value);
+        }, onDone: () async {
+          count++;
+          await file.writeAsBytes(bytes);
+        });
+        print('fiile is $file');
+        return file;
+
+      } else if (response.statusCode == 401) {
+        // removeAccount(context);
+        toastShow('Authorization Failure');
+      } else {
+        print(response.statusCode);
+        return response.statusCode;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  Future sixNp(BuildContext context, var image) async {
+    try {
+      Uri uri = Uri.parse(HttpLinks.sixUrl);
+      var stream = ByteStream(image.openRead());
+      stream.cast();
+      var length = await image.length();
+      var request = MultipartRequest('POST', uri)
+        ..files.add(
+          MultipartFile(
+            'file1',
+            stream,
+            length,
+            filename: image.path,
+            contentType: MediaType('Content-Type', "multipart/form-data"),
+          ),
+        );
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        final directory = await getExternalStorageDirectory();
+        var file = File('${directory!.path}/video$count.mp4');
+        var bytes = <int>[];
+        response.stream.listen((value) {
+          bytes.addAll(value);
+        }, onDone: () async {
+          count++;
+          await file.writeAsBytes(bytes);
+        });
+        print('fiile is $file');
+        return file;
+
+      } else if (response.statusCode == 401) {
+        // removeAccount(context);
+        toastShow('Authorization Failure');
+      } else {
+        print(response.statusCode);
+        return response.statusCode;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+
+
+
+
+
+
+
 /*Future parentLogin(BuildContext context, String email, String password,
       String? tokenFcm) async {
     try {

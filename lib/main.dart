@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         '/share_file': (context) => DemoApp(),
         '/video_players': (context) => VideoPlayers(),
       },
-      home: CategoryList(),
+      home: SongsList(),
     );
   }
 }
