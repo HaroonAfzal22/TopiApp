@@ -35,9 +35,9 @@ class _ImagePickersState extends State<ImagePickers> {
   var imagePaths;
   int pos = 0;
   List userAnswer = [
-    'Transmitting particles through radio waves...',
-    'Generating Fractal resonance harmonics...',
-    'Downloading your mystical creation...',
+    'Now Image is Processing to do some Magic...',
+    'Where you can see a lot of new features...',
+    'Downloading your magical image to video creation...',
   ];
 
   late Timer _timer,timer;
@@ -46,7 +46,6 @@ class _ImagePickersState extends State<ImagePickers> {
   void initState() {
     super.initState();
     state = AppState.free;
-
     setTimer();
       }
   setTimer(){

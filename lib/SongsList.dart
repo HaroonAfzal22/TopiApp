@@ -1,8 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:new_version/new_version.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/ListCards.dart';
+import 'package:topi/NavigationDrawer.dart';
+import 'package:topi/Shared_Pref.dart';
 import 'package:topi/constants.dart';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -69,13 +73,37 @@ class _SongsListState extends State<SongsList> {
       return Colors.grey;
     }
   }
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future(()async{
+      _checkVersion();
+    });
+  }
+  _checkVersion() async {
+
+    final newVersion = NewVersion(androidId: "com.topi.ai");
+    final status = await newVersion.getVersionStatus();
+    await SharedPref.setAppVersion(status!.storeVersion);
+    if (!status.storeVersion.contains(status.localVersion)) {
+      newVersion.showUpdateDialog(
+        context: context,
+        versionStatus: status,
+        dialogTitle: 'Update Available!!!',
+        dialogText:
+        'A new Version of WSMS is available! Version ${status.storeVersion} but your Version is  ${status.localVersion}.\n\n Would you Like to update it now?',
+        updateButtonText: 'Update Now',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
-        brightness: Brightness.dark,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         elevation: 0.0,
         title: Image.asset(
           'assets/topi.png',
@@ -85,6 +113,9 @@ class _SongsListState extends State<SongsList> {
         ),
         centerTitle: true,
       ),
+      drawer: Drawers(),
+
+      drawerScrimColor: Colors.transparent,
       floatingActionButton: FloatingActionButton(
         backgroundColor: fabColor(),
         onPressed: isEnabled
@@ -277,10 +308,10 @@ class _SongsListState extends State<SongsList> {
                               ? new RoundedRectangleBorder(
                                   side: new BorderSide(
                                       color: Colors.white, width: 4.0),
-                                  borderRadius: BorderRadius.circular(4.0))
+                                  borderRadius: BorderRadius.circular(20.0))
                               : new RoundedRectangleBorder(
                                   side: new BorderSide(width: 1.0),
-                                  borderRadius: BorderRadius.circular(4.0)),
+                                  borderRadius: BorderRadius.circular(20.0)),
                           color: europeanColors[index],
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -311,7 +342,7 @@ class _SongsListState extends State<SongsList> {
                                                 fontSize: 16.0),
                                           ),
                                         ),
-                                        Container(
+                                      /*  Container(
                                           child: Center(
                                             child: Text(
                                               singersList[index],
@@ -320,7 +351,7 @@ class _SongsListState extends State<SongsList> {
                                                   color: Colors.white),
                                             ),
                                           ),
-                                        ),
+                                        ),*/
                                       ],
                                     ),
                                   ),

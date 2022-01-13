@@ -6,17 +6,21 @@ import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:topi/CategoryList.dart';
 import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/GetImage.dart';
+import 'package:topi/InAppReview.dart';
 import 'package:topi/ShareFile.dart';
+import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
 import 'package:topi/constants.dart';
 import 'package:topi/starter.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness:
         Brightness.light,
   ));
+  await SharedPref.init();
   runApp(MyApp());
 
   // color used code  #FCCC44 as like yellow, #FC9425 like orange,#DC3843 like red
@@ -33,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/songs_list': (context) => SongsList(),
         '/image_pickers': (context) => ImagePickers(),
         '/share_file': (context) => DemoApp(),
+        '/in_app_review': (context) => InAppReviews(),
         '/video_players': (context) => VideoPlayers(),
       },
       home: SongsList(),

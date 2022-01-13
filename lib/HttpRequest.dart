@@ -27,7 +27,9 @@ class HttpRequest {
             filename: image.path,
             contentType: MediaType('Content-Type', "multipart/form-data"),
           ),
+
         );
+      print('response $request');
       var response = await request.send();
       if (response.statusCode == 200) {
         final directory = await getExternalStorageDirectory();
