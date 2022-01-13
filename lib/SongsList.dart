@@ -92,7 +92,7 @@ class _SongsListState extends State<SongsList> {
         versionStatus: status,
         dialogTitle: 'Update Available!!!',
         dialogText:
-        'A new Version of WSMS is available! Version ${status.storeVersion} but your Version is  ${status.localVersion}.\n\n Would you Like to update it now?',
+        'A new Version of TOPI.AI is available! which is ${status.storeVersion}. but your Version is  ${status.localVersion}.\n\n Would you Like to update it now?',
         updateButtonText: 'Update Now',
       );
     }

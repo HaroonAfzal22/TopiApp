@@ -86,7 +86,7 @@ class _DrawersState extends State<Drawers> {
                 icon:FontAwesomeIcons.shareSquare,
                 onClick: (){
                   Navigator.pop(context);
-                //  _openStoreListing();
+                  _openStoreListing();
                 },
                 text: 'Share'),
             listTiles(
