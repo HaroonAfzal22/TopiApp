@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path/path.dart' as path;
 import 'package:chewie/chewie.dart';
@@ -109,7 +110,7 @@ class _VideoPlayersState extends State<VideoPlayers> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
-        brightness: Brightness.dark,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         elevation: 0.0,
         title: Image.asset(
           'assets/topi.png',

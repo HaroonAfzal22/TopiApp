@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:topi/CategoryList.dart';
 import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/GetImage.dart';
+import 'package:topi/Google/GoogleAds.dart';
 import 'package:topi/InAppReview.dart';
 import 'package:topi/ShareFile.dart';
 import 'package:topi/Shared_Pref.dart';
@@ -15,6 +17,7 @@ import 'package:topi/starter.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness:
@@ -39,6 +42,7 @@ class MyApp extends StatelessWidget {
         '/share_file': (context) => DemoApp(),
         '/in_app_review': (context) => InAppReviews(),
         '/video_players': (context) => VideoPlayers(),
+        '/google_ads': (context) => Googles(),
       },
       home: SongsList(),
     );

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:new_version/new_version.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/ListCards.dart';
@@ -73,17 +74,17 @@ class _SongsListState extends State<SongsList> {
       return Colors.grey;
     }
   }
+  final BannerAd myBanner= BannerAd(
+      size: AdSize.banner, adUnitId: 'ca-app-pub-3940256099942544/6300978111', listener: BannerAdListener(), request: AdRequest());
 @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future(()async{
-      _checkVersion();
-    });
+      myBanner.load();
+     // _checkVersion();
   }
   _checkVersion() async {
-
-    final newVersion = NewVersion(androidId: "com.topi.ai");
+    final newVersion =NewVersion(androidId: "com.topi.ai");
     final status = await newVersion.getVersionStatus();
     await SharedPref.setAppVersion(status!.storeVersion);
     if (!status.storeVersion.contains(status.localVersion)) {
@@ -114,7 +115,6 @@ class _SongsListState extends State<SongsList> {
         centerTitle: true,
       ),
       drawer: Drawers(),
-
       drawerScrimColor: Colors.transparent,
       floatingActionButton: FloatingActionButton(
         backgroundColor: fabColor(),
@@ -212,157 +212,172 @@ class _SongsListState extends State<SongsList> {
               },
         child: Icon(CupertinoIcons.arrow_up_doc_fill),
       ),
+      bottomSheet: Padding(padding: EdgeInsets.only(bottom: 90.0)),
       body: SafeArea(
         child: BackgroundGradient(
-          childView: ListView(
-            physics: ScrollPhysics(),
+          childView: Stack(
             children: [
-              SizedBox(
-                height: 8,
-              ),
-              Container(
-                height: 100,
-                child: ListView.builder(
-                  physics: ScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 7,
-                  itemBuilder: (context, index) {
-                    return ListCards(
-                        text: europeanCountries[index],
-                        images: CachedNetworkImage(
-                          key: UniqueKey(),
-                          fit: BoxFit.fill,
-                          imageUrl: europeanFlags[index],
-                          width: 50,
-                          height: 50,
-                        ),
-                        onClicks: () {
-                          print('click at ${europeanCountries[index]}');
-                          for (int i = index + 1; i < 7; i++) {
-                            if (isClick.toList().elementAt(i)) {
-                              snackShow(context, 'Coming Soon...');
-                            }
-                          }
-                        });
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Container(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  itemCount: 7,
-                  itemBuilder: (context, index) {
-                    if (isClick.length != 7) {
-                      isClick.add(false);
-                      selected.add(false);
-                    }
-                    return GestureDetector(
-                      onTap: () {
-                        //   Navigator.pushNamed(context, '/share_file');
-                        setState(() {
-                          if (isClick[index] == true) {
-                            isClick[index] = false;
-                            selected[index] = false;
-                            isEnabled = false;
-                          } else {
-                            isClick[index] = true;
-                            selected[index] = true;
-                            isEnabled = true;
-                            /* if (isClick.toList().elementAt(1) ||
-                                isClick.toList().elementAt(2) ||
-                                isClick.toList().elementAt(3) ||
-                                isClick.toList().elementAt(4) ||
-                                isClick.toList().elementAt(5) ||
-                                isClick.toList().elementAt(6)) {
-                              isEnabled = false;
-                              snackShow(context, 'Coming Soon...');
-                            }*/
-                          }
-                        });
-                        if (isClick.toList().elementAt(0) == true) {
-                          player.play('bamboleo.mp3');
-                        } else if (isClick.toList().elementAt(1) == true) {
-                          player.play('munda_shahar.mp3');
-                        } else if (isClick.toList().elementAt(2) == true) {
-                          player.play('patla_lak.mp3');
-                        } else if (isClick.toList().elementAt(3) == true) {
-                          player.play('pani_pani.mp3');
-                        } else if (isClick.toList().elementAt(4) == true) {
-                          player.play('athra_style.mp3');
-                        } else if (isClick.toList().elementAt(5) == true) {
-                          player.play('eid_mubarak.mp3');
-                        } else if (isClick.toList().elementAt(6) == true) {
-                          player.play('tera_suit.mp3');
-                        } else {
-                          player.fixedPlayer!.stop();
-                        }
+              ListView(
+                physics: ScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Container(
+                    height: 100,
+                    child: ListView.builder(
+                      physics: ScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 7,
+                      itemBuilder: (context, index) {
+                        return ListCards(
+                            text: europeanCountries[index],
+                            images: CachedNetworkImage(
+                              key: UniqueKey(),
+                              fit: BoxFit.fill,
+                              imageUrl: europeanFlags[index],
+                              width: 50,
+                              height: 50,
+                            ),
+                            onClicks: () {
+                              for (int i = index + 1; i < 7; i++) {
+                                if (isClick.toList().elementAt(i)) {
+                                  snackShow(context, 'Coming Soon...');
+                                }
+                              }
+                            });
                       },
-                      child: Container(
-                        height: 100,
-                        child: Card(
-                          shape: selected[index] == true
-                              ? new RoundedRectangleBorder(
-                                  side: new BorderSide(
-                                      color: Colors.white, width: 4.0),
-                                  borderRadius: BorderRadius.circular(20.0))
-                              : new RoundedRectangleBorder(
-                                  side: new BorderSide(width: 1.0),
-                                  borderRadius: BorderRadius.circular(20.0)),
-                          color: europeanColors[index],
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Container(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      itemCount: 7,
+                      itemBuilder: (context, index) {
+                        if (isClick.length != 7) {
+                          isClick.add(false);
+                          selected.add(false);
+                        }
+                        return GestureDetector(
+                          onTap: () {
+                            //   Navigator.pushNamed(context, '/share_file');
+                            setState(() {
+                              if (isClick[index] == true) {
+                                isClick[index] = false;
+                                selected[index] = false;
+                                isEnabled = false;
+                              } else {
+                                isClick[index] = true;
+                                selected[index] = true;
+                                isEnabled = true;
+                                /* if (isClick.toList().elementAt(1) ||
+                                    isClick.toList().elementAt(2) ||
+                                    isClick.toList().elementAt(3) ||
+                                    isClick.toList().elementAt(4) ||
+                                    isClick.toList().elementAt(5) ||
+                                    isClick.toList().elementAt(6)) {
+                                  isEnabled = false;
+                                  snackShow(context, 'Coming Soon...');
+                                }*/
+                              }
+                            });
+                            if (isClick.toList().elementAt(0) == true) {
+                              player.play('bamboleo.mp3');
+                            } else if (isClick.toList().elementAt(1) == true) {
+                              player.play('munda_shahar.mp3');
+                            } else if (isClick.toList().elementAt(2) == true) {
+                              player.play('patla_lak.mp3');
+                            } else if (isClick.toList().elementAt(3) == true) {
+                              player.play('pani_pani.mp3');
+                            } else if (isClick.toList().elementAt(4) == true) {
+                              player.play('athra_style.mp3');
+                            } else if (isClick.toList().elementAt(5) == true) {
+                              player.play('eid_mubarak.mp3');
+                            } else if (isClick.toList().elementAt(6) == true) {
+                              player.play('tera_suit.mp3');
+                            } else {
+                              player.fixedPlayer!.stop();
+                            }
+                          },
+                          child: Container(
+                            height: 100,
+                            child: Card(
+                              shape: selected[index] == true
+                                  ? new RoundedRectangleBorder(
+                                      side: new BorderSide(
+                                          color: Colors.white, width: 4.0),
+                                      borderRadius: BorderRadius.circular(20.0))
+                                  : new RoundedRectangleBorder(
+                                      side: new BorderSide(width: 1.0),
+                                      borderRadius: BorderRadius.circular(20.0)),
+                              color: europeanColors[index],
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Expanded(
-                                    child: Icon(
-                                      clickIcon(index),
-                                      size: 40.0,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 4,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.symmetric(
-                                              vertical: 12.0),
-                                          child: Text(
-                                            songsList[index],
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16.0),
-                                          ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Expanded(
+                                        child: Icon(
+                                          clickIcon(index),
+                                          size: 40.0,
                                         ),
-                                      /*  Container(
-                                          child: Center(
-                                            child: Text(
-                                              singersList[index],
-                                              style: TextStyle(
-                                                  fontSize: 12.0,
-                                                  color: Colors.white),
+                                      ),
+                                      Expanded(
+                                        flex: 4,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.symmetric(
+                                                  vertical: 12.0),
+                                              child: Text(
+                                                songsList[index],
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16.0),
+                                              ),
                                             ),
-                                          ),
-                                        ),*/
-                                      ],
-                                    ),
+                                          /*  Container(
+                                              child: Center(
+                                                child: Text(
+                                                  singersList[index],
+                                                  style: TextStyle(
+                                                      fontSize: 12.0,
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ),*/
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
+                        );
+                      },
+                    ),
+                  ),
+
+                ],
+              ),
+              Positioned(
+                bottom: 8.0,
+                child: Container(
+                 width: MediaQuery.of(context).size.width,
+                  height: 60,
+                  child: AdWidget(
+                    ad: myBanner,
+                  ),
                 ),
               ),
             ],
@@ -385,6 +400,7 @@ class _SongsListState extends State<SongsList> {
   @override
   void dispose() {
     super.dispose();
+    myBanner.dispose();
     player.fixedPlayer!.stop();
   }
 }

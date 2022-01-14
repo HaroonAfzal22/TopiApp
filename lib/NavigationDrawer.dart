@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:topi/Shared_Pref.dart';
 
 class Drawers extends StatefulWidget {
@@ -28,11 +28,7 @@ class _DrawersState extends State<Drawers> {
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       try {
         final isAvailable = await _inAppReview.isAvailable();
-
         setState(() {
-          // This plugin cannot be tested on Android by installing your app
-          // locally. See https://github.com/britannio/in_app_review#testing for
-          // more information.
           _availability = isAvailable && !Platform.isAndroid
               ? Availability.available
               : Availability.unavailable;
@@ -80,13 +76,14 @@ class _DrawersState extends State<Drawers> {
                 icon: CupertinoIcons.lock_shield_fill,
                 onClick: () {
                   Navigator.pop(context);
+                  Navigator.pushNamed(context, '/google_ads');
                 },
                 text: 'Privacy Policy'),
             listTiles(
-                icon:FontAwesomeIcons.shareSquare,
+                icon:FontAwesomeIcons.solidShareSquare,
                 onClick: (){
                   Navigator.pop(context);
-                  _openStoreListing();
+                  _shareLink();
                 },
                 text: 'Share'),
             listTiles(
@@ -109,12 +106,18 @@ class _DrawersState extends State<Drawers> {
   }
 
 }
+
+void _shareLink() {
+  Share.share('https://play.google.com/store/apps/details?id=com.topi.ai&hl=en&gl=US');
+  
+}
 //${SharedPref.getAppVersion()}
 Column listTiles(
     {required IconData icon, required String text, required var onClick}) {
   return Column(
     children: [
       ListTile(
+        minLeadingWidth: 8.0,
         leading: Icon(
           icon,
           color: Color(0xffFCCC44),
