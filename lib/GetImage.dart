@@ -5,9 +5,11 @@ import 'package:external_path/external_path.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -28,7 +30,8 @@ enum AppState {
   cropped,
 }
 
-class _ImagePickersState extends State<ImagePickers> {
+class _ImagePickersState extends State<ImagePickers>
+    with SingleTickerProviderStateMixin {
   late AppState state;
   File? imageFile;
   bool isLoading = false;
@@ -50,13 +53,24 @@ class _ImagePickersState extends State<ImagePickers> {
   RewardedAd? _rewardedAd;
   bool isInterstitialAdReady = false;
   bool isRewardedAdReady = false;
+  late AnimationController animationController;
 
   @override
   void initState() {
     super.initState();
     state = AppState.free;
-    /* myBanner= BannerAd(
-        size: adSize, adUnitId: 'ca-app-pub-3940256099942544/6300978111', listener: BannerAdListener(), request: AdRequest());*/
+    myBanner = BannerAd(
+        size: AdSize.mediumRectangle,
+        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+        listener: BannerAdListener(),
+        request: AdRequest());
+    animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 60),
+    );
+
+    animationController.addListener(() => setState(() {}));
+
     myNative = NativeAd(
       adUnitId: 'ca-app-pub-3940256099942544/2247696110',
       factoryId: 'listTile',
@@ -74,8 +88,10 @@ class _ImagePickersState extends State<ImagePickers> {
         },
       ),
     );
-    myNative!.load();
-    // myBanner!.load();
+    setState(() {
+      myNative!.load();
+    });
+    myBanner!.load();
     // _loadInterstitialAd();
     _loadRewardedAd();
     setTimer();
@@ -136,9 +152,13 @@ class _ImagePickersState extends State<ImagePickers> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
+    final percentage = animationController.value * 100;
     if (args != null) {
       setState(() {
         songs = args['song_name'];
+        if (percentage.toStringAsFixed(0) == '100') {
+          animationController.stop();
+        }
       });
     }
 
@@ -161,61 +181,161 @@ class _ImagePickersState extends State<ImagePickers> {
               ? isLoading
                   ? Container(
                       margin: EdgeInsets.only(top: 60.0),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Container(
-                              child: Lottie.asset('assets/waiting.json',
-                                  repeat: true, reverse: true, animate: true),
-                            ),
-                            AnimatedSwitcher(
-                              duration: Duration(milliseconds: 900),
-                              transitionBuilder:
-                                  (Widget child, Animation<double> animation) {
-                                return ScaleTransition(
-                                    scale: animation, child: child);
-                              },
-                              child: Text(
-                                '${userAnswer[pos]}',
-                                key: ValueKey<String>(userAnswer[pos]),
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 250,
+                            child: Lottie.asset('assets/waiting.json',
+                                repeat: true, reverse: true, animate: true),
+                          ),
+                          percentage.toStringAsFixed(0) == '100'
+                              ? Container(
+                                  margin: EdgeInsets.only(top: 8.0),
+                                  child: AnimatedSwitcher(
+                                    duration: Duration(milliseconds: 900),
+                                    transitionBuilder: (Widget child,
+                                        Animation<double> animation) {
+                                      return ScaleTransition(
+                                          scale: animation, child: child);
+                                    },
+                                    child: Text(
+                                      '${userAnswer[pos]}',
+                                      key: ValueKey<String>(userAnswer[pos]),
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.white),
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                          percentage.toStringAsFixed(0) != '100'
+                              ? Container(
+                                  width: double.infinity,
+                                  height: 60,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8.0, vertical: 8.0),
+                                  child: LiquidLinearProgressIndicator(
+                                    borderRadius: 24.0,
+                                    value: animationController.value,
+                                    valueColor: AlwaysStoppedAnimation(
+                                        Color(0xffFC9425)),
+                                    center: Text(
+                                      '${percentage.toStringAsFixed(0)}%',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    direction: Axis.horizontal,
+                                    backgroundColor: Colors.grey.shade300,
+                                  ),
+                                )
+                              : Container(),
+                          Expanded(child: Container()),
+                          isAdLoaded
+                              ? Container(
+                                  alignment: Alignment.bottomCenter,
+                                  color: Colors.white,
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 50,
+                                  child: AdWidget(
+                                    ad: myNative!,
+                                  ),
+                                )
+                              : Text('loading...')
+                        ],
                       ),
                     )
-                  : Container(
-                      child: Lottie.asset('assets/upload_file.json',
-                          repeat: true, reverse: true, animate: true),
+                  : ListView(
+                      children: [
+                        Container(
+                          height: 250,
+                          width: MediaQuery.of(context).size.width,
+                          child: AdWidget(
+                            ad: myBanner!,
+                          ),
+                        ),
+                        Container(
+                          height: 300,
+                          child: Lottie.asset('assets/upload_file.json',
+                              repeat: true, reverse: true, animate: true),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(
+                              vertical: 36.0, horizontal: 24.0),
+                          child: ElevatedButton.icon(
+                            style: ButtonStyle(
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(24.0))),
+                                padding: MaterialStateProperty.all(
+                                    EdgeInsets.symmetric(vertical: 12.0)),
+                                backgroundColor: MaterialStateProperty.all(
+                                  Colors.deepOrange,
+                                )),
+                            label: Text(
+                              "Upload Image",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                            onPressed: () {
+                              _pickImage();
+                            },
+                            icon: Icon(FontAwesomeIcons.upload),
+                          ),
+                        ),
+                      ],
                     )
-              : Column(
+              : ListView(
                   children: [
                     Container(
+                      height: 250,
+                      width: MediaQuery.of(context).size.width,
+                      child: AdWidget(
+                        ad: myBanner!,
+                      ),
+                    ),
+                    Container(
+                      height: 300,
                       child: Lottie.asset('assets/upload_file.json',
                           repeat: true, reverse: true, animate: true),
                     ),
-                    isAdLoaded
-                        ? Container(
+                    Container(
+                      margin: EdgeInsets.symmetric(
+                          vertical: 36.0, horizontal: 24.0),
+                      child: ElevatedButton.icon(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24.0))),
+                            padding: MaterialStateProperty.all(
+                                EdgeInsets.symmetric(vertical: 12.0)),
+                            backgroundColor: MaterialStateProperty.all(
+                              Colors.deepOrange,
+                            )),
+                        label: Text(
+                          "Upload Image",
+                          style: TextStyle(
                             color: Colors.white,
-                            width: MediaQuery.of(context).size.width,
-                            height: 100,
-                            child: AdWidget(
-                              ad: myNative!,
-                            ),
-                          )
-                        : Text('loading...'),
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        onPressed: () {
+                          _pickImage();
+                        },
+                        icon: Icon(FontAwesomeIcons.upload),
+                      ),
+                    ),
+
+                    /* isAdLoaded
+                        ?*/
+                    /* : Text('loading...')*/
                   ],
                 ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepOrange,
-        onPressed: () {
-          _pickImage();
-        },
-        child: _buildButtonIcon(),
       ),
     );
   }
@@ -245,11 +365,13 @@ class _ImagePickersState extends State<ImagePickers> {
       setState(() {
         isLoading = true;
         if (isRewardedAdReady) {
-                _rewardedAd?.show(onUserEarnedReward: (RewardedAd ad,RewardItem item){});
-
+          _rewardedAd?.show(
+              onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
         } else {
           toastShow('Ad not work');
+          _loadRewardedAd();
         }
+        animationController.repeat();
       });
       imageFile = croppedFile;
       if (songs == 'bamboleo') {
@@ -613,5 +735,6 @@ class _ImagePickersState extends State<ImagePickers> {
     super.dispose();
     timer.cancel();
     _timer.cancel();
+    animationController.dispose();
   }
 }

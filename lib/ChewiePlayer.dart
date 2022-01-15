@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path/path.dart' as path;
 import 'package:chewie/chewie.dart';
 import 'package:external_path/external_path.dart';
@@ -97,10 +98,40 @@ class VideoPlayers extends StatefulWidget {
   _VideoPlayersState createState() => _VideoPlayersState();
 }
 
-late var imagePaths;
-bool isLoading = false;
 
 class _VideoPlayersState extends State<VideoPlayers> {
+
+  late var imagePaths;
+  bool isLoading = false;
+  NativeAd? myNative;
+  bool isAdLoaded = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    myNative = NativeAd(
+      adUnitId: 'ca-app-pub-3940256099942544/2247696110',
+      factoryId: 'listTile',
+      request: AdRequest(),
+      listener: NativeAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (Ad ad) => {
+          setState(() {
+            isAdLoaded = true;
+          }),
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          print('natty $NativeAd failedToLoad: $error');
+          ad.dispose();
+        },
+      ),
+    );
+    setState(() {
+      myNative!.load();
+
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
@@ -131,50 +162,67 @@ class _VideoPlayersState extends State<VideoPlayers> {
                     videoPlayerController:
                         VideoPlayerController.file(File(imagePaths)),
                     childView: Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Column(
                         children: [
                           Expanded(
-                            child: Container(
-                              margin: EdgeInsets.symmetric(horizontal: 8.0),
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                      width: 1.0, color: Colors.redAccent),
-                                ),
-                                onPressed: () {
-                                  _onSave(context, imagePaths);
-                                },
-                                child: Text(
-                                  'Save',
-                                  style: TextStyle(
-                                    color: Colors.orange,
-                                    fontSize: 18.0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        side: BorderSide(
+                                            width: 1.0, color: Colors.redAccent),
+                                      ),
+                                      onPressed: () {
+                                        _onSave(context, imagePaths);
+                                      },
+                                      child: Text(
+                                        'Save',
+                                        style: TextStyle(
+                                          color: Colors.orange,
+                                          fontSize: 18.0,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                      width: 1.0, color: Colors.redAccent),
-                                ),
-                                onPressed: () {
-                                  _onShare(context, imagePaths.toString());
-                                },
-                                child: Text(
-                                  'Share',
-                                  style: TextStyle(
-                                    color: Colors.orange,
-                                    fontSize: 18.0,
+                                Expanded(
+                                  child: Container(
+                                    child: OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        side: BorderSide(
+                                            width: 1.0, color: Colors.redAccent),
+                                      ),
+                                      onPressed: () {
+                                        _onShare(context, imagePaths.toString());
+                                      },
+                                      child: Text(
+                                        'Share',
+                                        style: TextStyle(
+                                          color: Colors.orange,
+                                          fontSize: 18.0,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+
+                              ],
                             ),
                           ),
+
+                          isAdLoaded
+                              ?Container(
+                            color: Colors.white,
+                            height: 60,
+                            width: MediaQuery.of(context).size.width,
+                            child: AdWidget(
+                              ad:myNative!,
+                            ),
+                          ) : Text('loading...')
                         ],
                       ),
                     ),

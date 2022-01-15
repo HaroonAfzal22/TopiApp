@@ -367,11 +367,10 @@ class _SongsListState extends State<SongsList> {
                       },
                     ),
                   ),
-
                 ],
               ),
               Positioned(
-                bottom: 8.0,
+                bottom: 1.0,
                 child: Container(
                  width: MediaQuery.of(context).size.width,
                   height: 60,

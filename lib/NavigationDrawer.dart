@@ -76,7 +76,7 @@ class _DrawersState extends State<Drawers> {
                 icon: CupertinoIcons.lock_shield_fill,
                 onClick: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/google_ads');
+                 // Navigator.pushNamed(context, '/google_ads');
                 },
                 text: 'Privacy Policy'),
             listTiles(
@@ -90,7 +90,7 @@ class _DrawersState extends State<Drawers> {
                 icon: Icons.star,
                 onClick: () {
                   Navigator.pop(context);
-                  _requestReview();
+                  _openStoreListing();
                 },
                 text: 'Rate us'),
             listTiles(
