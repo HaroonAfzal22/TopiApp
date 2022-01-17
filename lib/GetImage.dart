@@ -46,7 +46,7 @@ class _ImagePickersState extends State<ImagePickers>
     'Where you can see a lot of new features...',
     'Downloading your magical image to video creation...',
   ];
-  late Timer _timer, timer;
+   Timer? _timer, timer;
   var songs;
   NativeAd? myNative;
   InterstitialAd? _interstitialAd;
@@ -257,7 +257,7 @@ class _ImagePickersState extends State<ImagePickers>
                         ),
                         Container(
                           height: 300,
-                          child: Lottie.asset('assets/upload_file.json',
+                          child: Lottie.asset('assets/upload.json',
                               repeat: true, reverse: true, animate: true),
                         ),
                         Container(
@@ -300,7 +300,7 @@ class _ImagePickersState extends State<ImagePickers>
                     ),
                     Container(
                       height: 300,
-                      child: Lottie.asset('assets/upload_file.json',
+                      child: Lottie.asset('assets/upload.json',
                           repeat: true, reverse: true, animate: true),
                     ),
                     Container(
@@ -414,7 +414,7 @@ class _ImagePickersState extends State<ImagePickers>
           List values = await dir!.list().toList();
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
-              timer.cancel();
+              timer!.cancel();
               Future.delayed(Duration(seconds: 10), () {
                 Navigator.pushNamed(context, '/video_players', arguments: {
                   'file': '${result.path}',
@@ -449,7 +449,7 @@ class _ImagePickersState extends State<ImagePickers>
           List values = await dir!.list().toList();
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
-              timer.cancel();
+              timer!.cancel();
               Future.delayed(Duration(seconds: 10), () {
                 Navigator.pushNamed(context, '/video_players', arguments: {
                   'file': '${result.path}',
@@ -484,7 +484,7 @@ class _ImagePickersState extends State<ImagePickers>
           List values = await dir!.list().toList();
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
-              timer.cancel();
+              timer!.cancel();
               Future.delayed(Duration(seconds: 10), () {
                 Navigator.pushNamed(context, '/video_players', arguments: {
                   'file': '${result.path}',
@@ -519,7 +519,7 @@ class _ImagePickersState extends State<ImagePickers>
           List values = await dir!.list().toList();
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
-              timer.cancel();
+              timer!.cancel();
               Future.delayed(Duration(seconds: 10), () {
                 Navigator.pushNamed(context, '/video_players', arguments: {
                   'file': '${result.path}',
@@ -554,7 +554,7 @@ class _ImagePickersState extends State<ImagePickers>
           List values = await dir!.list().toList();
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
-              timer.cancel();
+              timer!.cancel();
               Future.delayed(Duration(seconds: 10), () {
                 Navigator.pushNamed(context, '/video_players', arguments: {
                   'file': '${result.path}',
@@ -589,7 +589,7 @@ class _ImagePickersState extends State<ImagePickers>
           List values = await dir!.list().toList();
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
-              timer.cancel();
+              timer!.cancel();
               Future.delayed(Duration(seconds: 10), () {
                 Navigator.pushNamed(context, '/video_players', arguments: {
                   'file': '${result.path}',
@@ -624,7 +624,7 @@ class _ImagePickersState extends State<ImagePickers>
           List values = await dir!.list().toList();
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
-              timer.cancel();
+              timer!.cancel();
               Future.delayed(Duration(seconds: 10), () {
                 Navigator.pushNamed(context, '/video_players', arguments: {
                   'file': '${result.path}',
@@ -733,8 +733,8 @@ class _ImagePickersState extends State<ImagePickers>
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    timer.cancel();
-    _timer.cancel();
+    timer?.cancel();
+    _timer!.cancel();
     animationController.dispose();
   }
 }

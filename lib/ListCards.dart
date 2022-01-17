@@ -24,7 +24,7 @@ class ListCards extends StatelessWidget {
           ),
         ),
         Container(
-          margin: EdgeInsets.only(top: 6.0),
+          margin: EdgeInsets.only(top: 6.0,right: 8),
           child: Text(
             text,
             style: TextStyle(

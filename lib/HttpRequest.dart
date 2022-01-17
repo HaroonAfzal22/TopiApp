@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -304,9 +305,58 @@ class HttpRequest {
 
 
 
+Future getCategories(BuildContext context)async{
+    try{
 
+      Uri uri = Uri.parse(HttpLinks.getCategories);
+      Response response= await get(uri,headers: {
+        HttpHeaders.contentTypeHeader:'application/json',
+      });
+      if(response.statusCode==200){
+        return jsonDecode(response.body);
+      }else{
+        return response.statusCode;
+      }
+    }catch(e){
+      print('error $e');
+  }
 
+}
+Future getSongsList(BuildContext context,int id)async{
+    try{
+      Uri uri = Uri.parse('${HttpLinks.getCategories}/$id${HttpLinks.getSongs}');
+      Response response= await get(uri,headers: {
+        HttpHeaders.contentTypeHeader:'application/json',
+      });
+      if(response.statusCode==200){
+        return jsonDecode(response.body);
+      }else{
+        return response.statusCode;
+      }
+    }catch(e){
+      print('error $e');
+  }
 
+}
+
+  Future postFcmToken(BuildContext context, String? tokenFcm) async {
+    try {
+      Uri uri = Uri.parse(HttpLinks.postFcmToken);
+      Response response = await post(uri, body: {
+        'token': tokenFcm,
+      });
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else if (response.statusCode == 401) {
+        toastShow('Authorization Failure');
+      } else {
+        print(response.statusCode);
+        return response.statusCode;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
 
 /*Future parentLogin(BuildContext context, String email, String password,

@@ -50,7 +50,7 @@ snackShow(context, text) {
   );
 }
 
-var spinkit = SpinKitFadingCircle(
-  color: Colors.orangeAccent,
+var spinkit = SpinKitSpinningLines(
+  color: Colors.orange,
   size: 50.0,
 );

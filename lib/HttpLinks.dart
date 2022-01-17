@@ -11,6 +11,10 @@ class HttpLinks {
 
   static const String _baseLocalUrl = localUrl;
 
+  static const String baseUrl = 'http://59.103.234.58:8005/api';
+  static const String getCategories = '$baseUrl/categories';
+  static const String getSongs = '/songs';
+  static const String postFcmToken = '$baseUrl/fcm-token';
 
   static const String Url = '${_baseLocalUrl}students/';
   static const String loginUrl = '${_baseLocalUrl}student/signin';
