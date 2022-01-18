@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
+import 'package:topi/AppCategory.dart';
 import 'package:topi/CategoryList.dart';
 import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/GetImage.dart';
@@ -101,8 +102,9 @@ class _MyAppState extends State<MyApp> {
         '/in_app_review': (context) => InAppReviews(),
         '/video_players': (context) => VideoPlayers(),
         '/google_ads': (context) => Googles(),
+        '/app_category': (context) => AppCategory(),
       },
-      home: SongsList(),
+      home: AppCategory(),
     );
   }
 }

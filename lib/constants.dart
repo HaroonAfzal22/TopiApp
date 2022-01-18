@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -41,10 +42,7 @@ snackShow(context, text) {
       duration: const Duration(milliseconds: 3000), // default 4s
       content: Text(
         '$text',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16.0
-        ),
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
       ),
     ),
   );
@@ -54,3 +52,21 @@ var spinkit = SpinKitSpinningLines(
   color: Colors.orange,
   size: 50.0,
 );
+
+Container titleIcon(final setLogo, double d) {
+  return Container(
+    child: CircleAvatar(
+      radius: d,
+      backgroundColor: Colors.deepOrange,
+      child: Image.asset(
+        '$setLogo',
+        fit: BoxFit.fill,
+        /*  imageUrl: setLogo,
+        imageBuilder: (context, imageProvider) => CircleAvatar(
+          radius: d,
+          backgroundImage: imageProvider,
+        ),*/
+      ),
+    ),
+  );
+}

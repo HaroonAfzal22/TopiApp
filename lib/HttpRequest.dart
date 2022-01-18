@@ -358,6 +358,29 @@ Future getSongsList(BuildContext context,int id)async{
     }
   }
 
+  Future getCommunity(BuildContext context) async {
+    try {
+      Uri uri = Uri.parse('https://wasisoft.com/dev/index.php');
+      Response response = await get(
+        uri,
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else if (response.statusCode == 401) {
+        toastShow('UnAuthorized Error');
+      } else {
+        print(response.statusCode);
+        return response.statusCode;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
 
 /*Future parentLogin(BuildContext context, String email, String password,
       String? tokenFcm) async {

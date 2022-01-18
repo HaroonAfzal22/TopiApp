@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:new_version/new_version.dart';
 import 'package:topi/Gradient.dart';
@@ -106,21 +107,9 @@ class _SongsListState extends State<SongsList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black87,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        elevation: 0.0,
-        title: Image.asset(
-          'assets/topi.png',
-          fit: BoxFit.contain,
-          width: 80,
-          height: 80,
-        ),
-        centerTitle: true,
-      ),
-      drawer: Drawers(),
       drawerScrimColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton:isEnabled==true?
+      FloatingActionButton(
         backgroundColor: fabColor(),
         onPressed: isEnabled
             ? () {
@@ -206,10 +195,12 @@ class _SongsListState extends State<SongsList> {
             : () {
                 snackShow(context, 'please choose song first...');
               },
-        child: Icon(CupertinoIcons.arrow_up_doc_fill),
-      ),
-      bottomSheet: Padding(padding: EdgeInsets.only(bottom: 90.0)),
+        child: Icon(FontAwesomeIcons.fileImport),
+        tooltip: 'Upload Image',
+      ):Container(),
+      bottomSheet: Padding(padding: EdgeInsets.only(bottom: 150.0)),
       body: SafeArea(
+        bottom: false,
         child: BackgroundGradient(
           childView: isLoading
               ? Center(
@@ -218,7 +209,7 @@ class _SongsListState extends State<SongsList> {
               : Stack(
                   children: [
                     Container(
-                      margin: EdgeInsets.only(bottom: 55.0),
+                      margin: EdgeInsets.only(bottom: 110.0),
                       child: ListView(
                         physics: ScrollPhysics(),
                         children: [
@@ -240,7 +231,7 @@ class _SongsListState extends State<SongsList> {
                                       fit: BoxFit.fill,
                                       imageUrl: europeanCountries[index]
                                           ['category_image'],
-                                      width: 60,
+                                      width: 50,
                                       height: 50,
                                     ),
                                     onClicks: () {
@@ -250,9 +241,10 @@ class _SongsListState extends State<SongsList> {
                                   }
                                 }*/
                                       setState(() {
-                                  isLoading=true;
-                                });
-                                      getSongsList(europeanCountries[index]['id']);
+                                        isLoading = true;
+                                      });
+                                      getSongsList(
+                                          europeanCountries[index]['id']);
                                     });
                               },
                             ),
@@ -268,20 +260,28 @@ class _SongsListState extends State<SongsList> {
                               itemBuilder: (context, index) {
                                 if (isClick.length != songsList.length) {
                                   isClick.add(false);
-                                  selected.add(false);
+                                  // selected.add(false);
                                 }
                                 return GestureDetector(
                                   onTap: () {
                                     //   Navigator.pushNamed(context, '/share_file');
                                     setState(() {
-                                      if (isClick[index] == true) {
-                                        isClick[index] = false;
-                                        selected[index] = false;
-                                        isEnabled = false;
+                                      if (selected.contains(true)) {
+                                        if (selected[index] == true) {
+                                          selected[index] = false;
+                                          isEnabled = false;
+                                        } else {
+                                          selected = List.filled(
+                                              songsList.length, false);
+                                          selected[index] = true;
+                                          isEnabled = true;
+                                        }
                                       } else {
-                                        isClick[index] = true;
+                                        //isClick[index] = true;
                                         selected[index] = true;
+
                                         isEnabled = true;
+
                                         /* if (isClick.toList().elementAt(1) ||
                                       isClick.toList().elementAt(2) ||
                                       isClick.toList().elementAt(3) ||
@@ -293,6 +293,7 @@ class _SongsListState extends State<SongsList> {
                                   }*/
                                       }
                                     });
+                                    print('list of select $selected');
                                     if (isClick.toList().elementAt(0) == true) {
                                       player.play('bamboleo.mp3');
                                     } else if (isClick.toList().elementAt(1) ==
@@ -331,55 +332,71 @@ class _SongsListState extends State<SongsList> {
                                               side: new BorderSide(width: 1.0),
                                               borderRadius:
                                                   BorderRadius.circular(20.0)),
-                                      color:Color(int.parse('0xff${songsList[index]['color'].toString().substring(1,songsList[index]['color'].length)}')),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Expanded(
-                                                child: Icon(
-                                                  clickIcon(index),
-                                                  size: 40.0,
-                                                ),
-                                              ),
-                                              Expanded(
-                                                flex: 4,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    Container(
-                                                      margin:
-                                                          EdgeInsets.symmetric(
-                                                              vertical: 12.0),
-                                                      child: Text(
-                                                        'Title: ${songsList[index]['video_name']}',
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16.0),
-                                                      ),
-                                                    ),
-                                                    /*  Container(
-                                                child: Center(
-                                                  child: Text(
-                                                    singersList[index],
-                                                    style: TextStyle(
-                                                        fontSize: 12.0,
-                                                        color: Colors.white),
+                                      /* color:Color(int.parse('0xff${songsList[index]['color'].toString().substring(1,songsList[index]['color'].length)}')),*/
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.yellow,
+                                              Colors.orangeAccent,
+                                              Colors.deepOrange,
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Expanded(
+                                                  child: Icon(
+                                                    clickIcon(index),
+                                                    size: 40.0,
                                                   ),
                                                 ),
-                                              ),*/
-                                                  ],
+                                                Expanded(
+                                                  flex: 4,
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      Container(
+                                                        margin: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 12.0),
+                                                        child: Text(
+                                                          'Title: ${songsList[index]['video_name']}',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 16.0),
+                                                        ),
+                                                      ),
+                                                      /*  Container(
+                                                  child: Center(
+                                                    child: Text(
+                                                      singersList[index],
+                                                      style: TextStyle(
+                                                          fontSize: 12.0,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ),*/
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -391,7 +408,7 @@ class _SongsListState extends State<SongsList> {
                       ),
                     ),
                     Positioned(
-                      bottom: 1.0,
+                      bottom: 55.0,
                       child: Container(
                         width: MediaQuery.of(context).size.width,
                         height: 60,
@@ -410,7 +427,7 @@ class _SongsListState extends State<SongsList> {
   List<bool> isClick = [];
 
   clickIcon(index) {
-    if (isClick[index] == true) {
+    if (selected[index] == true) {
       return CupertinoIcons.pause;
     } else {
       return CupertinoIcons.play_fill;
@@ -443,7 +460,8 @@ class _SongsListState extends State<SongsList> {
 
     setState(() {
       songsList = songs;
-      isLoading=false;
+      selected = List.filled(songs.length, false);
+      isLoading = false;
     });
   }
 
