@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:topi/Gradient.dart';
+import 'package:topi/Shared_Pref.dart';
 import 'package:topi/constants.dart';
 import 'package:video_player/video_player.dart';
 
@@ -111,7 +112,7 @@ class _VideoPlayersState extends State<VideoPlayers> {
     // TODO: implement initState
     super.initState();
     myNative = NativeAd(
-      adUnitId: 'ca-app-pub-3940256099942544/2247696110',
+      adUnitId: SharedPref.getNativeAd(),
       factoryId: 'listTile',
       request: AdRequest(),
       listener: NativeAdListener(

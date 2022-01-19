@@ -8,6 +8,7 @@ import 'package:new_version/new_version.dart';
 import 'package:topi/ClassActivity.dart';
 import 'package:topi/Community.dart';
 import 'package:topi/Constants.dart';
+import 'package:topi/HttpRequest.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
 
@@ -19,12 +20,8 @@ class AppCategory extends StatefulWidget {
 }
 
 class _AppCategoryState extends State<AppCategory> {
-  var newColor = SharedPref.getSchoolColor(),
-      br = SharedPref.getBranchName(),
-      sc = SharedPref.getSchoolName();
-  var r = SharedPref.getRoleId();
+
   var log = 'assets/background.png';
-  var logos = SharedPref.getSchoolLogo();
   bool isLoading = false;
   int _page = 0;
   GlobalKey<CurvedNavigationBarState> _bottomsKey = GlobalKey();
@@ -40,31 +37,25 @@ class _AppCategoryState extends State<AppCategory> {
     // TODO: implement initState
     super.initState();
     //isLoading = true;
+    getAds();
    /* Future(() async {
       await setColor();
-      _checkVersion();
     });*/
+    _checkVersion();
+
   }
 
- /* Future setColor() async {
-    if (newColor == null && logos == null && br == null && sc == null) {
-      await getSchoolInfo(context);
-      await getSchoolColor();
-      setState(() {
-        newColor = SharedPref.getSchoolColor()!;
-        logos = SharedPref.getSchoolLogo();
-        br = SharedPref.getBranchName();
-        sc = SharedPref.getSchoolName();
-      });
-      if (newColor != null) {
-        isLoading = false;
-      }
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }*/
+  void getAds()async{
+    HttpRequest request= HttpRequest();
+    var result = await request.getAds(context);
+    await SharedPref.setBannerAd(result['banner_id']);
+    await SharedPref.setNativeAd(result['native_id']);
+    await SharedPref.setInterstitialAd(result['inter_id']);
+    await SharedPref.setRewardedAd(result['reward_id']);
+    print('result at $result');
+  }
+
+
 
   _checkVersion() async {
     final newVersion = NewVersion(androidId: "com.wasisoft.wsms");
@@ -226,72 +217,4 @@ class _AppCategoryState extends State<AppCategory> {
     super.dispose();
   }
 
-/*joinMeeting(BuildContext context) {
-    bool _isMeetingEnded(String status) {
-      var result = false;
-      print('is called');
-      if (Platform.isAndroid)
-        result = status == "MEETING_STATUS_DISCONNECTING" || status == "MEETING_STATUS_FAILED";
-      else
-        result = status == "MEETING_STATUS_IDLE";
-
-      return result;
-    }
-    if(mId.isNotEmpty && mPass.isNotEmpty){
-      ZoomOptions zoomOptions = new ZoomOptions(
-        domain: "zoom.us",
-        appKey: "OwDb6fY72qHf71tEGZtlfYyxEiBCdOaXbIBy", //API KEY FROM ZOOM
-        appSecret: "AFlUoisnwW1pkB2aGFMSDWudjpVlSRNIaQaj", //API SECRET FROM ZOOM
-      );
-      var meetingOptions = new ZoomMeetingOptions(
-          userId: '$sName', //pass username for join meeting only --- Any name eg:- EVILRATT.
-          meetingId: '$mId', //pass meeting id for join meeting only
-          meetingPassword: '$mPass', //pass meeting password for join meeting only
-          disableDialIn: "true",
-          disableDrive: "true",
-          disableInvite: "true",
-          disableShare: "true",
-          disableTitlebar: "false",
-          viewOptions: "true",
-          noAudio: "false",
-          noDisconnectAudio: "false"
-      );
-
-      var zoom = ZoomView();
-      zoom.initZoom(zoomOptions).then((results) {
-        if(results[0] == 0) {
-          zoom.onMeetingStatus().listen((status) {
-            print("[Meeting Status Stream] : " + status[0] + " - " + status[1]);
-            if (_isMeetingEnded(status[0])) {
-              print("[Meeting Status] :- Ended");
-              timer.cancel();
-            }
-          });
-          print("listen on event channel");
-          zoom.joinMeeting(meetingOptions).then((joinMeetingResult) {
-            timer = Timer.periodic(new Duration(seconds: 2), (timer) {
-              zoom.meetingStatus(meetingOptions.meetingId!)
-                  .then((status) {
-                print("[Meeting Status Polling] : " + status[0] + " - " + status[1]);
-              });
-            });
-          });
-        }
-      }).catchError((error) {
-        print("[Error Generated] : " + error);
-      });
-    }else{
-      if(mId.isEmpty){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Enter a valid meeting id to continue."),
-        ));
-      }
-      else if(mPass.isEmpty){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Enter a meeting password to start."),
-        ));
-      }
-    }
-
-  }*/
 }

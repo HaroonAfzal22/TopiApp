@@ -20,7 +20,7 @@ class SongsList extends StatefulWidget {
 }
 
 class _SongsListState extends State<SongsList> {
-  AudioCache player = AudioCache(fixedPlayer: AudioPlayer());
+  //AudioCache player = AudioCache(fixedPlayer: AudioPlayer());
   List europeanCountries = [];
   int? categoryId;
   int count = 0;
@@ -58,23 +58,24 @@ class _SongsListState extends State<SongsList> {
 
   fabColor() {
     if (isEnabled) {
-      return Colors.green;
+      return Colors.deepOrange;
     } else {
       return Colors.grey;
     }
   }
 
-  final BannerAd myBanner = BannerAd(
-      size: AdSize.banner,
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-      listener: BannerAdListener(),
-      request: AdRequest());
+   BannerAd?  myBanner = BannerAd(
+       size: AdSize.banner,
+       adUnitId: SharedPref.getBannerAd(),
+       listener: BannerAdListener(),
+       request: AdRequest());
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     isLoading = true;
+
     Future.delayed(Duration(seconds: 4), () {
       if (count == 0) {
         setState(() {
@@ -83,25 +84,11 @@ class _SongsListState extends State<SongsList> {
         });
       }
     });
-    myBanner.load();
-    // _checkVersion();
-    getCategoryList();
-  }
 
-  _checkVersion() async {
-    final newVersion = NewVersion(androidId: "com.topi.ai");
-    final status = await newVersion.getVersionStatus();
-    await SharedPref.setAppVersion(status!.storeVersion);
-    if (!status.storeVersion.contains(status.localVersion)) {
-      newVersion.showUpdateDialog(
-        context: context,
-        versionStatus: status,
-        dialogTitle: 'Update Available!!!',
-        dialogText:
-            'A new Version of TOPI.AI is available! which is ${status.storeVersion}. but your Version is  ${status.localVersion}.\n\n Would you Like to update it now?',
-        updateButtonText: 'Update Now',
-      );
-    }
+    myBanner!.load();
+
+    getCategoryList();
+
   }
 
   @override
@@ -111,10 +98,9 @@ class _SongsListState extends State<SongsList> {
       floatingActionButton:isEnabled==true?
       FloatingActionButton(
         backgroundColor: fabColor(),
-        onPressed: isEnabled
-            ? () {
-                player.fixedPlayer!.stop();
-                if (isClick.toList().elementAt(0) == true) {
+        onPressed: () {
+            //    player.fixedPlayer!.stop();
+               /* if (isClick.toList().elementAt(0) == true) {
                   setState(() {
                     isClick[0] = false;
                     selected[0] = false;
@@ -125,7 +111,8 @@ class _SongsListState extends State<SongsList> {
                   Navigator.pushNamed(context, '/image_pickers', arguments: {
                     'song_name': 'bamboleo',
                   });
-                } else if (isClick.toList().elementAt(1) == true) {
+                }
+                else if (isClick.toList().elementAt(1) == true) {
                   setState(() {
                     isClick[1] = false;
                     selected[1] = false;
@@ -136,7 +123,8 @@ class _SongsListState extends State<SongsList> {
                   Navigator.pushNamed(context, '/image_pickers', arguments: {
                     'song_name': 'munda_lahori',
                   });
-                } else if (isClick.toList().elementAt(2) == true) {
+                }
+                else if (isClick.toList().elementAt(2) == true) {
                   setState(() {
                     isClick[2] = false;
                     selected[2] = false;
@@ -147,7 +135,8 @@ class _SongsListState extends State<SongsList> {
                   Navigator.pushNamed(context, '/image_pickers', arguments: {
                     'song_name': 'patla_lak',
                   });
-                } else if (isClick.toList().elementAt(3) == true) {
+                }
+                else if (isClick.toList().elementAt(3) == true) {
                   setState(() {
                     isClick[3] = false;
                     selected[3] = false;
@@ -158,7 +147,8 @@ class _SongsListState extends State<SongsList> {
                   Navigator.pushNamed(context, '/image_pickers', arguments: {
                     'song_name': 'pani_pani',
                   });
-                } else if (isClick.toList().elementAt(4) == true) {
+                }
+                else if (isClick.toList().elementAt(4) == true) {
                   setState(() {
                     isClick[4] = false;
                     selected[4] = false;
@@ -169,7 +159,8 @@ class _SongsListState extends State<SongsList> {
                   Navigator.pushNamed(context, '/image_pickers', arguments: {
                     'song_name': 'athra_style',
                   });
-                } else if (isClick.toList().elementAt(5) == true) {
+                }
+                else if (isClick.toList().elementAt(5) == true) {
                   setState(() {
                     isClick[5] = false;
                     selected[5] = false;
@@ -180,7 +171,8 @@ class _SongsListState extends State<SongsList> {
                   Navigator.pushNamed(context, '/image_pickers', arguments: {
                     'song_name': 'eid_mubarak',
                   });
-                } else if (isClick.toList().elementAt(6) == true) {
+                }
+                else if (isClick.toList().elementAt(6) == true) {
                   setState(() {
                     isClick[6] = false;
                     selected[6] = false;
@@ -190,10 +182,10 @@ class _SongsListState extends State<SongsList> {
                   Navigator.pushNamed(context, '/image_pickers', arguments: {
                     'song_name': 'tera_suit',
                   });
-                }
-              }
-            : () {
-                snackShow(context, 'please choose song first...');
+                }*/
+                Navigator.pushNamed(context, '/image_pickers');
+                print('song id ${SharedPref.getSongId()}');
+                print('song premium ${SharedPref.getSongPremium()}');
               },
         child: Icon(FontAwesomeIcons.fileImport),
         tooltip: 'Upload Image',
@@ -258,65 +250,25 @@ class _SongsListState extends State<SongsList> {
                               physics: BouncingScrollPhysics(),
                               itemCount: songsList.length,
                               itemBuilder: (context, index) {
-                                if (isClick.length != songsList.length) {
-                                  isClick.add(false);
-                                  // selected.add(false);
-                                }
                                 return GestureDetector(
-                                  onTap: () {
-                                    //   Navigator.pushNamed(context, '/share_file');
+                                  onTap: () async{
                                     setState(() {
                                       if (selected.contains(true)) {
                                         if (selected[index] == true) {
                                           selected[index] = false;
                                           isEnabled = false;
                                         } else {
-                                          selected = List.filled(
-                                              songsList.length, false);
+                                          selected = List.filled(songsList.length, false);
                                           selected[index] = true;
                                           isEnabled = true;
                                         }
                                       } else {
-                                        //isClick[index] = true;
                                         selected[index] = true;
-
                                         isEnabled = true;
-
-                                        /* if (isClick.toList().elementAt(1) ||
-                                      isClick.toList().elementAt(2) ||
-                                      isClick.toList().elementAt(3) ||
-                                      isClick.toList().elementAt(4) ||
-                                      isClick.toList().elementAt(5) ||
-                                      isClick.toList().elementAt(6)) {
-                                    isEnabled = false;
-                                    snackShow(context, 'Coming Soon...');
-                                  }*/
                                       }
                                     });
-                                    print('list of select $selected');
-                                    if (isClick.toList().elementAt(0) == true) {
-                                      player.play('bamboleo.mp3');
-                                    } else if (isClick.toList().elementAt(1) ==
-                                        true) {
-                                      player.play('munda_shahar.mp3');
-                                    } else if (isClick.toList().elementAt(2) ==
-                                        true) {
-                                      player.play('patla_lak.mp3');
-                                    } else if (isClick.toList().elementAt(3) ==
-                                        true) {
-                                      player.play('pani_pani.mp3');
-                                    } else if (isClick.toList().elementAt(4) ==
-                                        true) {
-                                      player.play('athra_style.mp3');
-                                    } else if (isClick.toList().elementAt(5) ==
-                                        true) {
-                                      player.play('eid_mubarak.mp3');
-                                    } else if (isClick.toList().elementAt(6) ==
-                                        true) {
-                                      player.play('tera_suit.mp3');
-                                    } else {
-                                      player.fixedPlayer!.stop();
-                                    }
+                                    await SharedPref.setSongId(songsList[index]['id'].toString());
+                                    await SharedPref.setSongPremium(songsList[index]['premium'].toString());
                                   },
                                   child: Container(
                                     height: 100,
@@ -332,16 +284,16 @@ class _SongsListState extends State<SongsList> {
                                               side: new BorderSide(width: 1.0),
                                               borderRadius:
                                                   BorderRadius.circular(20.0)),
-                                      /* color:Color(int.parse('0xff${songsList[index]['color'].toString().substring(1,songsList[index]['color'].length)}')),*/
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(20.0),
                                           gradient: LinearGradient(
                                             colors: [
-                                              Colors.yellow,
-                                              Colors.orangeAccent,
-                                              Colors.deepOrange,
+                                              Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(0).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
+                                              Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(1).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
+                                              Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(2).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
+
                                             ],
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
@@ -353,16 +305,17 @@ class _SongsListState extends State<SongsList> {
                                           children: [
                                             Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
+                                                  MainAxisAlignment.spaceAround,
                                               children: [
-                                                Expanded(
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 8.0),
                                                   child: Icon(
                                                     clickIcon(index),
                                                     size: 40.0,
+                                                    color: Colors.white,
                                                   ),
                                                 ),
                                                 Expanded(
-                                                  flex: 4,
                                                   child: Column(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
@@ -377,7 +330,8 @@ class _SongsListState extends State<SongsList> {
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.white,
-                                                              fontSize: 16.0),
+                                                              fontWeight: FontWeight.w700,
+                                                              fontSize: 18.0),
                                                         ),
                                                       ),
                                                       /*  Container(
@@ -413,7 +367,7 @@ class _SongsListState extends State<SongsList> {
                         width: MediaQuery.of(context).size.width,
                         height: 60,
                         child: AdWidget(
-                          ad: myBanner,
+                          ad: myBanner!,
                         ),
                       ),
                     ),
@@ -468,7 +422,7 @@ class _SongsListState extends State<SongsList> {
   @override
   void dispose() {
     super.dispose();
-    myBanner.dispose();
-    player.fixedPlayer!.stop();
+    myBanner!.dispose();
+   // player.fixedPlayer!.stop();
   }
 }

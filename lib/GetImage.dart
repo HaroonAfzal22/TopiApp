@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:chewie/chewie.dart';
 import 'package:external_path/external_path.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,6 +17,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/HttpRequest.dart';
+import 'package:topi/Shared_Pref.dart';
 import 'package:topi/constants.dart';
 import 'package:video_player/video_player.dart';
 
@@ -39,14 +41,18 @@ class _ImagePickersState extends State<ImagePickers>
   bool isAdLoaded = false;
   var imagePaths;
   final AdSize adSize = AdSize(width: 320, height: 250);
-  BannerAd? myBanner;
+  BannerAd? myBanner= BannerAd(
+      size: AdSize.mediumRectangle,
+      adUnitId: SharedPref.getBannerAd(),
+      listener: BannerAdListener(),
+      request: AdRequest());
   int pos = 0;
   List userAnswer = [
     'Now Image is Processing to do some Magic...',
     'Where you can see a lot of new features...',
     'Downloading your magical image to video creation...',
   ];
-   Timer? _timer, timer;
+  Timer? _timer, timer;
   var songs;
   NativeAd? myNative;
   InterstitialAd? _interstitialAd;
@@ -59,11 +65,6 @@ class _ImagePickersState extends State<ImagePickers>
   void initState() {
     super.initState();
     state = AppState.free;
-    myBanner = BannerAd(
-        size: AdSize.mediumRectangle,
-        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-        listener: BannerAdListener(),
-        request: AdRequest());
     animationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 60),
@@ -72,7 +73,7 @@ class _ImagePickersState extends State<ImagePickers>
     animationController.addListener(() => setState(() {}));
 
     myNative = NativeAd(
-      adUnitId: 'ca-app-pub-3940256099942544/2247696110',
+      adUnitId: SharedPref.getNativeAd(),
       factoryId: 'listTile',
       request: AdRequest(),
       listener: NativeAdListener(
@@ -99,7 +100,7 @@ class _ImagePickersState extends State<ImagePickers>
 
   void _loadInterstitialAd() {
     InterstitialAd.load(
-        adUnitId: 'ca-app-pub-3940256099942544/8691691433',
+        adUnitId: SharedPref.getInterstitialAd(),
         request: AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(onAdLoaded: (ad) {
           this._interstitialAd = ad;
@@ -116,7 +117,7 @@ class _ImagePickersState extends State<ImagePickers>
 
   void _loadRewardedAd() {
     RewardedAd.load(
-        adUnitId: 'ca-app-pub-3940256099942544/5224354917',
+        adUnitId:SharedPref.getRewardedAd(),
         request: AdRequest(),
         rewardedAdLoadCallback: RewardedAdLoadCallback(onAdLoaded: (ad) {
           this._rewardedAd = ad;
@@ -151,16 +152,12 @@ class _ImagePickersState extends State<ImagePickers>
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map;
     final percentage = animationController.value * 100;
-    if (args != null) {
-      setState(() {
-        songs = args['song_name'];
-        if (percentage.toStringAsFixed(0) == '100') {
-          animationController.stop();
-        }
-      });
-    }
+    setState(() {
+      if (percentage.toStringAsFixed(0) == '100') {
+        animationController.stop();
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -183,11 +180,12 @@ class _ImagePickersState extends State<ImagePickers>
                       margin: EdgeInsets.only(top: 60.0),
                       child: Column(
                         children: [
+                          percentage.toStringAsFixed(0) == '100'?
                           Container(
                             height: 250,
                             child: Lottie.asset('assets/waiting.json',
                                 repeat: true, reverse: true, animate: true),
-                          ),
+                          ):Container(),
                           percentage.toStringAsFixed(0) == '100'
                               ? Container(
                                   margin: EdgeInsets.only(top: 8.0),
@@ -210,11 +208,10 @@ class _ImagePickersState extends State<ImagePickers>
                           percentage.toStringAsFixed(0) != '100'
                               ? Container(
                                   width: double.infinity,
-                                  height: 60,
+                                  height: 100,
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 8.0, vertical: 8.0),
                                   child: LiquidLinearProgressIndicator(
-                                    borderRadius: 24.0,
                                     value: animationController.value,
                                     valueColor: AlwaysStoppedAnimation(
                                         Color(0xffFC9425)),
@@ -340,19 +337,51 @@ class _ImagePickersState extends State<ImagePickers>
     );
   }
 
-  Widget _buildButtonIcon() {
-    return Icon(Icons.add);
+
+
+  static String getFileSizeString({required int bytes, int decimals = 0}) {
+    if (bytes <= 0) return "0 Bytes";
+    const suffixes = ["Bytes", "KB", "MB", "GB", "TB"];
+    var i = (log(bytes) / log(1024)).floor();
+    return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) + suffixes[i];
   }
 
   Future<Null> _pickImage() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     imageFile = pickedImage != null ? File(pickedImage.path) : null;
     if (imageFile != null) {
-      setState(() {
-        state = AppState.picked;
-        _cropImage();
-      });
+      var result = getFileSizeString(bytes: imageFile!.lengthSync());
+      if (result.contains('KB')) {
+        if (int.parse(result.substring(0, result.length - 2)) < 50) {
+          _onWillPop('Image quality too low, kindly upload best quality image for better result...');
+        } else {
+          setState(() {
+            isLoading = true;
+            predictSong();
+            if (isRewardedAdReady) {
+              _rewardedAd?.show(
+                  onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
+            } else {
+              toastShow('Ad not work');
+              _loadRewardedAd();
+            }
+            animationController.repeat();
+          });
+        }
+      } else {
+        setState(() {
+          isLoading = true;
+          predictSong();
+          if (isRewardedAdReady) {
+            _rewardedAd?.show(
+                onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
+          } else {
+            toastShow('Ad not work');
+            _loadRewardedAd();
+          }
+          animationController.repeat();
+        });
+      }
     }
   }
 
@@ -374,7 +403,7 @@ class _ImagePickersState extends State<ImagePickers>
         animationController.repeat();
       });
       imageFile = croppedFile;
-      if (songs == 'bamboleo') {
+  /*    if (songs == 'bamboleo') {
         print('0 is $songs');
         predictSong();
       } else if (songs == 'munda_lahori') {
@@ -395,13 +424,17 @@ class _ImagePickersState extends State<ImagePickers>
       } else if (songs == 'tera_suit') {
         print('6 is $songs');
         sixNpSong();
-      }
+      }*/
     }
   }
 
   predictSong() async {
+    Map<String,String> bodyMap ={
+      'id':SharedPref.getSongId(),
+      'type':SharedPref.getSongPremium()
+    };
     HttpRequest request = HttpRequest();
-    var result = await request.predictNp(context, imageFile);
+    var result = await request.predictNp(context,bodyMap, imageFile);
     if (result != null) {
       if (result == 504) {
         snackShow(context, '$result Server Error ');
@@ -409,9 +442,9 @@ class _ImagePickersState extends State<ImagePickers>
           isLoading = false;
         });
       } else {
-        timer = Timer.periodic(Duration(seconds: 1), (_) async {
-          var dir = await getExternalStorageDirectory();
-          List values = await dir!.list().toList();
+        var dir = await getExternalStorageDirectory();
+        List values = await dir!.list().toList();
+        timer = Timer.periodic(Duration(seconds: 1), (_) {
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
               timer!.cancel();
@@ -419,7 +452,9 @@ class _ImagePickersState extends State<ImagePickers>
                 Navigator.pushNamed(context, '/video_players', arguments: {
                   'file': '${result.path}',
                 });
-                isLoading = false;
+                setState(() {
+                  isLoading = false;
+                });
               });
             }
           }
@@ -433,7 +468,7 @@ class _ImagePickersState extends State<ImagePickers>
       });
     }
   }
-
+/*
   oneNpSong() async {
     HttpRequest request = HttpRequest();
     var result = await request.oneNp(context, imageFile);
@@ -642,7 +677,7 @@ class _ImagePickersState extends State<ImagePickers>
         _clearImage();
       });
     }
-  }
+  }*/
 
   void _clearImage() {
     imageFile = null;
@@ -651,83 +686,47 @@ class _ImagePickersState extends State<ImagePickers>
     });
   }
 
-  Future<bool> _onWillPop(image) async {
+  void _onWillPop(image) async {
     if (Platform.isIOS) {
-      return await showDialog(
-              context: context,
-              builder: (context) => CupertinoAlertDialog(
-                    title: Text('Are you sure?'),
-                    content: Container(
-                      child: Image.file(image),
-                    ),
-                    actions: <Widget>[
-                      CupertinoDialogAction(
-                        child: Text('No'),
-                        onPressed: () => Navigator.of(context).pop(false),
-                      ),
-                      CupertinoDialogAction(
-                        child: Text('Yes'),
-                        onPressed: () => Navigator.of(context).pop(true),
-                      ),
-                    ],
-                  )) ??
-          false;
+      await showDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+                title: Text('Warning!!!',style: TextStyle(fontSize: 16.0),),
+                content: Container(
+                  child: Text('$image'),
+                ),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                    child: Text('Ok'),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              ));
     } else {
-      return (await showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              backgroundColor: Color(0xffe8f6fa),
-              actionsPadding: EdgeInsets.symmetric(horizontal: 24.0),
-              content: Container(
-                height: 150,
-                child: _onPlay(context, File(image)),
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Warning!!!',style: TextStyle(fontSize: 16.0),),
+
+          backgroundColor: Color(0xffe8f6fa),
+          actionsPadding: EdgeInsets.symmetric(horizontal: 24.0),
+          content: Container(
+            child: Text('$image'),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor:MaterialStateProperty.all(Colors.deepOrange)
               ),
-              actions: <Widget>[
-                ElevatedButton(
-                  onPressed: () => _onSave(context),
-                  child: new Text('Save'),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.red)),
-                ),
-                ElevatedButton(
-                  onPressed: () => _onShare(context),
-                  child: new Text('Share'),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.red)),
-                ),
-              ],
+              onPressed: () => Navigator.of(context).pop(false),
+              child: new Text('Ok'),
             ),
-          )) ??
-          false;
+          ],
+        ),
+      );
     }
   }
 
-  _onPlay(BuildContext context, file) {
-    /* chewiePlayer(
-      videoPlayerController: VideoPlayerController.file(file),
-    );*/
-    print('isCalled $file');
-  }
-
-  void _onShare(BuildContext context) async {
-    final box = context.findRenderObject() as RenderBox?;
-    if (imagePaths != null) {
-      await Share.shareFiles(['$imagePaths'],
-          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
-    } else {
-      await Share.share(imageFile.toString(),
-          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
-    }
-  }
-
-  void _onSave(BuildContext context) async {
-    var dir = await ExternalPath.getExternalStoragePublicDirectory(
-        ExternalPath.DIRECTORY_DOWNLOADS);
-    /* var path = await File(
-      imagePaths.toString().substring(0, imagePaths.toString().length - 9),
-    ).rename('/storage/emulated/0/Downloads/');*/
-    //print('new path is $path');
-  }
 
   @override
   void dispose() {
