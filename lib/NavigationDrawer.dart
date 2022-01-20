@@ -73,12 +73,13 @@ class _DrawersState extends State<Drawers> {
             ),
             //listTiles class use for design drawer items
             listTiles(
-                icon: CupertinoIcons.lock_shield_fill,
+                icon: CupertinoIcons.profile_circled,
                 onClick: () {
                   Navigator.pop(context);
-                 // Navigator.pushNamed(context, '/google_ads');
+                  Navigator.pushNamed(context, '/about_us');
                 },
-                text: 'Privacy Policy'),
+                text: 'About us'),
+
             listTiles(
                 icon:FontAwesomeIcons.solidShareSquare,
                 onClick: (){
@@ -93,6 +94,13 @@ class _DrawersState extends State<Drawers> {
                   _openStoreListing();
                 },
                 text: 'Rate us'),
+            listTiles(
+                icon: CupertinoIcons.lock_shield_fill,
+                onClick: () {
+                  Navigator.pop(context);
+                  // Navigator.pushNamed(context, '/google_ads');
+                },
+                text: 'Privacy Policy'),
             listTiles(
                 icon: Icons.android_sharp,
                 onClick:  () {

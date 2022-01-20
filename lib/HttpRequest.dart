@@ -59,7 +59,7 @@ class HttpRequest {
 Future getCategories(BuildContext context)async{
     try{
 
-      Uri uri = Uri.parse(HttpLinks.getCategories);
+      Uri uri = Uri.parse(HttpLinks.getCategory);
       Response response= await get(uri,headers: {
         HttpHeaders.contentTypeHeader:'application/json',
       });
@@ -87,8 +87,22 @@ Future getSongsList(BuildContext context,int id)async{
     }catch(e){
       print('error $e');
   }
-
 }
+
+
+  Future getAboutUs(BuildContext context)async{
+    try{
+      Uri uri = Uri.parse('${HttpLinks.aboutUs}');
+      Response response= await get(uri);
+      if(response.statusCode==200){
+        return jsonDecode(response.body);
+      }else{
+        return response.statusCode;
+      }
+    }catch(e){
+      print('error $e');
+    }
+  }
 
   Future postFcmToken(BuildContext context, String? tokenFcm) async {
     try {

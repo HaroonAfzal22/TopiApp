@@ -60,7 +60,7 @@ class _ImagePickersState extends State<ImagePickers>
   bool isInterstitialAdReady = false;
   bool isRewardedAdReady = false;
   late AnimationController animationController;
-
+      double? percentage;
   @override
   void initState() {
     super.initState();
@@ -93,7 +93,7 @@ class _ImagePickersState extends State<ImagePickers>
       myNative!.load();
     });
     myBanner!.load();
-    // _loadInterstitialAd();
+     _loadInterstitialAd();
     _loadRewardedAd();
     setTimer();
   }
@@ -152,10 +152,17 @@ class _ImagePickersState extends State<ImagePickers>
 
   @override
   Widget build(BuildContext context) {
-    final percentage = animationController.value * 100;
+     percentage = animationController.value * 100;
     setState(() {
-      if (percentage.toStringAsFixed(0) == '100') {
+      if (percentage!.toStringAsFixed(0) == '100') {
         animationController.stop();
+        if (isInterstitialAdReady) {
+          _interstitialAd?.show();
+        } else {
+          toastShow('Ad not work');
+          _loadInterstitialAd();
+        }
+
       }
     });
 
@@ -177,16 +184,17 @@ class _ImagePickersState extends State<ImagePickers>
           child: imageFile != null
               ? isLoading
                   ? Container(
-                      margin: EdgeInsets.only(top: 60.0),
+                      margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/4),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          percentage.toStringAsFixed(0) == '100'?
+                          percentage!.toStringAsFixed(0) == '100'?
                           Container(
-                            height: 250,
+                            height: 350,
                             child: Lottie.asset('assets/waiting.json',
                                 repeat: true, reverse: true, animate: true),
                           ):Container(),
-                          percentage.toStringAsFixed(0) == '100'
+                          percentage!.toStringAsFixed(0) == '100'
                               ? Container(
                                   margin: EdgeInsets.only(top: 8.0),
                                   child: AnimatedSwitcher(
@@ -205,25 +213,25 @@ class _ImagePickersState extends State<ImagePickers>
                                   ),
                                 )
                               : Container(),
-                          percentage.toStringAsFixed(0) != '100'
+                          percentage!.toStringAsFixed(0) != '100'
                               ? Container(
-                                  width: double.infinity,
-                                  height: 100,
+                                  width: MediaQuery.of(context).size.width*0.7,
+                                  height: MediaQuery.of(context).size.height*0.3,
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 8.0, vertical: 8.0),
-                                  child: LiquidLinearProgressIndicator(
-                                    value: animationController.value,
+                                  child: LiquidCircularProgressIndicator(
+                                    value: double.parse('${animationController.value}'),
                                     valueColor: AlwaysStoppedAnimation(
                                         Color(0xffFC9425)),
                                     center: Text(
-                                      '${percentage.toStringAsFixed(0)}%',
+                                      '${percentage!.toStringAsFixed(0)}%',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
                                       ),
                                     ),
-                                    direction: Axis.horizontal,
+                                    direction: Axis.vertical,
                                     backgroundColor: Colors.grey.shade300,
                                   ),
                                 )
@@ -338,7 +346,6 @@ class _ImagePickersState extends State<ImagePickers>
   }
 
 
-
   static String getFileSizeString({required int bytes, int decimals = 0}) {
     if (bytes <= 0) return "0 Bytes";
     const suffixes = ["Bytes", "KB", "MB", "GB", "TB"];
@@ -365,7 +372,7 @@ class _ImagePickersState extends State<ImagePickers>
               toastShow('Ad not work');
               _loadRewardedAd();
             }
-            animationController.repeat();
+            animationController.forward();
           });
         }
       } else {
@@ -379,7 +386,7 @@ class _ImagePickersState extends State<ImagePickers>
             toastShow('Ad not work');
             _loadRewardedAd();
           }
-          animationController.repeat();
+          animationController.forward();
         });
       }
     }
@@ -436,12 +443,16 @@ class _ImagePickersState extends State<ImagePickers>
     HttpRequest request = HttpRequest();
     var result = await request.predictNp(context,bodyMap, imageFile);
     if (result != null) {
-      if (result == 504) {
-        snackShow(context, '$result Server Error ');
+      if (result == 504 ||result == 500) {
+        snackShow(context, '$result Server Error try again later...');
         setState(() {
           isLoading = false;
+          percentage = animationController.value * 0;
+          animationController.value = 0;
         });
-      } else {
+
+      }
+      else {
         var dir = await getExternalStorageDirectory();
         List values = await dir!.list().toList();
         timer = Timer.periodic(Duration(seconds: 1), (_) {
@@ -454,13 +465,18 @@ class _ImagePickersState extends State<ImagePickers>
                 });
                 setState(() {
                   isLoading = false;
+                  print('percentage bf $percentage');
+                  percentage = animationController.value * 0;
+                   animationController.value = 0;
+                  print('percentage af $percentage');
                 });
               });
             }
           }
         });
       }
-    } else {
+    }
+    else {
       setState(() {
         toastShow('Unable to Load!Check Internet Connectivity');
         isLoading = false;
@@ -468,216 +484,6 @@ class _ImagePickersState extends State<ImagePickers>
       });
     }
   }
-/*
-  oneNpSong() async {
-    HttpRequest request = HttpRequest();
-    var result = await request.oneNp(context, imageFile);
-    if (result != null) {
-      if (result == 504) {
-        snackShow(context, '$result Server Error ');
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        timer = Timer.periodic(Duration(seconds: 1), (_) async {
-          var dir = await getExternalStorageDirectory();
-          List values = await dir!.list().toList();
-          for (int i = 0; i < values.length; i++) {
-            if (values[i].toString().contains(result.path.toString())) {
-              timer!.cancel();
-              Future.delayed(Duration(seconds: 10), () {
-                Navigator.pushNamed(context, '/video_players', arguments: {
-                  'file': '${result.path}',
-                });
-                isLoading = false;
-              });
-            }
-          }
-        });
-      }
-    } else {
-      setState(() {
-        toastShow('Unable to Load!Check Internet Connectivity');
-        isLoading = false;
-        _clearImage();
-      });
-    }
-  }
-
-  twoNpSong() async {
-    HttpRequest request = HttpRequest();
-    var result = await request.twoNp(context, imageFile);
-    if (result != null) {
-      if (result == 504) {
-        snackShow(context, '$result Server Error ');
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        timer = Timer.periodic(Duration(seconds: 1), (_) async {
-          var dir = await getExternalStorageDirectory();
-          List values = await dir!.list().toList();
-          for (int i = 0; i < values.length; i++) {
-            if (values[i].toString().contains(result.path.toString())) {
-              timer!.cancel();
-              Future.delayed(Duration(seconds: 10), () {
-                Navigator.pushNamed(context, '/video_players', arguments: {
-                  'file': '${result.path}',
-                });
-                isLoading = false;
-              });
-            }
-          }
-        });
-      }
-    } else {
-      setState(() {
-        toastShow('Unable to Load!Check Internet Connectivity');
-        isLoading = false;
-        _clearImage();
-      });
-    }
-  }
-
-  threeNpSong() async {
-    HttpRequest request = HttpRequest();
-    var result = await request.threeNp(context, imageFile);
-    if (result != null) {
-      if (result == 504) {
-        snackShow(context, '$result Server Error ');
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        timer = Timer.periodic(Duration(seconds: 1), (_) async {
-          var dir = await getExternalStorageDirectory();
-          List values = await dir!.list().toList();
-          for (int i = 0; i < values.length; i++) {
-            if (values[i].toString().contains(result.path.toString())) {
-              timer!.cancel();
-              Future.delayed(Duration(seconds: 10), () {
-                Navigator.pushNamed(context, '/video_players', arguments: {
-                  'file': '${result.path}',
-                });
-                isLoading = false;
-              });
-            }
-          }
-        });
-      }
-    } else {
-      setState(() {
-        toastShow('Unable to Load!Check Internet Connectivity');
-        isLoading = false;
-        _clearImage();
-      });
-    }
-  }
-
-  fourNpSong() async {
-    HttpRequest request = HttpRequest();
-    var result = await request.fourNp(context, imageFile);
-    if (result != null) {
-      if (result == 504) {
-        snackShow(context, '$result Server Error ');
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        timer = Timer.periodic(Duration(seconds: 1), (_) async {
-          var dir = await getExternalStorageDirectory();
-          List values = await dir!.list().toList();
-          for (int i = 0; i < values.length; i++) {
-            if (values[i].toString().contains(result.path.toString())) {
-              timer!.cancel();
-              Future.delayed(Duration(seconds: 10), () {
-                Navigator.pushNamed(context, '/video_players', arguments: {
-                  'file': '${result.path}',
-                });
-                isLoading = false;
-              });
-            }
-          }
-        });
-      }
-    } else {
-      setState(() {
-        toastShow('Unable to Load!Check Internet Connectivity');
-        isLoading = false;
-        _clearImage();
-      });
-    }
-  }
-
-  fiveNpSong() async {
-    HttpRequest request = HttpRequest();
-    var result = await request.fiveNp(context, imageFile);
-    if (result != null) {
-      if (result == 504) {
-        snackShow(context, '$result Server Error ');
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        timer = Timer.periodic(Duration(seconds: 1), (_) async {
-          var dir = await getExternalStorageDirectory();
-          List values = await dir!.list().toList();
-          for (int i = 0; i < values.length; i++) {
-            if (values[i].toString().contains(result.path.toString())) {
-              timer!.cancel();
-              Future.delayed(Duration(seconds: 10), () {
-                Navigator.pushNamed(context, '/video_players', arguments: {
-                  'file': '${result.path}',
-                });
-                isLoading = false;
-              });
-            }
-          }
-        });
-      }
-    } else {
-      setState(() {
-        toastShow('Unable to Load!Check Internet Connectivity');
-        isLoading = false;
-        _clearImage();
-      });
-    }
-  }
-
-  sixNpSong() async {
-    HttpRequest request = HttpRequest();
-    var result = await request.sixNp(context, imageFile);
-    if (result != null) {
-      if (result == 504) {
-        snackShow(context, '$result Server Error ');
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        timer = Timer.periodic(Duration(seconds: 1), (_) async {
-          var dir = await getExternalStorageDirectory();
-          List values = await dir!.list().toList();
-          for (int i = 0; i < values.length; i++) {
-            if (values[i].toString().contains(result.path.toString())) {
-              timer!.cancel();
-              Future.delayed(Duration(seconds: 10), () {
-                Navigator.pushNamed(context, '/video_players', arguments: {
-                  'file': '${result.path}',
-                });
-                isLoading = false;
-              });
-            }
-          }
-        });
-      }
-    } else {
-      setState(() {
-        toastShow('Unable to Load!Check Internet Connectivity');
-        isLoading = false;
-        _clearImage();
-      });
-    }
-  }*/
 
   void _clearImage() {
     imageFile = null;

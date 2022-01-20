@@ -52,13 +52,12 @@ class _AppCategoryState extends State<AppCategory> {
     await SharedPref.setNativeAd(result['native_id']);
     await SharedPref.setInterstitialAd(result['inter_id']);
     await SharedPref.setRewardedAd(result['reward_id']);
-    print('result at $result');
   }
 
 
 
   _checkVersion() async {
-    final newVersion = NewVersion(androidId: "com.wasisoft.wsms");
+    final newVersion = NewVersion(androidId: "com.topi.ai");
     final status = await newVersion.getVersionStatus();
     await SharedPref.setAppVersion(status!.storeVersion);
 
@@ -68,7 +67,7 @@ class _AppCategoryState extends State<AppCategory> {
         versionStatus: status,
         dialogTitle: 'Update Available!!!',
         dialogText:
-            'A new Version of WSMS is available! Version ${status.storeVersion} but your Version is  ${status.localVersion}.\n\n Would you Like to update it now?',
+            'A new Version of Topi.Ai is available! Which is  Version ${status.storeVersion} but your Version is ${status.localVersion}.\n\n Would you Like to update it now?',
         updateButtonText: 'Update Now',
       );
     }

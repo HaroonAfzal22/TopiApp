@@ -84,12 +84,11 @@ class _SongsListState extends State<SongsList> {
         });
       }
     });
-
     myBanner!.load();
-
     getCategoryList();
-
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -100,89 +99,6 @@ class _SongsListState extends State<SongsList> {
         backgroundColor: fabColor(),
         onPressed: () {
             //    player.fixedPlayer!.stop();
-               /* if (isClick.toList().elementAt(0) == true) {
-                  setState(() {
-                    isClick[0] = false;
-                    selected[0] = false;
-                    clickIcon(0);
-                    isEnabled = false;
-                  });
-
-                  Navigator.pushNamed(context, '/image_pickers', arguments: {
-                    'song_name': 'bamboleo',
-                  });
-                }
-                else if (isClick.toList().elementAt(1) == true) {
-                  setState(() {
-                    isClick[1] = false;
-                    selected[1] = false;
-                    clickIcon(1);
-                    isEnabled = false;
-                  });
-
-                  Navigator.pushNamed(context, '/image_pickers', arguments: {
-                    'song_name': 'munda_lahori',
-                  });
-                }
-                else if (isClick.toList().elementAt(2) == true) {
-                  setState(() {
-                    isClick[2] = false;
-                    selected[2] = false;
-                    clickIcon(2);
-                    isEnabled = false;
-                  });
-
-                  Navigator.pushNamed(context, '/image_pickers', arguments: {
-                    'song_name': 'patla_lak',
-                  });
-                }
-                else if (isClick.toList().elementAt(3) == true) {
-                  setState(() {
-                    isClick[3] = false;
-                    selected[3] = false;
-                    clickIcon(3);
-                    isEnabled = false;
-                  });
-
-                  Navigator.pushNamed(context, '/image_pickers', arguments: {
-                    'song_name': 'pani_pani',
-                  });
-                }
-                else if (isClick.toList().elementAt(4) == true) {
-                  setState(() {
-                    isClick[4] = false;
-                    selected[4] = false;
-                    clickIcon(4);
-                    isEnabled = false;
-                  });
-
-                  Navigator.pushNamed(context, '/image_pickers', arguments: {
-                    'song_name': 'athra_style',
-                  });
-                }
-                else if (isClick.toList().elementAt(5) == true) {
-                  setState(() {
-                    isClick[5] = false;
-                    selected[5] = false;
-                    clickIcon(5);
-                    isEnabled = false;
-                  });
-
-                  Navigator.pushNamed(context, '/image_pickers', arguments: {
-                    'song_name': 'eid_mubarak',
-                  });
-                }
-                else if (isClick.toList().elementAt(6) == true) {
-                  setState(() {
-                    isClick[6] = false;
-                    selected[6] = false;
-                    clickIcon(6);
-                    isEnabled = false;
-                  });
-                  Navigator.pushNamed(context, '/image_pickers', arguments: {
-                    'song_name': 'tera_suit',
-                  });
-                }*/
                 Navigator.pushNamed(context, '/image_pickers');
                 print('song id ${SharedPref.getSongId()}');
                 print('song premium ${SharedPref.getSongPremium()}');
@@ -393,13 +309,11 @@ class _SongsListState extends State<SongsList> {
     var result =
         await request.postFcmToken(context, SharedPref.getUserFcmToken());
 
-    debugPrint('result $result');
   }
 
   void getCategoryList() async {
     HttpRequest request = HttpRequest();
     var result = await request.getCategories(context);
-
     setState(() {
       europeanCountries = result;
       categoryId = result[0]['id'];
@@ -411,7 +325,6 @@ class _SongsListState extends State<SongsList> {
   void getSongsList(int id) async {
     HttpRequest request = HttpRequest();
     var songs = await request.getSongsList(context, id);
-
     setState(() {
       songsList = songs;
       selected = List.filled(songs.length, false);

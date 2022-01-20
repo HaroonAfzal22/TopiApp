@@ -14,9 +14,12 @@ class HttpLinks {
   static const String _baseLocalUrl = localUrl;
 
   static const String baseUrl = 'http://59.103.234.58:8005/api';
-  static const String getCategories = '$baseUrl/categories';
+  static const String _baseUrl = 'http://59.103.234.58:8002/api';
+  static const String getCategories = '$_baseUrl/categories';
+  static const String getCategory = '$baseUrl/categories';
   static const String getSongs = '/songs';
   static const String postFcmToken = '$baseUrl/fcm-token';
+  static const String aboutUs = '$baseUrl/company/profilr';
 
   static const String AdsUrl = 'http://59.103.234.58:8005/api/adds/unit/id';
   static const String loginUrl = '${_baseLocalUrl}student/signin';
