@@ -14,6 +14,7 @@ import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/GetImage.dart';
 import 'package:topi/Google/GoogleAds.dart';
 import 'package:topi/InAppReview.dart';
+import 'package:topi/PrivacyPolicy.dart';
 import 'package:topi/ShareFile.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
@@ -105,6 +106,7 @@ class _MyAppState extends State<MyApp> {
         '/google_ads': (context) => Googles(),
         '/app_category': (context) => AppCategory(),
         '/about_us': (context) => AboutUs(),
+        '/privacy_policy': (context) => PrivacyPolicy(),
       },
       home: AppCategory(),
     );

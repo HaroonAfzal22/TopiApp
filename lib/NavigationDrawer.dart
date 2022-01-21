@@ -98,7 +98,7 @@ class _DrawersState extends State<Drawers> {
                 icon: CupertinoIcons.lock_shield_fill,
                 onClick: () {
                   Navigator.pop(context);
-                  // Navigator.pushNamed(context, '/google_ads');
+                   Navigator.pushNamed(context, '/privacy_policy');
                 },
                 text: 'Privacy Policy'),
             listTiles(

@@ -1,15 +1,16 @@
 class HttpLinks {
  // static const String _localUrl = 'http://192.168.1.8:83/api/';
-  static const String localUrl ='http://59.103.234.58:8002/create/video/with/image/demo';
+  static const String localUrl ='http://59.103.234.58:8002/demo_p';
   //title : bamboleo, artist gipsy kings
-
+  static const String oneUrl ='http://59.103.234.58:8002/one_np';
+/*
   static const String oneUrl ='http://59.103.234.58:8002/one_np';//title : Munda Shehar Lahore da, artist Naseebo Lal
   static const String twoUrl ='http://59.103.234.58:8002/two_np';//title : Lak wy Patla Lak wy, artist Naseebo Lal
   static const String threeUrl ='http://59.103.234.58:8002/three_np';//title : Blue ha Pani, artist Yo Yo honey Singh
   static const String fourUrl ='http://59.103.234.58:8002/four_np';//title : Athra Style Jatta, artist Sidhu Moosewala
   static const String fiveUrl ='http://59.103.234.58:8002/five_np';//title : Eid Mubarak, artist Aayat Arif
   static const String sixUrl ='http://59.103.234.58:8002/six_np';//title : Tera Suit, artist Tony Kakkar
-  static const String _globalLocalUrl = 'https://wasisoft.com/softwares/wsms/api/';
+  static const String _globalLocalUrl = 'https://wasisoft.com/softwares/wsms/api/';*/
 
   static const String _baseLocalUrl = localUrl;
 
@@ -20,6 +21,7 @@ class HttpLinks {
   static const String getSongs = '/songs';
   static const String postFcmToken = '$baseUrl/fcm-token';
   static const String aboutUs = '$baseUrl/company/profilr';
+  static const String privacyPolicy = '$baseUrl/privicy/policy';
 
   static const String AdsUrl = 'http://59.103.234.58:8005/api/adds/unit/id';
   static const String loginUrl = '${_baseLocalUrl}student/signin';

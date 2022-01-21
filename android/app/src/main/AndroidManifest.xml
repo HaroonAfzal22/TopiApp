@@ -11,6 +11,7 @@
         android:label="Topi"
         android:icon="@mipmap/ic_launcher"
        android:allowBackup="true"
+       android:usesCleartextTraffic="true"
        android:requestLegacyExternalStorage="true"
        android:fullBackupContent="true">
         <activity

@@ -20,7 +20,7 @@ class SongsList extends StatefulWidget {
 }
 
 class _SongsListState extends State<SongsList> {
-  //AudioCache player = AudioCache(fixedPlayer: AudioPlayer());
+  AudioPlayer audioPlayer= AudioPlayer();
   List europeanCountries = [];
   int? categoryId;
   int count = 0;
@@ -34,15 +34,7 @@ class _SongsListState extends State<SongsList> {
     'Artist: Aayat Arif',
     'Artist: Tony Kakkar',
   ];
-  final europeanFlags = [
-    'https://st2.depositphotos.com/1023173/6070/v/950/depositphotos_60708117-stock-illustration-red-hash-on-yellow.jpg',
-    'https://st3.depositphotos.com/6736296/33335/v/1600/depositphotos_333352716-stock-illustration-tik-tok-logo-editorial-vector.jpg',
-    'https://st2.depositphotos.com/4017237/6536/i/950/depositphotos_65367503-stock-photo-crumpled-flag-of-india.jpg',
-    'https://img.freepik.com/free-vector/flag-usa-united-states-america-background_53500-169.jpg?size=626&ext=jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/2560px-Flag_of_South_Korea.svg.png',
-    'https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/Flag_of_Russia.svg/1200px-Flag_of_Russia.svg.png',
-    'https://wallpapercave.com/wp/wp2571235.jpg'
-  ];
+
   final europeanColors = [
     Color(0xffffc3a0),
     Color(0xff6dd5ed),
@@ -75,7 +67,6 @@ class _SongsListState extends State<SongsList> {
     // TODO: implement initState
     super.initState();
     isLoading = true;
-
     Future.delayed(Duration(seconds: 4), () {
       if (count == 0) {
         setState(() {
@@ -98,10 +89,13 @@ class _SongsListState extends State<SongsList> {
       FloatingActionButton(
         backgroundColor: fabColor(),
         onPressed: () {
-            //    player.fixedPlayer!.stop();
+          setState(() {
+            stop();
+            selected = List.filled(songsList.length, false);
+            isClick = List.filled(songsList.length, false);
+            isEnabled=false;
+          });
                 Navigator.pushNamed(context, '/image_pickers');
-                print('song id ${SharedPref.getSongId()}');
-                print('song premium ${SharedPref.getSongPremium()}');
               },
         child: Icon(FontAwesomeIcons.fileImport),
         tooltip: 'Upload Image',
@@ -118,163 +112,184 @@ class _SongsListState extends State<SongsList> {
                   children: [
                     Container(
                       margin: EdgeInsets.only(bottom: 110.0),
-                      child: ListView(
-                        physics: ScrollPhysics(),
-                        children: [
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Container(
-                            height: 100,
-                            child: ListView.builder(
-                              physics: ScrollPhysics(),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: europeanCountries.length,
-                              itemBuilder: (context, index) {
-                                return ListCards(
-                                    text: europeanCountries[index]
-                                        ['category_name'],
-                                    images: CachedNetworkImage(
-                                      key: UniqueKey(),
-                                      fit: BoxFit.fill,
-                                      imageUrl: europeanCountries[index]
-                                          ['category_image'],
-                                      width: 50,
-                                      height: 50,
-                                    ),
-                                    onClicks: () {
-                                      /* for (int i = index + 1; i < 7; i++) {
-                                  if (isClick.toList().elementAt(i)) {
-                                    snackShow(context, 'Coming Soon...');
-                                  }
-                                }*/
-                                      setState(() {
-                                        isLoading = true;
-                                      });
-                                      getSongsList(
-                                          europeanCountries[index]['id']);
-                                    });
-                              },
+                      child: RefreshIndicator(
+                        onRefresh: getCategoryList,
+                        child: ListView(
+                          physics: AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(
+                              height: 8,
                             ),
-                          ),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Container(
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: BouncingScrollPhysics(),
-                              itemCount: songsList.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () async{
-                                    setState(() {
-                                      if (selected.contains(true)) {
-                                        if (selected[index] == true) {
-                                          selected[index] = false;
-                                          isEnabled = false;
+                            Container(
+                              height: 100,
+                              child: ListView.builder(
+                                physics: AlwaysScrollableScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: europeanCountries.length,
+                                itemBuilder: (context, index) {
+                                  return ListCards(
+                                      text: europeanCountries[index]
+                                          ['category_name'],
+                                      images: CachedNetworkImage(
+                                        key: UniqueKey(),
+                                        fit: BoxFit.fill,
+                                        imageUrl: europeanCountries[index]
+                                            ['category_image'],
+                                        width: 50,
+                                        height: 50,
+                                      ),
+                                      onClicks: () {
+                                        /* for (int i = index + 1; i < 7; i++) {
+                                    if (isClick.toList().elementAt(i)) {
+                                      snackShow(context, 'Coming Soon...');
+                                    }
+                                  }*/
+                                        setState(() {
+                                          isLoading = true;
+                                        });
+                                        getSongsList(
+                                            europeanCountries[index]['id']);
+                                      });
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                            Container(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: BouncingScrollPhysics(),
+                                itemCount: songsList.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () async{
+                                      setState(() {
+                                        if (selected.contains(true)) {
+                                          if (selected[index] == true) {
+                                            selected[index] = false;
+                                            isEnabled = false;
+                                          } else {
+                                            selected = List.filled(songsList.length, false);
+                                            selected[index] = true;
+                                            isEnabled = true;
+                                          }
                                         } else {
-                                          selected = List.filled(songsList.length, false);
                                           selected[index] = true;
                                           isEnabled = true;
                                         }
-                                      } else {
-                                        selected[index] = true;
-                                        isEnabled = true;
-                                      }
-                                    });
-                                    await SharedPref.setSongId(songsList[index]['id'].toString());
-                                    await SharedPref.setSongPremium(songsList[index]['premium'].toString());
-                                  },
-                                  child: Container(
-                                    height: 100,
-                                    child: Card(
-                                      shape: selected[index] == true
-                                          ? new RoundedRectangleBorder(
-                                              side: new BorderSide(
-                                                  color: Colors.white,
-                                                  width: 4.0),
-                                              borderRadius:
-                                                  BorderRadius.circular(20.0))
-                                          : new RoundedRectangleBorder(
-                                              side: new BorderSide(width: 1.0),
-                                              borderRadius:
-                                                  BorderRadius.circular(20.0)),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20.0),
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(0).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
-                                              Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(1).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
-                                              Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(2).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
-
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          ),
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.only(left: 8.0),
-                                                  child: Icon(
-                                                    clickIcon(index),
-                                                    size: 40.0,
+                                      });
+                                      await SharedPref.setSongId(songsList[index]['id'].toString());
+                                      await SharedPref.setSongPremium(songsList[index]['premium'].toString());
+                                    },
+                                    child: Container(
+                                      height: 100,
+                                      child: Card(
+                                        shape: selected[index] == true
+                                            ? new RoundedRectangleBorder(
+                                                side: new BorderSide(
                                                     color: Colors.white,
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: [
-                                                      Container(
-                                                        margin: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 12.0),
-                                                        child: Text(
-                                                          'Title: ${songsList[index]['video_name']}',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontWeight: FontWeight.w700,
-                                                              fontSize: 18.0),
-                                                        ),
-                                                      ),
-                                                      /*  Container(
-                                                  child: Center(
-                                                    child: Text(
-                                                      singersList[index],
-                                                      style: TextStyle(
-                                                          fontSize: 12.0,
-                                                          color: Colors.white),
+                                                    width: 4.0),
+                                                borderRadius:
+                                                    BorderRadius.circular(20.0))
+                                            : new RoundedRectangleBorder(
+                                                side: new BorderSide(width: 1.0),
+                                                borderRadius:
+                                                    BorderRadius.circular(20.0)),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(0).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
+                                                Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(1).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
+                                                Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(2).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.spaceAround,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(left: 8.0),
+                                                    child: IconButton(
+                                                      iconSize: 40.0,
+                                                      color: Colors.white,
+                                                        icon:Icon(clickIcon(index)),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          if (isClick.contains(true)) {
+                                                            if (isClick[index] == true) {
+                                                              isClick[index] = false;
+                                                              print('stop');
+                                                              stop();
+                                                            } else {
+                                                              isClick = List.filled(songsList.length, false);
+                                                              isClick[index] = true;
+                                                              print('play isclick false');                                                                                       play(songsList[index]['audio']);
+                                                            }
+                                                          } else {
+                                                            isClick[index] = true;
+                                                            print('play isClick not contain');
+                                                            play(songsList[index]['audio']);
+                                                          }
+                                                        });
+                                                      },
                                                     ),
                                                   ),
-                                                ),*/
-                                                    ],
+                                                  Expanded(
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        Container(
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 12.0),
+                                                          child: Text(
+                                                            'Title: ${songsList[index]['video_name']}',
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.white,
+                                                                fontWeight: FontWeight.w700,
+                                                                fontSize: 18.0),
+                                                          ),
+                                                        ),
+                                                        /*  Container(
+                                                    child: Center(
+                                                      child: Text(
+                                                        singersList[index],
+                                                        style: TextStyle(
+                                                            fontSize: 12.0,
+                                                            color: Colors.white),
+                                                      ),
+                                                    ),
+                                                  ),*/
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     Positioned(
@@ -294,10 +309,25 @@ class _SongsListState extends State<SongsList> {
     );
   }
 
+  play(index)async{
+    print('index $index');
+    int result = await audioPlayer.play(index,volume: 10.0);
+    if(result==1){
+      print('playing..');
+    }
+
+  }
+  stop()async{
+    int result = await audioPlayer.stop();
+    if(result ==1 ){
+      print('stop song ');
+    }
+  }
+
   List<bool> isClick = [];
 
   clickIcon(index) {
-    if (selected[index] == true) {
+    if (isClick[index] == true) {
       return CupertinoIcons.pause;
     } else {
       return CupertinoIcons.play_fill;
@@ -311,7 +341,7 @@ class _SongsListState extends State<SongsList> {
 
   }
 
-  void getCategoryList() async {
+  Future<void> getCategoryList() async {
     HttpRequest request = HttpRequest();
     var result = await request.getCategories(context);
     setState(() {
@@ -325,17 +355,25 @@ class _SongsListState extends State<SongsList> {
   void getSongsList(int id) async {
     HttpRequest request = HttpRequest();
     var songs = await request.getSongsList(context, id);
-    setState(() {
-      songsList = songs;
-      selected = List.filled(songs.length, false);
-      isLoading = false;
-    });
+    if(songs==500){
+      snackShow(context, '$songs Error try again later...');
+      setState(() {
+        isLoading=false;
+      });
+    }else {
+      setState(() {
+        songsList = songs;
+        selected = List.filled(songs.length, false);
+        isClick = List.filled(songs.length, false);
+        isLoading = false;
+      });
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
     myBanner!.dispose();
-   // player.fixedPlayer!.stop();
+    audioPlayer.stop();
   }
 }

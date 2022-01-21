@@ -138,6 +138,7 @@ class _VideoPlayersState extends State<VideoPlayers> {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     if (args['file'] != null) {
       imagePaths = args['file'];
+      print('image $imagePaths');
     }
     return Scaffold(
       appBar: AppBar(

@@ -295,7 +295,7 @@ BetterPlayerPlaylistController? _configuration;
                               text: TextSpan(
                                   children: [
                                 TextSpan(
-                                    text: 'Topi',
+                                    text: 'Topi ',
                                     style: TextStyle(
                                         fontSize: 12.0,
                                         color: Color(0xff262626),

@@ -410,28 +410,6 @@ class _ImagePickersState extends State<ImagePickers>
         animationController.repeat();
       });
       imageFile = croppedFile;
-  /*    if (songs == 'bamboleo') {
-        print('0 is $songs');
-        predictSong();
-      } else if (songs == 'munda_lahori') {
-        print('1 is $songs');
-        oneNpSong();
-      } else if (songs == 'patla_lak') {
-        print('2 is $songs');
-        twoNpSong();
-      } else if (songs == 'pani_pani') {
-        print('3 is $songs');
-        threeNpSong();
-      } else if (songs == 'athra_style') {
-        print('4 is $songs');
-        fourNpSong();
-      } else if (songs == 'eid_mubarak') {
-        print('5 is $songs');
-        fiveNpSong();
-      } else if (songs == 'tera_suit') {
-        print('6 is $songs');
-        sixNpSong();
-      }*/
     }
   }
 
@@ -440,7 +418,8 @@ class _ImagePickersState extends State<ImagePickers>
       'id':SharedPref.getSongId(),
       'type':SharedPref.getSongPremium()
     };
-    HttpRequest request = HttpRequest();
+    HttpRequest request = HttpRequest();    print('result ${imageFile!.path}');
+
     var result = await request.predictNp(context,bodyMap, imageFile);
     if (result != null) {
       if (result == 504 ||result == 500) {
@@ -450,7 +429,6 @@ class _ImagePickersState extends State<ImagePickers>
           percentage = animationController.value * 0;
           animationController.value = 0;
         });
-
       }
       else {
         var dir = await getExternalStorageDirectory();
@@ -465,10 +443,8 @@ class _ImagePickersState extends State<ImagePickers>
                 });
                 setState(() {
                   isLoading = false;
-                  print('percentage bf $percentage');
                   percentage = animationController.value * 0;
                    animationController.value = 0;
-                  print('percentage af $percentage');
                 });
               });
             }
@@ -478,8 +454,10 @@ class _ImagePickersState extends State<ImagePickers>
     }
     else {
       setState(() {
-        toastShow('Unable to Load!Check Internet Connectivity');
+        toastShow('Unable to Load!!! try again later...');
         isLoading = false;
+        percentage = animationController.value * 0;
+        animationController.value = 0;
         _clearImage();
       });
     }

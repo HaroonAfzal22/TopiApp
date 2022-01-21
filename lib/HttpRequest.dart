@@ -17,6 +17,8 @@ class HttpRequest {
     try {
       Uri uri = Uri.parse(HttpLinks.localUrl);
       var stream = ByteStream(image.openRead());
+      print('uri $uri');
+
       stream.cast();
       var length = await image.length();
       var request = MultipartRequest('POST', uri)
@@ -28,9 +30,9 @@ class HttpRequest {
             filename: image.path,
             contentType: MediaType('Content-Type', "multipart/form-data"),
           ),);
-      request.fields.addAll(bodyMap);
-      print('response $request');
+     // request.fields.addAll(bodyMap);
       var response = await request.send();
+
       if (response.statusCode == 200) {
         final directory = await getExternalStorageDirectory();
         var file = File('${directory!.path}/video$count.mp4');
@@ -43,6 +45,7 @@ class HttpRequest {
         });
         print('fiile is $file');
         return file;
+
 
       } else if (response.statusCode == 401) {
         // removeAccount(context);
@@ -93,6 +96,20 @@ Future getSongsList(BuildContext context,int id)async{
   Future getAboutUs(BuildContext context)async{
     try{
       Uri uri = Uri.parse('${HttpLinks.aboutUs}');
+      Response response= await get(uri);
+      if(response.statusCode==200){
+        return jsonDecode(response.body);
+      }else{
+        return response.statusCode;
+      }
+    }catch(e){
+      print('error $e');
+    }
+  }
+
+  Future getPrivacyPolicy(BuildContext context)async{
+    try{
+      Uri uri = Uri.parse('${HttpLinks.privacyPolicy}');
       Response response= await get(uri);
       if(response.statusCode==200){
         return jsonDecode(response.body);

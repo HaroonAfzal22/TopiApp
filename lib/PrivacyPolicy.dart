@@ -10,14 +10,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:topi/HttpRequest.dart';
 import 'package:topi/constants.dart';
 
-class AboutUs extends StatefulWidget {
-  const AboutUs({Key? key}) : super(key: key);
+class PrivacyPolicy extends StatefulWidget {
+  const PrivacyPolicy({Key? key}) : super(key: key);
 
   @override
-  State<AboutUs> createState() => _AboutUsState();
+  State<PrivacyPolicy> createState() => _PrivacyPolicyState();
 }
 
-class _AboutUsState extends State<AboutUs> {
+class _PrivacyPolicyState extends State<PrivacyPolicy> {
   @override
   void initState() {
     // TODO: implement initState
@@ -29,11 +29,11 @@ String? filePath;
   void pdfResponse() async {
     HttpRequest request = HttpRequest();
 
-    var value = await request.getAboutUs(context);
-    Uri uri = Uri.parse(value['profile']);
+    var value = await request.getPrivacyPolicy(context);
+    Uri uri = Uri.parse(value['policy']);
     var response = await get(uri);
     var dir = await getTemporaryDirectory();
-    File file = File(dir.path+'/profile.pdf');
+    File file = File(dir.path+'/policy.pdf');
     setState(() {
       filePath=file.path;
     });
@@ -48,7 +48,7 @@ String? filePath;
           backgroundColor: Colors.black87,
           systemOverlayStyle: SystemUiOverlayStyle.light,
           title: Text(
-            'Company Profile',
+            'Privacy Policy',
             style: TextStyle(color: Colors.deepOrange),
           ),
         ),
