@@ -15,14 +15,15 @@ class HttpRequest {
 
   Future predictNp(BuildContext context,Map<String,String>bodyMap, var image) async {
     try {
-      Uri uri = Uri.parse(HttpLinks.localUrl);
+      Uri uri = Uri.parse(HttpLinks.localsUrl);
       var stream = ByteStream(image.openRead());
       print('uri $uri');
 
       stream.cast();
       var length = await image.length();
-      var request = MultipartRequest('POST', uri)
-        ..files.add(
+      var request = MultipartRequest('POST', uri);
+        //  request.headers['content-length']='50000';
+        request.files.add(
           MultipartFile(
             'file1',
             stream,
@@ -30,7 +31,15 @@ class HttpRequest {
             filename: image.path,
             contentType: MediaType('Content-Type', "multipart/form-data"),
           ),);
-     // request.fields.addAll(bodyMap);
+
+      print('request file ${ MultipartFile(
+        'file1',
+        stream,
+        length,
+        filename: image.path,
+        contentType: MediaType('Content-Type', "multipart/form-data"),
+      ).length}');
+      request.fields.addAll(bodyMap);
       var response = await request.send();
 
       if (response.statusCode == 200) {
@@ -58,6 +67,60 @@ class HttpRequest {
       print(e);
     }
   }
+
+
+ /* Future predictNp(BuildContext context,Map<String,String>bodyMap, var image) async {
+    try {
+      Uri uri = Uri.parse(HttpLinks.localUrl);
+     *//* var stream = ByteStream(image.openRead());
+      print('uri $uri');
+
+      stream.cast();
+      var length = await image.length();
+      var request = MultipartRequest('POST', uri)
+        ..files.add(
+          MultipartFile(
+            'file1',
+            stream,
+            length,
+            filename: image.path,
+            contentType: MediaType('Content-Type', "multipart/form-data"),
+          ),);
+
+      request.fields.addAll(bodyMap);
+      var response = await request.send();*//*
+      Response response = await post(uri,
+          headers: {
+        HttpHeaders.contentTypeHeader:'application/x-www-form-urlencoded',
+      },
+          body:bodyMap);
+
+      if (response.statusCode == 200) {
+       *//* final directory = await getExternalStorageDirectory();
+        var file = File('${directory!.path}/video$count.mp4');
+        var bytes = <int>[];
+        response.stream.listen((value) {
+          bytes.addAll(value);
+        }, onDone: () async {
+          count++;
+          await file.writeAsBytes(bytes);
+        });
+        print('fiile is $file');
+        return file;
+
+*//*
+        print("response ${response.body}");
+      } else if (response.statusCode == 401) {
+        // removeAccount(context);
+        toastShow('Authorization Failure');
+      } else {
+        print(response.statusCode);
+        return response.statusCode;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }*/
 
 Future getCategories(BuildContext context)async{
     try{

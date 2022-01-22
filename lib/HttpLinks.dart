@@ -1,6 +1,7 @@
 class HttpLinks {
  // static const String _localUrl = 'http://192.168.1.8:83/api/';
-  static const String localUrl ='http://59.103.234.58:8002/demo_p';
+  static const String localUrl ='http://59.103.234.58:8002/create/video/with/image/demo';
+  static const String localsUrl ='http://59.103.234.58:8002/demo_p';
   //title : bamboleo, artist gipsy kings
   static const String oneUrl ='http://59.103.234.58:8002/one_np';
 /*

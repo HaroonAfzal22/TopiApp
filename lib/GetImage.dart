@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:chewie/chewie.dart';
 import 'package:external_path/external_path.dart';
 import 'package:flutter/cupertino.dart';
@@ -359,15 +361,14 @@ class _ImagePickersState extends State<ImagePickers>
     if (imageFile != null) {
       var result = getFileSizeString(bytes: imageFile!.lengthSync());
       if (result.contains('KB')) {
-        if (int.parse(result.substring(0, result.length - 2)) < 50) {
+        if (int.parse(result.substring(0, result.length - 2)) < 40) {
           _onWillPop('Image quality too low, kindly upload best quality image for better result...');
         } else {
           setState(() {
             isLoading = true;
             predictSong();
             if (isRewardedAdReady) {
-              _rewardedAd?.show(
-                  onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
+              _rewardedAd?.show(onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
             } else {
               toastShow('Ad not work');
               _loadRewardedAd();
@@ -414,13 +415,19 @@ class _ImagePickersState extends State<ImagePickers>
   }
 
   predictSong() async {
+    /*final bytes= File(imageFile!.path).readAsBytesSync();
+    String base64Image = base64Encode(bytes);
+    Uint8List base = base64Decode(base64Image);
+    print('image decode ${Image.memory(base)}');*/
     Map<String,String> bodyMap ={
       'id':SharedPref.getSongId(),
-      'type':SharedPref.getSongPremium()
+      'type':SharedPref.getSongPremium(),
     };
-    HttpRequest request = HttpRequest();    print('result ${imageFile!.path}');
+    HttpRequest request = HttpRequest();
 
     var result = await request.predictNp(context,bodyMap, imageFile);
+
+    print('response is $result');
     if (result != null) {
       if (result == 504 ||result == 500) {
         snackShow(context, '$result Server Error try again later...');
@@ -452,6 +459,7 @@ class _ImagePickersState extends State<ImagePickers>
         });
       }
     }
+
     else {
       setState(() {
         toastShow('Unable to Load!!! try again later...');

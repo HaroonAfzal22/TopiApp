@@ -169,14 +169,20 @@ class _SongsListState extends State<SongsList> {
                                           if (selected[index] == true) {
                                             selected[index] = false;
                                             isEnabled = false;
+                                            stop();
+
                                           } else {
                                             selected = List.filled(songsList.length, false);
                                             selected[index] = true;
                                             isEnabled = true;
+                                            play(songsList[index]['audio']);
+
                                           }
                                         } else {
                                           selected[index] = true;
                                           isEnabled = true;
+                                          play(songsList[index]['audio']);
+
                                         }
                                       });
                                       await SharedPref.setSongId(songsList[index]['id'].toString());
@@ -220,11 +226,11 @@ class _SongsListState extends State<SongsList> {
                                                 children: [
                                                   Padding(
                                                     padding: const EdgeInsets.only(left: 8.0),
-                                                    child: IconButton(
-                                                      iconSize: 40.0,
+                                                    child: Icon(
+                                                      clickIcon(index),
+                                                      size: 40.0,
                                                       color: Colors.white,
-                                                        icon:Icon(clickIcon(index)),
-                                                      onPressed: () {
+                                                     /* onPressed: () {
                                                         setState(() {
                                                           if (isClick.contains(true)) {
                                                             if (isClick[index] == true) {
@@ -242,7 +248,7 @@ class _SongsListState extends State<SongsList> {
                                                             play(songsList[index]['audio']);
                                                           }
                                                         });
-                                                      },
+                                                      },*/
                                                     ),
                                                   ),
                                                   Expanded(
@@ -327,7 +333,7 @@ class _SongsListState extends State<SongsList> {
   List<bool> isClick = [];
 
   clickIcon(index) {
-    if (isClick[index] == true) {
+    if (selected[index] == true) {
       return CupertinoIcons.pause;
     } else {
       return CupertinoIcons.play_fill;
