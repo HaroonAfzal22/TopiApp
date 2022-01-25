@@ -9,8 +9,10 @@ import 'package:topi/ClassActivity.dart';
 import 'package:topi/Community.dart';
 import 'package:topi/Constants.dart';
 import 'package:topi/HttpRequest.dart';
+import 'package:topi/Notifications.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
+import 'package:topi/test.dart';
 
 import 'NavigationDrawer.dart';
 
@@ -29,19 +31,18 @@ class _AppCategoryState extends State<AppCategory> {
   final resultScreens = [
     Community(),
     SongsList(),
-    ClassActivity(),
+    //AutoFullscreenOrientationPage(),
+    Notifications(),
+   // ClassActivity(),
   ];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    //isLoading = true;
     getAds();
-   /* Future(() async {
-      await setColor();
-    });*/
-    _checkVersion();
+
+   // _checkVersion();
 
   }
 
@@ -186,12 +187,12 @@ class _AppCategoryState extends State<AppCategory> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(CupertinoIcons.person_2_fill,
+                    Icon(CupertinoIcons.bell_solid,
                         color: Colors.white, size: 30),
                     Visibility(
                         visible: _page == 2 ? false : true,
                         child: Text(
-                          'Class Activity',
+                          'Notification',
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.bold),
                         )),

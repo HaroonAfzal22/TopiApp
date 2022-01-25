@@ -5,11 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:new_version/new_version.dart';
+import 'package:topi/CategoryLists.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/HttpRequest.dart';
 import 'package:topi/ListCards.dart';
 import 'package:topi/NavigationDrawer.dart';
 import 'package:topi/Shared_Pref.dart';
+import 'package:topi/SongsLists.dart';
 import 'package:topi/constants.dart';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -20,12 +22,10 @@ class SongsList extends StatefulWidget {
 }
 
 class _SongsListState extends State<SongsList> {
-  AudioPlayer audioPlayer= AudioPlayer();
-  List europeanCountries = [];
+  AudioPlayer audioPlayer = AudioPlayer();
+  List europeanCountries = [],songsList = [];
   int? categoryId;
-  int count = 0;
-  List songsList = [];
-  final singersList = [
+ /* final singersList = [
     'Artist: Gipsy Kings',
     'Artist: Naseebo Lal',
     'Artist: Naseebo Lal',
@@ -43,9 +43,8 @@ class _SongsListState extends State<SongsList> {
     Color(0xff2c3e50),
     Color(0xffef629f),
     Color(0xfffaaca8),
-  ];
-  bool isEnabled = false;
-  bool isLoading = false;
+  ];*/
+  bool isEnabled = false,isLoading = false;
   List<bool> selected = [];
 
   fabColor() {
@@ -56,11 +55,11 @@ class _SongsListState extends State<SongsList> {
     }
   }
 
-   BannerAd?  myBanner = BannerAd(
-       size: AdSize.banner,
-       adUnitId: SharedPref.getBannerAd(),
-       listener: BannerAdListener(),
-       request: AdRequest());
+  BannerAd? myBanner = BannerAd(
+      size: AdSize.banner,
+      adUnitId: SharedPref.getBannerAd(),
+      listener: BannerAdListener(),
+      request: AdRequest());
 
   @override
   void initState() {
@@ -68,38 +67,32 @@ class _SongsListState extends State<SongsList> {
     super.initState();
     isLoading = true;
     Future.delayed(Duration(seconds: 4), () {
-      if (count == 0) {
-        setState(() {
           postFcmToken();
-          count++;
-        });
-      }
     });
     myBanner!.load();
     getCategoryList();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawerScrimColor: Colors.transparent,
-      floatingActionButton:isEnabled==true?
-      FloatingActionButton(
-        backgroundColor: fabColor(),
-        onPressed: () {
-          setState(() {
-            stop();
-            selected = List.filled(songsList.length, false);
-            isClick = List.filled(songsList.length, false);
-            isEnabled=false;
-          });
+      floatingActionButton: isEnabled == true
+          ? FloatingActionButton(
+              backgroundColor: fabColor(),
+              onPressed: () {
+                setState(() {
+                  stop();
+                  selected = List.filled(songsList.length, false);
+                  isClick = List.filled(songsList.length, false);
+                  isEnabled = false;
+                });
                 Navigator.pushNamed(context, '/image_pickers');
               },
-        child: Icon(FontAwesomeIcons.fileImport),
-        tooltip: 'Upload Image',
-      ):Container(),
+              child: Icon(FontAwesomeIcons.fileImport),
+              tooltip: 'Upload Image',
+            )
+          : Container(),
       bottomSheet: Padding(padding: EdgeInsets.only(bottom: 150.0)),
       body: SafeArea(
         bottom: false,
@@ -117,183 +110,49 @@ class _SongsListState extends State<SongsList> {
                         child: ListView(
                           physics: AlwaysScrollableScrollPhysics(),
                           children: [
+                           CategoryLists(europeanCountries: europeanCountries, isLoading: isLoading, getSongsList: getSongsList),
                             SizedBox(
-                              height: 8,
-                            ),
-                            Container(
-                              height: 100,
-                              child: ListView.builder(
-                                physics: AlwaysScrollableScrollPhysics(),
-                                scrollDirection: Axis.horizontal,
-                                itemCount: europeanCountries.length,
-                                itemBuilder: (context, index) {
-                                  return ListCards(
-                                      text: europeanCountries[index]
-                                          ['category_name'],
-                                      images: CachedNetworkImage(
-                                        key: UniqueKey(),
-                                        fit: BoxFit.fill,
-                                        imageUrl: europeanCountries[index]
-                                            ['category_image'],
-                                        width: 50,
-                                        height: 50,
-                                      ),
-                                      onClicks: () {
-                                        /* for (int i = index + 1; i < 7; i++) {
-                                    if (isClick.toList().elementAt(i)) {
-                                      snackShow(context, 'Coming Soon...');
-                                    }
-                                  }*/
+                              height: MediaQuery.of(context).size.height,
+                              child: Container(
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: BouncingScrollPhysics(),
+                                  itemCount: songsList.length,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () async {
                                         setState(() {
-                                          isLoading = true;
-                                        });
-                                        getSongsList(
-                                            europeanCountries[index]['id']);
-                                      });
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                            Container(
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: BouncingScrollPhysics(),
-                                itemCount: songsList.length,
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    onTap: () async{
-                                      setState(() {
-                                        if (selected.contains(true)) {
-                                          if (selected[index] == true) {
-                                            selected[index] = false;
-                                            isEnabled = false;
-                                            stop();
-
+                                          if (selected.contains(true)) {
+                                            if (selected[index] == true) {
+                                              selected[index] = false;
+                                              isEnabled = false;
+                                              stop();
+                                            } else {
+                                              selected =
+                                                  List.filled(songsList.length, false);
+                                              selected[index] = true;
+                                              isEnabled = true;
+                                              play(songsList[index]['audio'],index);
+                                            }
                                           } else {
-                                            selected = List.filled(songsList.length, false);
                                             selected[index] = true;
                                             isEnabled = true;
-                                            play(songsList[index]['audio']);
-
+                                           play(songsList[index]['audio'],index);
                                           }
-                                        } else {
-                                          selected[index] = true;
-                                          isEnabled = true;
-                                          play(songsList[index]['audio']);
-
-                                        }
-                                      });
-                                      await SharedPref.setSongId(songsList[index]['id'].toString());
-                                      await SharedPref.setSongPremium(songsList[index]['premium'].toString());
-                                    },
-                                    child: Container(
-                                      height: 100,
-                                      child: Card(
-                                        shape: selected[index] == true
-                                            ? new RoundedRectangleBorder(
-                                                side: new BorderSide(
-                                                    color: Colors.white,
-                                                    width: 4.0),
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0))
-                                            : new RoundedRectangleBorder(
-                                                side: new BorderSide(width: 1.0),
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0)),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(0).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
-                                                Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(1).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
-                                                Color(int.parse('0xff${songsList[index]['color'].toString().split(',').elementAt(2).substring(1,songsList[index]['color'].toString().split(',').elementAt(0).length)}')),
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.spaceAround,
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(left: 8.0),
-                                                    child: Icon(
-                                                      clickIcon(index),
-                                                      size: 40.0,
-                                                      color: Colors.white,
-                                                     /* onPressed: () {
-                                                        setState(() {
-                                                          if (isClick.contains(true)) {
-                                                            if (isClick[index] == true) {
-                                                              isClick[index] = false;
-                                                              print('stop');
-                                                              stop();
-                                                            } else {
-                                                              isClick = List.filled(songsList.length, false);
-                                                              isClick[index] = true;
-                                                              print('play isclick false');                                                                                       play(songsList[index]['audio']);
-                                                            }
-                                                          } else {
-                                                            isClick[index] = true;
-                                                            print('play isClick not contain');
-                                                            play(songsList[index]['audio']);
-                                                          }
-                                                        });
-                                                      },*/
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceEvenly,
-                                                      children: [
-                                                        Container(
-                                                          margin: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 12.0),
-                                                          child: Text(
-                                                            'Title: ${songsList[index]['video_name']}',
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.white,
-                                                                fontWeight: FontWeight.w700,
-                                                                fontSize: 18.0),
-                                                          ),
-                                                        ),
-                                                        /*  Container(
-                                                    child: Center(
-                                                      child: Text(
-                                                        singersList[index],
-                                                        style: TextStyle(
-                                                            fontSize: 12.0,
-                                                            color: Colors.white),
-                                                      ),
-                                                    ),
-                                                  ),*/
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
+                                        });
+                                        await SharedPref.setSongId(
+                                            songsList[index]['id'].toString());
+                                        await SharedPref.setSongPremium(
+                                            songsList[index]['premium'].toString());
+                                      },
+                                      child: SongsLists(songsList: songsList,
+                                        selected: selected,clickIcon: clickIcon, index: index,),
+                                    );
+                                  },
+                                ),
                               ),
                             ),
+
                           ],
                         ),
                       ),
@@ -315,18 +174,31 @@ class _SongsListState extends State<SongsList> {
     );
   }
 
-  play(index)async{
-    print('index $index');
-    int result = await audioPlayer.play(index,volume: 10.0);
-    if(result==1){
-      print('playing..');
+  play(index,pos) async {
+    int result = await audioPlayer.play(index, volume: 10.0);
+    if (result == 1) {
+      audioPlayer.onPlayerCompletion.listen((event) {
+        setState(() {
+          if (selected.contains(true)) {
+            if (selected[pos] == true) {
+              selected[pos] = false;
+              isEnabled = false;
+              stop();
+            } else {
+              selected =
+                  List.filled(songsList.length, false);
+              selected[pos] = true;
+              isEnabled = true;
+            }
+          }
+        });
+      });
     }
-
   }
-  stop()async{
+
+  stop() async {
     int result = await audioPlayer.stop();
-    if(result ==1 ){
-      print('stop song ');
+    if (result == 1) {
     }
   }
 
@@ -344,7 +216,6 @@ class _SongsListState extends State<SongsList> {
     HttpRequest request = HttpRequest();
     var result =
         await request.postFcmToken(context, SharedPref.getUserFcmToken());
-
   }
 
   Future<void> getCategoryList() async {
@@ -361,12 +232,12 @@ class _SongsListState extends State<SongsList> {
   void getSongsList(int id) async {
     HttpRequest request = HttpRequest();
     var songs = await request.getSongsList(context, id);
-    if(songs==500){
+    if (songs == 500) {
       snackShow(context, '$songs Error try again later...');
       setState(() {
-        isLoading=false;
+        isLoading = false;
       });
-    }else {
+    } else {
       setState(() {
         songsList = songs;
         selected = List.filled(songs.length, false);

@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
-import 'package:chewie/chewie.dart';
-import 'package:external_path/external_path.dart';
+import 'package:image/image.dart' as Im;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,13 +12,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/HttpRequest.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/constants.dart';
-import 'package:video_player/video_player.dart';
 
 class ImagePickers extends StatefulWidget {
   @override
@@ -358,15 +352,27 @@ class _ImagePickersState extends State<ImagePickers>
   Future<Null> _pickImage() async {
     final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     imageFile = pickedImage != null ? File(pickedImage.path) : null;
+    print('image file size is ${imageFile!.lengthSync()}');
     if (imageFile != null) {
       var result = getFileSizeString(bytes: imageFile!.lengthSync());
       if (result.contains('KB')) {
-        if (int.parse(result.substring(0, result.length - 2)) < 40) {
+        if (int.parse(result.substring(0, result.length - 2)) < 50) {
           _onWillPop('Image quality too low, kindly upload best quality image for better result...');
-        } else {
+        }/*else if(int.parse(result.substring(0, result.length - 2)) > 800){
+          var tempDir = await getTemporaryDirectory();
+          final path = tempDir.path;
+          int rand = Random().nextInt(10000);
+
+          Im.Image? image = Im.decodeImage(imageFile!.readAsBytesSync());
+          var compressedImage = File('$path/img_r$rand.jpg')
+          ..writeAsBytesSync(Im.encodeJpg(image!,quality: 50));
+
+          print('compress image is kb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');
+          predictSong(compressedImage);
+        }*/ else {
           setState(() {
             isLoading = true;
-            predictSong();
+            predictSong(imageFile);
             if (isRewardedAdReady) {
               _rewardedAd?.show(onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
             } else {
@@ -377,12 +383,21 @@ class _ImagePickersState extends State<ImagePickers>
           });
         }
       } else {
+        /*var tempDir = await getTemporaryDirectory();
+        final path = tempDir.path;
+        int rand = Random().nextInt(10000);
+
+        Im.Image? image = Im.decodeImage(imageFile!.readAsBytesSync());
+        var compressedImage = File('$path/img_r$rand.jpg')
+          ..writeAsBytesSync(Im.encodeJpg(image!,quality: 50));
+
+        print('compress image is mb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');*/
+
         setState(() {
           isLoading = true;
-          predictSong();
-          if (isRewardedAdReady) {
-            _rewardedAd?.show(
-                onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
+          predictSong(imageFile);
+          if (isRewardedAdReady ) {
+            _rewardedAd?.show(onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
           } else {
             toastShow('Ad not work');
             _loadRewardedAd();
@@ -414,20 +429,18 @@ class _ImagePickersState extends State<ImagePickers>
     }
   }
 
-  predictSong() async {
+  predictSong(image) async {
     /*final bytes= File(imageFile!.path).readAsBytesSync();
     String base64Image = base64Encode(bytes);
     Uint8List base = base64Decode(base64Image);
     print('image decode ${Image.memory(base)}');*/
+
     Map<String,String> bodyMap ={
       'id':SharedPref.getSongId(),
       'type':SharedPref.getSongPremium(),
     };
     HttpRequest request = HttpRequest();
-
-    var result = await request.predictNp(context,bodyMap, imageFile);
-
-    print('response is $result');
+    var result = await request.predictNp(context,bodyMap, image);
     if (result != null) {
       if (result == 504 ||result == 500) {
         snackShow(context, '$result Server Error try again later...');
@@ -459,7 +472,6 @@ class _ImagePickersState extends State<ImagePickers>
         });
       }
     }
-
     else {
       setState(() {
         toastShow('Unable to Load!!! try again later...');

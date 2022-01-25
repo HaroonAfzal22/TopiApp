@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:preload_page_view/preload_page_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:topi/constants.dart';
 import 'package:topi/HttpRequest.dart';
@@ -15,22 +16,14 @@ class Community extends StatefulWidget {
   @override
   _CommunityState createState() => _CommunityState();
 }
-
 class _CommunityState extends State<Community> {
   var log = 'images/background.png';
+
 
   int value = 0;
   var data = [];
   bool isVisible = true;
   bool isLoading = false;
-BetterPlayerPlaylistController? _configuration;
-  /*setLogo() {
-    if (logos != null) {
-      return '$logos';
-    } else
-      return '$log';
-  }*/
-
   var activeIndex = 0;
   List<bool> isLiked = [];
   List<bool> isDescClick = [];
@@ -39,13 +32,16 @@ BetterPlayerPlaylistController? _configuration;
       listing = [],
       values = [1, 2, 3, 4, 5],
       pos = [
-        'https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__340.jpg',
-        'https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832__340.jpg',
-        'https://cdn.pixabay.com/photo/2015/12/01/20/28/road-1072821__340.jpg',
-        'https://cdn.pixabay.com/photo/2014/02/27/16/10/tree-276014__340.jpg',
-        'https://cdn.pixabay.com/photo/2017/02/08/17/24/fantasy-2049567__340.jpg',
-        'https://cdn.pixabay.com/photo/2015/06/19/21/24/avenue-815297__340.jpg',
-        'https://cdn.pixabay.com/photo/2014/04/14/20/11/pink-324175__340.jpg',
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
+        "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
       ],
       vid = [];
   BetterPlayerConfiguration? betterPlayerConfiguration;
@@ -55,9 +51,11 @@ BetterPlayerPlaylistController? _configuration;
     // TODO: implement initState
     super.initState();
     isLoading = true;
-    controller = BetterPlayerListVideoPlayerController();
-    betterPlayerConfiguration = BetterPlayerConfiguration(autoPlay: true);
+
+      controller = BetterPlayerListVideoPlayerController();
+    betterPlayerConfiguration = BetterPlayerConfiguration();
     getCommunity();
+
     indexes = List<int>.filled(values.length, 0);
     listing = List<int>.filled(values.length, 0);
     isLikedCount = List<int>.filled(values.length, 0);
@@ -80,151 +78,72 @@ BetterPlayerPlaylistController? _configuration;
     return true;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      /*appBar: AppBar(
-        backgroundColor: Color(int.parse('$newColor')),
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        title: Text('$sc Community'),
-      ),*/
+      backgroundColor: Colors.black54,
       bottomSheet: Padding(padding: EdgeInsets.only(bottom: 100.0)),
       body: SafeArea(
         bottom: false,
         child: isLoading
             ? Center(child: spinkit)
-            : ListView.builder(
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  padding: EdgeInsets.only(bottom: 13.0),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
+            : PageView.builder(
+          scrollDirection: Axis.vertical,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    padding: EdgeInsets.only(bottom: 13.0),
+                    child: Container(
+                      child: Stack(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: titleIcon('assets/topi.png', 16.0),
-                          ),
-                          Expanded(
-                            flex: 8,
-                            child: Text(
-                              'Topi',
-                              textAlign: TextAlign.start,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xff262626)),
-                            ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTapDown: (TapDownDetails details) async {
-                                await showMenuDialog(
-                                    context, details.globalPosition);
-                                setState(() {
-                                  // isLoading = true;
-                                  // postApplicationStatus(listValue[index]['id'], value);
-                                });
-                              },
-                              child: Icon(
-                                Icons.more_vert_sharp,
-                                color: Color(0xff262626),
-                              ),
-                            ),
+                          Container(
+                            child:  BetterPlayerListVideoPlayer(
+                                          BetterPlayerDataSource(
+                                              BetterPlayerDataSourceType.network,
+                                              '${data[index]['video']}',
+                                            cacheConfiguration: BetterPlayerCacheConfiguration(
+                                              useCache: true
+                                            ),
+                                          ),
+                                          playFraction: 1.0,
+                                          betterPlayerListVideoPlayerController:
+                                              controller,
+                                          configuration:
+                                              BetterPlayerConfiguration(
+                                            aspectRatio: 1.0,
+                                            autoPlay: true,
+                                            controlsConfiguration:
+                                                BetterPlayerControlsConfiguration(
+                                                    enableMute: false,
+                                                    enableOverflowMenu: false,
+                                                    enablePlayPause: false,
+                                                    enableFullscreen: false,
+                                                    enableSkips: false,
+                                                    enableProgressText: false,
+                                                    playIcon: CupertinoIcons
+                                                        .play_arrow_solid,
+                                                    controlBarColor:
+                                                        Colors.transparent,
+                                                    enableProgressBar: false),
+
+                                          ),
+                                        )
+
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 4.0,
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height / 2,
-                        child: Stack(
-                          children: [
-                            Container(
-                              child: InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    isVisible = true;
-                                  });
-                                },
-                                child: CarouselSlider.builder(
-                                  itemCount: 1,
-                                  itemBuilder: (BuildContext context,
-                                      int itemIndex, int pageViewIndex) {
-                                    return Container(
-                                      child: data[index]['media_type'] ==
-                                              'video'
-                                          ? Container(
-                                              child: BetterPlayerListVideoPlayer(
-                                                BetterPlayerDataSource(BetterPlayerDataSourceType.network,'https://wasisoft.com/dev/${data[index]['media']}'),
-                                                playFraction: 0.8,
-                                                betterPlayerListVideoPlayerController: controller,
-                                                configuration:BetterPlayerConfiguration(
-                                                  aspectRatio: 9/9,
-                                                  controlsConfiguration: BetterPlayerControlsConfiguration(
-                                                      enableMute: false,
-                                                      enableOverflowMenu: false,
-                                                      enablePlayPause: false,
-                                                      enableFullscreen: false,
-                                                      enableSkips: false,
-                                                      enableProgressText: false,
-                                                      playIcon: CupertinoIcons.play_arrow_solid,
-                                                      controlBarColor: Colors.transparent,
-                                                      enableProgressBar:false),
-                                                ),
+                    ),
+                  );
+                },
+                itemCount: data.length,
+              ),
 
-                                               /* betterPlayerPlaylistConfiguration: BetterPlayerPlaylistConfiguration(),
-                                                betterPlayerConfiguration: BetterPlayerConfiguration(
-                                                  aspectRatio: 9/9,
-                                                  controlsConfiguration: BetterPlayerControlsConfiguration(
-                                                        enableMute: false,
-                                                          enableOverflowMenu: false,
-                                                          enablePlayPause: false,
-                                                          enableFullscreen: false,
-                                                          enableSkips: false,
-                                                          enableProgressText: false,
-                                                          playIcon: CupertinoIcons.play_arrow_solid,
-                                                          controlBarColor: Colors.transparent,
-                                                          enableProgressBar:false),
-                                                ),
-                                                betterPlayerDataSourceList:
-                                                    createDataSet(
-                                                        'https://wasisoft.com/dev/${data[index]['media']}'),*/
-                                              ),
-                                            )
-                                          : CachedNetworkImage(
-                                              fit: BoxFit.fill,
-                                              filterQuality:
-                                                  FilterQuality.medium,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height / 2,
-                                              imageUrl:
-                                                  'https://wasisoft.com/dev/${data[index]['media']}',
-                                            ),
-                                    );
-                                  },
-                                  options: CarouselOptions(
-                                    viewportFraction: 1.0,
-                                    enableInfiniteScroll: false,
-                                    height:
-                                        MediaQuery.of(context).size.height/2,
-                                    onPageChanged: (i, reason) =>
-                                        setState(() {
-                                      activeIndex = i;
-                                    }),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
+
+      ),
+    );
+  }
+
+  /*    SizedBox(
                         height: 4.0,
                       ),
                       Container(
@@ -232,7 +151,9 @@ BetterPlayerPlaylistController? _configuration;
                         child: AnimatedSmoothIndicator(
                           count: 1,
                           activeIndex:
-                              1 /*int.parse(data[index]['media'][activeIndex])*/,
+                              1 */
+  /*int.parse(data[index]['media'][activeIndex])*/
+  /*,
                           effect: WormEffect(
                               offset: 8.0,
                               spacing: 4.0,
@@ -315,17 +236,47 @@ BetterPlayerPlaylistController? _configuration;
                             });
                           },
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              itemCount: data.length,
-            ),
-      ),
-    );
-  }
+                      ),*/
 
+  /*  Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: titleIcon('assets/topi.png', 16.0),
+                            ),
+                            Expanded(
+                              flex: 8,
+                              child: Text(
+                                'Topi',
+                                textAlign: TextAlign.start,
+                                maxLines: 2,
+                                style: TextStyle(
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xff262626)),
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTapDown: (TapDownDetails details) async {
+                                  await showMenuDialog(
+                                      context, details.globalPosition);
+                                  setState(() {
+                                    // isLoading = true;
+                                    // postApplicationStatus(listValue[index]['id'], value);
+                                  });
+                                },
+                                child: Icon(
+                                  Icons.more_vert_sharp,
+                                  color: Color(0xff262626),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 4.0,
+                        ),*/
   showMenuDialog(context, details) async {
     double left = details.dx;
     double top = details.dy;
@@ -348,5 +299,4 @@ BetterPlayerPlaylistController? _configuration;
       }
     });
   }
-
 }

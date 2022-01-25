@@ -14,12 +14,14 @@ import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/GetImage.dart';
 import 'package:topi/Google/GoogleAds.dart';
 import 'package:topi/InAppReview.dart';
+import 'package:topi/Notifications.dart';
 import 'package:topi/PrivacyPolicy.dart';
 import 'package:topi/ShareFile.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
 import 'package:topi/constants.dart';
 import 'package:topi/starter.dart';
+import 'package:topi/test.dart';
 
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -105,8 +107,10 @@ class _MyAppState extends State<MyApp> {
         '/video_players': (context) => VideoPlayers(),
         '/google_ads': (context) => Googles(),
         '/app_category': (context) => AppCategory(),
+        '/test': (context) => AutoFullscreenOrientationPage(),
         '/about_us': (context) => AboutUs(),
         '/privacy_policy': (context) => PrivacyPolicy(),
+        '/notification': (context) => Notifications(),
       },
       home: AppCategory(),
     );

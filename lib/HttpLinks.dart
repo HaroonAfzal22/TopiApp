@@ -23,6 +23,7 @@ class HttpLinks {
   static const String postFcmToken = '$baseUrl/fcm-token';
   static const String aboutUs = '$baseUrl/company/profilr';
   static const String privacyPolicy = '$baseUrl/privicy/policy';
+  static const String adminVideos = '$baseUrl/admin/videos';
 
   static const String AdsUrl = 'http://59.103.234.58:8005/api/adds/unit/id';
   static const String loginUrl = '${_baseLocalUrl}student/signin';

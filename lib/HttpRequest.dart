@@ -15,10 +15,8 @@ class HttpRequest {
 
   Future predictNp(BuildContext context,Map<String,String>bodyMap, var image) async {
     try {
-      Uri uri = Uri.parse(HttpLinks.localsUrl);
+      Uri uri = Uri.parse(HttpLinks.localUrl);
       var stream = ByteStream(image.openRead());
-      print('uri $uri');
-
       stream.cast();
       var length = await image.length();
       var request = MultipartRequest('POST', uri);
@@ -205,7 +203,7 @@ Future getSongsList(BuildContext context,int id)async{
 
   Future getCommunity(BuildContext context) async {
     try {
-      Uri uri = Uri.parse('https://wasisoft.com/dev/index.php');
+      Uri uri = Uri.parse(HttpLinks.adminVideos);
       Response response = await get(
         uri,
         headers: {
