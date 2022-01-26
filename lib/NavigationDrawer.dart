@@ -25,7 +25,7 @@ class _DrawersState extends State<Drawers> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+   /* WidgetsBinding.instance!.addPostFrameCallback((_) async {
       try {
         final isAvailable = await _inAppReview.isAvailable();
         setState(() {
@@ -36,7 +36,7 @@ class _DrawersState extends State<Drawers> {
       } catch (e) {
         setState(() => _availability = Availability.unavailable);
       }
-    });
+    });*/
 }
   Future<void> _requestReview() => _inAppReview.requestReview();
 

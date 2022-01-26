@@ -22,40 +22,35 @@ class AppCategory extends StatefulWidget {
 }
 
 class _AppCategoryState extends State<AppCategory> {
-
   var log = 'assets/background.png';
   bool isLoading = false;
-  int _page = 0;
+  int _page = 1;
   GlobalKey<CurvedNavigationBarState> _bottomsKey = GlobalKey();
 
   final resultScreens = [
     Community(),
     SongsList(),
-    //AutoFullscreenOrientationPage(),
     Notifications(),
-   // ClassActivity(),
   ];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getAds();
-
-   // _checkVersion();
-
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      getAds();
+    });
+    // _checkVersion();
   }
 
-  void getAds()async{
-    HttpRequest request= HttpRequest();
+  void getAds() async {
+    HttpRequest request = HttpRequest();
     var result = await request.getAds(context);
     await SharedPref.setBannerAd(result['banner_id']);
     await SharedPref.setNativeAd(result['native_id']);
     await SharedPref.setInterstitialAd(result['inter_id']);
     await SharedPref.setRewardedAd(result['reward_id']);
   }
-
-
 
   _checkVersion() async {
     final newVersion = NewVersion(androidId: "com.topi.ai");
@@ -130,20 +125,20 @@ class _AppCategoryState extends State<AppCategory> {
             ),
           )
         : Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black87,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        elevation: 0.0,
-        title: Image.asset(
-          'assets/topi.png',
-          fit: BoxFit.contain,
-          width: 80,
-          height: 80,
-        ),
-        centerTitle: true,
-      ),
-      drawer: Drawers(),
-      backgroundColor: Colors.black87,
+            appBar: AppBar(
+              backgroundColor: Colors.black87,
+              systemOverlayStyle: SystemUiOverlayStyle.light,
+              elevation: 0.0,
+              title: Image.asset(
+                'assets/topi.png',
+                fit: BoxFit.contain,
+                width: 80,
+                height: 80,
+              ),
+              centerTitle: true,
+            ),
+            drawer: Drawers(),
+            backgroundColor: Colors.black87,
             extendBody: true,
             bottomNavigationBar: CurvedNavigationBar(
               index: _page,
@@ -156,7 +151,7 @@ class _AppCategoryState extends State<AppCategory> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                        CupertinoIcons.person_3_fill,
+                      CupertinoIcons.person_3_fill,
                       color: Colors.white,
                       size: 30,
                     ),
@@ -206,15 +201,13 @@ class _AppCategoryState extends State<AppCategory> {
               },
             ),
             body: WillPopScope(
-                onWillPop: _onWillPop,
-                child: resultScreens[_page]),
+                onWillPop: _onWillPop, child: resultScreens[_page]),
           );
   }
 
   @override
   void dispose() {
-    _page = 0;
+    _page = 1;
     super.dispose();
   }
-
 }

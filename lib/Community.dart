@@ -4,6 +4,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lottie/lottie.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:topi/constants.dart';
@@ -16,9 +18,9 @@ class Community extends StatefulWidget {
   @override
   _CommunityState createState() => _CommunityState();
 }
+
 class _CommunityState extends State<Community> {
   var log = 'images/background.png';
-
 
   int value = 0;
   var data = [];
@@ -44,17 +46,17 @@ class _CommunityState extends State<Community> {
         "http://www.exit109.com/~dnn/clips/RW20seconds_1.mp4",
       ],
       vid = [];
-  BetterPlayerConfiguration? betterPlayerConfiguration;
-  BetterPlayerListVideoPlayerController? controller;
+  List<BetterPlayerListVideoPlayerController>? controller = [];
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     isLoading = true;
 
-      controller = BetterPlayerListVideoPlayerController();
-    betterPlayerConfiguration = BetterPlayerConfiguration();
-    getCommunity();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      getCommunity();
+    });
 
     indexes = List<int>.filled(values.length, 0);
     listing = List<int>.filled(values.length, 0);
@@ -63,11 +65,15 @@ class _CommunityState extends State<Community> {
     isDescClick = List<bool>.filled(values.length, false);
   }
 
-  void getCommunity() async {
+  getCommunity() async {
     HttpRequest request = HttpRequest();
     var result = await request.getCommunity(context);
+    for (int i = 0; i < result.length; i++) {
+      controller?.insert(i, BetterPlayerListVideoPlayerController());
+    }
     setState(() {
       data = result;
+
       isLoading = false;
     });
   }
@@ -88,48 +94,72 @@ class _CommunityState extends State<Community> {
         bottom: false,
         child: isLoading
             ? Center(child: spinkit)
-            : PageView.builder(
-          scrollDirection: Axis.vertical,
+            : PreloadPageView.builder(
+                preloadPagesCount: 5,
+                onPageChanged: (index) {
+                  controller!.forEach((controllers) => controllers.pause());
+                  controller![index].play();
+                },
+                scrollDirection: Axis.vertical,
                 itemBuilder: (BuildContext context, int index) {
+                  controller![0].play();
                   return Container(
                     padding: EdgeInsets.only(bottom: 13.0),
                     child: Container(
                       child: Stack(
                         children: [
                           Container(
-                            child:  BetterPlayerListVideoPlayer(
-                                          BetterPlayerDataSource(
-                                              BetterPlayerDataSourceType.network,
-                                              '${data[index]['video']}',
-                                            cacheConfiguration: BetterPlayerCacheConfiguration(
-                                              useCache: true
-                                            ),
-                                          ),
-                                          playFraction: 1.0,
-                                          betterPlayerListVideoPlayerController:
-                                              controller,
-                                          configuration:
-                                              BetterPlayerConfiguration(
-                                            aspectRatio: 1.0,
-                                            autoPlay: true,
-                                            controlsConfiguration:
-                                                BetterPlayerControlsConfiguration(
-                                                    enableMute: false,
-                                                    enableOverflowMenu: false,
-                                                    enablePlayPause: false,
-                                                    enableFullscreen: false,
-                                                    enableSkips: false,
-                                                    enableProgressText: false,
-                                                    playIcon: CupertinoIcons
-                                                        .play_arrow_solid,
-                                                    controlBarColor:
-                                                        Colors.transparent,
-                                                    enableProgressBar: false),
-
-                                          ),
-                                        )
-
+                            child: BetterPlayerListVideoPlayer(
+                              BetterPlayerDataSource(
+                                  BetterPlayerDataSourceType.network,
+                                  '${data[index]['video']}'),
+                              playFraction: 0.8,
+                              betterPlayerListVideoPlayerController:
+                                  controller![index],
+                              configuration: BetterPlayerConfiguration(
+                                expandToFill: true,
+                                aspectRatio: 1.0,
+                                controlsConfiguration:
+                                    BetterPlayerControlsConfiguration(
+                                        enableMute: false,
+                                        enableOverflowMenu: false,
+                                        enablePlayPause: false,
+                                        enableFullscreen: false,
+                                        enableSkips: false,
+                                        showControlsOnInitialize: false,
+                                        enableProgressText: false,
+                                        playIcon:
+                                            CupertinoIcons.play_arrow_solid,
+                                        controlBarColor: Colors.transparent,
+                                        enableProgressBar: false),
+                              ),
+                            ),
                           ),
+                          Positioned(
+                              bottom: 430,
+                              left: MediaQuery.of(context).size.width - 50,
+                              child: Container(
+                               child:CircleAvatar(
+                                 child: Image.asset('assets/topi.png',
+                                 ),
+                               ),
+                              )),
+                          StackDesign(bottomMargin: 360.0,leftMargin: 60,ikon:Icons.file_download,onClick: (){},),
+
+                          StackDesign(bottomMargin: 290.0,leftMargin: 55,ikon:FontAwesomeIcons.commentDots,onClick: (){},),
+
+                          StackDesign(bottomMargin: 220.0,leftMargin: 55,ikon:CupertinoIcons
+                              .arrowshape_turn_up_right_fill,onClick: (){},),
+
+                          StackDesign(bottomMargin: 150.0,leftMargin: 60,ikon:Icons.file_download,onClick: (){},),
+                          Positioned(
+                              bottom: 50,
+                              left: MediaQuery.of(context).size.width - 85,
+                              child: Container(
+                                height: 100,
+                                child: Lottie.asset('assets/cd_animation.json',
+                                    repeat: true, animate: true),
+                              )),
                         ],
                       ),
                     ),
@@ -137,8 +167,6 @@ class _CommunityState extends State<Community> {
                 },
                 itemCount: data.length,
               ),
-
-
       ),
     );
   }
@@ -298,5 +326,53 @@ class _CommunityState extends State<Community> {
           break;
       }
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    controller!.forEach((element) {
+      element.pause();
+    });
+  }
+}
+
+class StackDesign extends StatelessWidget {
+  final bottomMargin,leftMargin,ikon,onClick;
+   StackDesign({
+    required this.bottomMargin,
+    required this.leftMargin,
+    required this.ikon,
+    required this.onClick,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+        bottom: bottomMargin,
+        left: MediaQuery.of(context).size.width - leftMargin,
+        child: InsideStacks(icons: ikon,onPress: onClick,));
+  }
+}
+
+class InsideStacks extends StatelessWidget {
+  final onPress,icons;
+  const InsideStacks({
+  required this.icons,
+  required this.onPress,
+  }) ;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: IconButton(
+          onPressed: onPress,
+          icon: Icon(
+            icons,
+            color: Colors.white,
+            size: 36,
+          )),
+    );
   }
 }
