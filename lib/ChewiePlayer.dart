@@ -245,7 +245,7 @@ class _VideoPlayersState extends State<VideoPlayers> {
       File value = File('$image');
     var paths=  await GallerySaver.saveVideo(value.path);
       if (paths.toString().isNotEmpty) {
-        toastShow('Video Saved!');
+        toastShow('Video Saved in gallery!');
       }
     } else {
       await [
