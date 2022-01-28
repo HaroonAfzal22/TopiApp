@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:better_player/better_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,6 +70,19 @@ class _CommunityState extends State<Community> {
     isLikedCount = List<int>.filled(values.length, 0);
     isLiked = List<bool>.filled(values.length, false);
     isDescClick = List<bool>.filled(values.length, false);
+
+    testingVideoLink();
+  }
+  void testingVideoLink() async {
+    String uriPrefix = 'https://wasisoft.page.link';
+    final DynamicLinkParameters parameters = DynamicLinkParameters(
+      uriPrefix: uriPrefix,
+      link: Uri.parse('https://www.youtube.com/watch?v=_SB7h2kB6Eg'),
+    );
+
+    final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+    Uri uri = shortDynamicLink.shortUrl;
+    Share.share(uri.toString(), subject: '...');
   }
 
   getCommunity() async {

@@ -222,8 +222,9 @@ class _SongsListState extends State<SongsList> {
     HttpRequest request = HttpRequest();
     var result = await request.getCategories(context);
     setState(() {
-      europeanCountries = result;
-      categoryId = result[0]['id'];
+      result!=null?europeanCountries = result : toastShow('Data not Found');
+      result!=null?isLoading=true :isLoading=false;
+      result!=null?categoryId = result[0]['id'] :null;
     });
 
     getSongsList(categoryId!);
