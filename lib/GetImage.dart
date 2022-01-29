@@ -308,15 +308,7 @@ class _ImagePickersState extends State<ImagePickers>
                       margin: EdgeInsets.symmetric(
                           vertical: 36.0, horizontal: 24.0),
                       child: ElevatedButton.icon(
-                        style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24.0))),
-                            padding: MaterialStateProperty.all(
-                                EdgeInsets.symmetric(vertical: 12.0)),
-                            backgroundColor: MaterialStateProperty.all(
-                              Colors.deepOrange,
-                            )),
+                        style:imageBtnStyle,
                         label: Text(
                           "Upload Image",
                           style: TextStyle(
@@ -330,10 +322,6 @@ class _ImagePickersState extends State<ImagePickers>
                         icon: Icon(FontAwesomeIcons.upload),
                       ),
                     ),
-
-                    /* isAdLoaded
-                        ?*/
-                    /* : Text('loading...')*/
                   ],
                 ),
         ),
@@ -358,7 +346,8 @@ class _ImagePickersState extends State<ImagePickers>
       if (result.contains('KB')) {
         if (int.parse(result.substring(0, result.length - 2)) < 50) {
           _onWillPop('Image quality too low, kindly upload best quality image for better result...');
-        }/*else if(int.parse(result.substring(0, result.length - 2)) > 800){
+        }
+        /*else if(int.parse(result.substring(0, result.length - 2)) > 800){
           var tempDir = await getTemporaryDirectory();
           final path = tempDir.path;
           int rand = Random().nextInt(10000);
@@ -369,7 +358,8 @@ class _ImagePickersState extends State<ImagePickers>
 
           print('compress image is kb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');
           predictSong(compressedImage);
-        }*/ else {
+        }*/
+        else {
           setState(() {
             isLoading = true;
             predictSong(imageFile);
@@ -392,7 +382,6 @@ class _ImagePickersState extends State<ImagePickers>
           ..writeAsBytesSync(Im.encodeJpg(image!,quality: 50));
 
         print('compress image is mb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');*/
-
         setState(() {
           isLoading = true;
           predictSong(imageFile);
@@ -434,15 +423,21 @@ class _ImagePickersState extends State<ImagePickers>
     String base64Image = base64Encode(bytes);
     Uint8List base = base64Decode(base64Image);
     print('image decode ${Image.memory(base)}');*/
-
     Map<String,String> bodyMap ={
       'id':SharedPref.getSongId(),
       'type':SharedPref.getSongPremium(),
     };
     HttpRequest request = HttpRequest();
     var result = await request.predictNp(context,bodyMap, image);
-    if (result != null) {
-      if (result == 504 ||result == 500) {
+    if (result == null ||result.isEmpty) {
+      setState(() {
+        toastShow('Data not Found...');
+        isLoading=false;
+        percentage = animationController.value * 0;
+        animationController.value = 0;
+        _clearImage();
+      });
+     /* if (result == 504 ||result == 500) {
         snackShow(context, '$result Server Error try again later...');
         setState(() {
           isLoading = false;
@@ -470,15 +465,35 @@ class _ImagePickersState extends State<ImagePickers>
             }
           }
         });
-      }
-    }
-    else {
+      }*/
+    }else if(result.toString().contains('Error')){
       setState(() {
-        toastShow('Unable to Load!!! try again later...');
-        isLoading = false;
+        toastShow('$result...');
+        isLoading=false;
         percentage = animationController.value * 0;
         animationController.value = 0;
         _clearImage();
+      });
+    }
+    else {
+      var dir = await getExternalStorageDirectory();
+      List values = await dir!.list().toList();
+      timer = Timer.periodic(Duration(seconds: 1), (_) {
+        for (int i = 0; i < values.length; i++) {
+          if (values[i].toString().contains(result.path.toString())) {
+            timer!.cancel();
+            Future.delayed(Duration(seconds: 10), () {
+              Navigator.pushNamed(context, '/video_players', arguments: {
+                'file': '${result.path}',
+              });
+              setState(() {
+                isLoading = false;
+                percentage = animationController.value * 0;
+                animationController.value = 0;
+              });
+            });
+          }
+        }
       });
     }
   }

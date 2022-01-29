@@ -7,11 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:new_version/new_version.dart';
 import 'package:topi/ClassActivity.dart';
 import 'package:topi/Community.dart';
-import 'package:topi/Constants.dart';
 import 'package:topi/HttpRequest.dart';
 import 'package:topi/Notifications.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
+import 'package:topi/constants.dart';
 import 'package:topi/test.dart';
 
 import 'NavigationDrawer.dart';
@@ -46,12 +46,17 @@ class _AppCategoryState extends State<AppCategory> {
   void getAds() async {
     HttpRequest request = HttpRequest();
     var result = await request.getAds(context);
-    await SharedPref.setBannerAd(result['banner_id']);
-    await SharedPref.setNativeAd(result['native_id']);
-    await SharedPref.setInterstitialAd(result['inter_id']);
-    await SharedPref.setRewardedAd(result['reward_id']);
+    if (result == null) {
+      toastShow('Data not Found');
+    } else if (result.toString().contains('Error')) {
+      toastShow('$result');
+    } else {
+      await SharedPref.setBannerAd(result['banner_id']);
+      await SharedPref.setNativeAd(result['native_id']);
+      await SharedPref.setInterstitialAd(result['inter_id']);
+      await SharedPref.setRewardedAd(result['reward_id']);
+    }
   }
-
   _checkVersion() async {
     final newVersion = NewVersion(androidId: "com.topi.ai");
     final status = await newVersion.getVersionStatus();

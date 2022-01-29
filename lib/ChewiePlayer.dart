@@ -1,13 +1,9 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:path/path.dart' as path;
 import 'package:chewie/chewie.dart';
-import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:topi/Gradient.dart';
@@ -235,13 +231,8 @@ class _VideoPlayersState extends State<VideoPlayers> {
   }
 
   void _onSave(BuildContext context, image) async {
-    //getPath();
-
-    //var newString = image.split('files');
     if (await Permission.storage.request().isGranted &&
         await Permission.accessMediaLocation.request().isGranted) {
-    //  var dir = await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS);
-      //var paths = await File(image).rename('$dir${newString[1]}');
       File value = File('$image');
     var paths=  await GallerySaver.saveVideo(value.path);
       if (paths.toString().isNotEmpty) {

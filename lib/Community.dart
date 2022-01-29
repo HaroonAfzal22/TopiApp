@@ -31,7 +31,7 @@ class _CommunityState extends State<Community> {
 
   int value = 0;
   var data = [];
-  bool isVisible = true,isDownloaded=false;
+  bool isVisible = true, isDownloaded = false;
   bool isLoading = false;
   var activeIndex = 0;
   List<bool> isLiked = [];
@@ -62,7 +62,7 @@ class _CommunityState extends State<Community> {
     isLoading = true;
 
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      getCommunity();
+     // getCommunity();
     });
 
     indexes = List<int>.filled(values.length, 0);
@@ -73,28 +73,39 @@ class _CommunityState extends State<Community> {
 
     testingVideoLink();
   }
+
   void testingVideoLink() async {
-    String uriPrefix = 'https://wasisoft.page.link';
+    String uriPrefix = 'https://wasisoft.page.link'; // https://topi.ai
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: uriPrefix,
-      link: Uri.parse('https://www.youtube.com/watch?v=_SB7h2kB6Eg'),
+      androidParameters: AndroidParameters(packageName: 'com.topi.ai',minimumVersion: 1),
+      link: /*Uri.parse(uriPrefix+'community?id=2'),*/
+      Uri.parse('https://www.tiktok.com/@awaisbalochh762/video/7054959096268672282?is_copy_url=1&is_from_webapp=v1'),
     );
 
-    final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+    final ShortDynamicLink shortDynamicLink =
+        await FirebaseDynamicLinks.instance.buildShortLink(parameters);
     Uri uri = shortDynamicLink.shortUrl;
-    Share.share(uri.toString(), subject: '...');
+    Share.share(uri.toString(), subject: 'Topi.Ai Songs');
   }
 
   getCommunity() async {
     HttpRequest request = HttpRequest();
     var result = await request.getCommunity(context);
-    for (int i = 0; i < result.length; i++) {
-      controller?.insert(i, BetterPlayerListVideoPlayerController());
-    }
     setState(() {
-      data = result;
-
-      isLoading = false;
+      if (result == null ||result.isEmpty) {
+        toastShow('Data not Found...');
+        isLoading = false;
+      } else if (result.toString().contains('Error')) {
+        toastShow('$result...');
+        isLoading = false;
+      } else {
+        for (int i = 0; i < result.length; i++) {
+          controller?.insert(i, BetterPlayerListVideoPlayerController());
+        }
+        data = result;
+        isLoading = false;
+      }
     });
   }
 
@@ -119,9 +130,6 @@ class _CommunityState extends State<Community> {
                 onPageChanged: (index) {
                   controller!.forEach((controllers) => controllers.pause());
                   controller![index].play();
-                  if(data.length-1==index){
-                    print('last and equal');
-                  }
                 },
                 scrollDirection: Axis.vertical,
                 itemBuilder: (BuildContext context, int index) {
@@ -162,77 +170,102 @@ class _CommunityState extends State<Community> {
                               bottom: 420,
                               left: MediaQuery.of(context).size.width - 55,
                               child: Container(
-                               child:CircleAvatar(
-                                 radius: 26,
-                                 backgroundColor:Colors.deepOrange,
-                                 child: CircleAvatar(
-                                   radius: 25.0,
-                                   child: Image.asset('assets/topi.png',
-                                   ),
-                                 ),
-                               ),
+                                child: CircleAvatar(
+                                  radius: 26,
+                                  backgroundColor: Colors.deepOrange,
+                                  child: CircleAvatar(
+                                    radius: 25.0,
+                                    child: Image.asset(
+                                      'assets/topi.png',
+                                    ),
+                                  ),
+                                ),
                               )),
-                          StackDesign(bottomMargin: 360.0,leftMargin: 55,ikon:CupertinoIcons.heart_solid,onClick: (){},),
-
-                          StackDesign(bottomMargin: 290.0,leftMargin: 55,ikon:FontAwesomeIcons.commentDots,onClick: (){},),
-
-                          StackDesign(bottomMargin: 220.0,leftMargin: 55,ikon:CupertinoIcons
-                              .arrowshape_turn_up_right_fill,onClick: (){
-                            _onShare(context, data[index]['video']);
-
-                          },),
-
-                          StackDesign(bottomMargin: 150.0,leftMargin: 60,ikon:FontAwesomeIcons.download,onClick: (){
-                            _onSave(context, data[index]['video']);
-                          },),
-
+                          StackDesign(
+                            bottomMargin: 360.0,
+                            leftMargin: 55,
+                            ikon: CupertinoIcons.heart_solid,
+                            onClick: () {},
+                          ),
+                          StackDesign(
+                            bottomMargin: 290.0,
+                            leftMargin: 55,
+                            ikon: FontAwesomeIcons.commentDots,
+                            onClick: () {},
+                          ),
+                          StackDesign(
+                            bottomMargin: 220.0,
+                            leftMargin: 55,
+                            ikon: CupertinoIcons.arrowshape_turn_up_right_fill,
+                            onClick: () {
+                              _onShare(context, data[index]['video']);
+                            },
+                          ),
+                          StackDesign(
+                            bottomMargin: 150.0,
+                            leftMargin: 60,
+                            ikon: FontAwesomeIcons.download,
+                            onClick: () {
+                              _onSave(context, data[index]['video']);
+                            },
+                          ),
                           Positioned(
                               bottom: 50,
                               left: MediaQuery.of(context).size.width - 85,
                               child: InkWell(
-                                onTap: ()async{
-                                  await SharedPref.setSongId(data[index]['modal_id'].toString());
-                                  await SharedPref.setSongPremium(data[index]['premium'].toString());
-                                  Navigator.pushNamed(context, '/image_pickers');
+                                onTap: () async {
+                                  await SharedPref.setSongId(
+                                      data[index]['modal_id'].toString());
+                                  await SharedPref.setSongPremium(
+                                      data[index]['premium'].toString());
+                                  Navigator.pushNamed(
+                                      context, '/image_pickers');
                                 },
                                 child: Container(
                                   height: 100,
-                                  child: Lottie.asset('assets/cd_animation.json',
-                                      repeat: true, animate: true),
+                                  child: Lottie.asset(
+                                      'assets/cd_animation.json',
+                                      repeat: true,
+                                      animate: true),
                                 ),
                               )),
                           Positioned(
-                              bottom: 100,
-                              right: MediaQuery.of(context).size.width - 85,
-                              child: Container(
-                                child: Text('@Topi.Ai official',style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold
-                                ),),
+                            bottom: 100,
+                            right: MediaQuery.of(context).size.width - 85,
+                            child: Container(
+                              child: Text(
+                                '@Topi.Ai official',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.bold),
                               ),
+                            ),
                           ),
                           Positioned(
                             bottom: 80,
                             right: MediaQuery.of(context).size.width - 20,
                             child: Container(
-                              child: Icon(CupertinoIcons.music_note_2,color: Colors.white,size: 14,),
+                              child: Icon(
+                                CupertinoIcons.music_note_2,
+                                color: Colors.white,
+                                size: 14,
+                              ),
                             ),
                           ),
                           Positioned(
                             bottom: 80,
                             right: MediaQuery.of(context).size.width - 100,
-                            left: MediaQuery.of(context).padding.left+22,
+                            left: MediaQuery.of(context).padding.left + 22,
                             child: Container(
                               height: 15,
                               child: Marquee(
                                 text: '${data[index]['video_name']}',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w700
-                              ),
-                              blankSpace: 10,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w700),
+                                blankSpace: 10,
                                 velocity: 30,
                               ),
                             ),
@@ -409,10 +442,10 @@ class _CommunityState extends State<Community> {
     if (await Permission.storage.request().isGranted &&
         await Permission.accessMediaLocation.request().isGranted) {
       File value = File('$image');
-      var paths=  await GallerySaver.saveVideo(value.path);
+      var paths = await GallerySaver.saveVideo(value.path);
       if (paths.toString().isNotEmpty) {
         toastShow('Video Saved in gallery!');
-        isDownloaded=true;
+        isDownloaded = true;
       }
     } else {
       await [
@@ -423,15 +456,15 @@ class _CommunityState extends State<Community> {
   }
 
   void _onShare(BuildContext context, image) async {
-   // final box = context.findRenderObject() as RenderBox?;
+    // final box = context.findRenderObject() as RenderBox?;
     print('image path $image');
     if (image != null) {
-
-      await Share.share(image,
-       /*   sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size*/);
+      await Share.share(
+        image, /*   sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size*/
+      );
     }
-
   }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -443,8 +476,9 @@ class _CommunityState extends State<Community> {
 }
 
 class StackDesign extends StatelessWidget {
-  final bottomMargin,leftMargin,ikon,onClick;
-   StackDesign({
+  final bottomMargin, leftMargin, ikon, onClick;
+
+  StackDesign({
     required this.bottomMargin,
     required this.leftMargin,
     required this.ikon,
@@ -456,16 +490,20 @@ class StackDesign extends StatelessWidget {
     return Positioned(
         bottom: bottomMargin,
         left: MediaQuery.of(context).size.width - leftMargin,
-        child: InsideStacks(icons: ikon,onPress: onClick,));
+        child: InsideStacks(
+          icons: ikon,
+          onPress: onClick,
+        ));
   }
 }
 
 class InsideStacks extends StatelessWidget {
-  final onPress,icons;
+  final onPress, icons;
+
   const InsideStacks({
-  required this.icons,
-  required this.onPress,
-  }) ;
+    required this.icons,
+    required this.onPress,
+  });
 
   @override
   Widget build(BuildContext context) {

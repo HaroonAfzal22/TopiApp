@@ -20,7 +20,6 @@ class HttpRequest {
       stream.cast();
       var length = await image.length();
       var request = MultipartRequest('POST', uri);
-        //  request.headers['content-length']='50000';
         request.files.add(
           MultipartFile(
             'file1',
@@ -39,7 +38,6 @@ class HttpRequest {
       ).length}');
       request.fields.addAll(bodyMap);
       var response = await request.send();
-
       if (response.statusCode == 200) {
         final directory = await getExternalStorageDirectory();
         var file = File('${directory!.path}/video$count.mp4');
@@ -52,14 +50,8 @@ class HttpRequest {
         });
         print('fiile is $file');
         return file;
-
-
-      } else if (response.statusCode == 401) {
-        // removeAccount(context);
-        toastShow('Authorization Failure');
       } else {
-        print(response.statusCode);
-        return response.statusCode;
+          return serverResponses(response.statusCode);
       }
     } catch (e) {
       print(e);
@@ -70,7 +62,8 @@ class HttpRequest {
  /* Future predictNp(BuildContext context,Map<String,String>bodyMap, var image) async {
     try {
       Uri uri = Uri.parse(HttpLinks.localUrl);
-     *//* var stream = ByteStream(image.openRead());
+     */
+  /* var stream = ByteStream(image.openRead());
       print('uri $uri');
 
       stream.cast();
@@ -94,7 +87,8 @@ class HttpRequest {
           body:bodyMap);
 
       if (response.statusCode == 200) {
-       *//* final directory = await getExternalStorageDirectory();
+       */
+  /* final directory = await getExternalStorageDirectory();
         var file = File('${directory!.path}/video$count.mp4');
         var bytes = <int>[];
         response.stream.listen((value) {
@@ -130,7 +124,7 @@ Future getCategories(BuildContext context)async{
       if(response.statusCode==200){
         return jsonDecode(response.body);
       }else{
-        return response.statusCode;
+        return serverResponses(response.statusCode);
       }
     }catch(e){
       print('error $e');
@@ -146,43 +140,40 @@ Future getSongsList(BuildContext context,int id)async{
       if(response.statusCode==200){
         return jsonDecode(response.body);
       }else{
-        return response.statusCode;
+        return serverResponses(response.statusCode);
       }
     }catch(e){
       print('error $e');
   }
 }
-
-
-  Future getAboutUs(BuildContext context)async{
+Future getAboutUs(BuildContext context)async{
     try{
       Uri uri = Uri.parse('${HttpLinks.aboutUs}');
       Response response= await get(uri);
       if(response.statusCode==200){
         return jsonDecode(response.body);
       }else{
-        return response.statusCode;
+        return serverResponses(response.statusCode);
       }
     }catch(e){
       print('error $e');
     }
   }
-
-  Future getPrivacyPolicy(BuildContext context)async{
+Future getPrivacyPolicy(BuildContext context)async{
     try{
       Uri uri = Uri.parse('${HttpLinks.privacyPolicy}');
       Response response= await get(uri);
       if(response.statusCode==200){
         return jsonDecode(response.body);
       }else{
-        return response.statusCode;
+        return serverResponses(response.statusCode);
       }
     }catch(e){
       print('error $e');
     }
   }
 
-  Future postFcmToken(BuildContext context, String? tokenFcm) async {
+Future postFcmToken(BuildContext context, String? tokenFcm) async {
     try {
       Uri uri = Uri.parse(HttpLinks.postFcmToken);
       Response response = await post(uri, body: {
@@ -190,18 +181,16 @@ Future getSongsList(BuildContext context,int id)async{
       });
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
-      } else if (response.statusCode == 401) {
-        toastShow('Authorization Failure');
       } else {
-        print(response.statusCode);
-        return response.statusCode;
+        print('status after post fcm ${response.statusCode}');
+        return serverResponses( response.statusCode);
       }
     } catch (e) {
       print(e);
     }
   }
 
-  Future getCommunity(BuildContext context) async {
+Future getCommunity(BuildContext context) async {
     try {
       Uri uri = Uri.parse(HttpLinks.adminVideos);
       Response response = await get(
@@ -210,21 +199,17 @@ Future getSongsList(BuildContext context,int id)async{
           HttpHeaders.contentTypeHeader: 'application/json',
         },
       );
-
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
-      } else if (response.statusCode == 401) {
-        toastShow('UnAuthorized Error');
       } else {
-        print(response.statusCode);
-        return response.statusCode;
+        return serverResponses(response.statusCode);
       }
     } catch (e) {
       print(e);
     }
   }
 
-  Future getAds(BuildContext context) async {
+Future getAds(BuildContext context) async {
     try {
       Uri uri = Uri.parse('${HttpLinks.AdsUrl}');
       Response response = await get(uri, headers: {
@@ -232,11 +217,9 @@ Future getSongsList(BuildContext context,int id)async{
       });
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
-      } else if (response.statusCode == 401) {
-        toastShow('Authorization Failure');
       } else {
         print(response.statusCode);
-        return response.statusCode;
+        return serverResponses(response.statusCode);
       }
     } catch (e) {
       print(e);

@@ -57,7 +57,7 @@ class _SongsListState extends State<SongsList> {
 
   BannerAd? myBanner = BannerAd(
       size: AdSize.banner,
-      adUnitId: SharedPref.getBannerAd(),
+      adUnitId: SharedPref.getBannerAd()??"",
       listener: BannerAdListener(),
       request: AdRequest());
 
@@ -115,7 +115,6 @@ class _SongsListState extends State<SongsList> {
                               height: MediaQuery.of(context).size.height,
                               child: Container(
                                 child: ListView.builder(
-                                  shrinkWrap: true,
                                   physics: BouncingScrollPhysics(),
                                   itemCount: songsList.length,
                                   itemBuilder: (context, index) {
@@ -222,9 +221,16 @@ class _SongsListState extends State<SongsList> {
     HttpRequest request = HttpRequest();
     var result = await request.getCategories(context);
     setState(() {
-      result!=null?europeanCountries = result : toastShow('Data not Found');
-      result!=null?isLoading=true :isLoading=false;
-      result!=null?categoryId = result[0]['id'] :null;
+      if(result==null ||result.isEmpty){
+        toastShow('Data List is Empty');
+        isLoading=false;
+      }else if(result.toString().contains('Error')) {
+        toastShow('${result.toString()}');
+         isLoading = false;
+      }else{
+        europeanCountries = result;
+        categoryId = result[0]['id'];
+      }
     });
 
     getSongsList(categoryId!);
@@ -233,19 +239,22 @@ class _SongsListState extends State<SongsList> {
   void getSongsList(int id) async {
     HttpRequest request = HttpRequest();
     var songs = await request.getSongsList(context, id);
-    if (songs == 500) {
-      snackShow(context, '$songs Error try again later...');
-      setState(() {
+
+    setState(() {
+      if (songs ==null ||songs.isEmpty) {
+        toastShow('Data List is Empty ..');
+          isLoading = false;
+      } else if(songs.toString().contains('Error')){
+        toastShow('${songs.toString()}');
         isLoading = false;
-      });
-    } else {
-      setState(() {
+      }else{
         songsList = songs;
         selected = List.filled(songs.length, false);
         isClick = List.filled(songs.length, false);
         isLoading = false;
-      });
-    }
+      }
+    });
+
   }
 
   @override
