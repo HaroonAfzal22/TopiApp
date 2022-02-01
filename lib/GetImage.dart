@@ -338,16 +338,16 @@ class _ImagePickersState extends State<ImagePickers>
   }
 
   Future<Null> _pickImage() async {
-    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery,imageQuality: 50);
     imageFile = pickedImage != null ? File(pickedImage.path) : null;
-    print('image file size is ${imageFile!.lengthSync()}');
+    print('image file size is ${getFileSizeString(bytes: imageFile!.lengthSync())}');
     if (imageFile != null) {
-      var result = getFileSizeString(bytes: imageFile!.lengthSync());
+      /*  var result = getFileSizeString(bytes: imageFile!.lengthSync());
       if (result.contains('KB')) {
         if (int.parse(result.substring(0, result.length - 2)) < 50) {
           _onWillPop('Image quality too low, kindly upload best quality image for better result...');
         }
-        /*else if(int.parse(result.substring(0, result.length - 2)) > 800){
+        *//*else if(int.parse(result.substring(0, result.length - 2)) > 800){
           var tempDir = await getTemporaryDirectory();
           final path = tempDir.path;
           int rand = Random().nextInt(10000);
@@ -358,7 +358,7 @@ class _ImagePickersState extends State<ImagePickers>
 
           print('compress image is kb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');
           predictSong(compressedImage);
-        }*/
+        }*//*
         else {
           setState(() {
             isLoading = true;
@@ -373,7 +373,7 @@ class _ImagePickersState extends State<ImagePickers>
           });
         }
       } else {
-        /*var tempDir = await getTemporaryDirectory();
+        var tempDir = await getTemporaryDirectory();
         final path = tempDir.path;
         int rand = Random().nextInt(10000);
 
@@ -393,7 +393,7 @@ class _ImagePickersState extends State<ImagePickers>
           }
           animationController.forward();
         });
-      }
+      //}
     }
   }
 
@@ -429,26 +429,19 @@ class _ImagePickersState extends State<ImagePickers>
     };
     HttpRequest request = HttpRequest();
     var result = await request.predictNp(context,bodyMap, image);
-    if (result == null ||result.isEmpty) {
-      setState(() {
-        toastShow('Data not Found...');
-        isLoading=false;
-        percentage = animationController.value * 0;
-        animationController.value = 0;
-        _clearImage();
-      });
-     /* if (result == 504 ||result == 500) {
-        snackShow(context, '$result Server Error try again later...');
+    print('result $result');
+     if (result == 504 ||result == 500) {
+        snackShow(context, '$result  Error try again later...');
         setState(() {
           isLoading = false;
           percentage = animationController.value * 0;
           animationController.value = 0;
         });
-      }
-      else {
-        var dir = await getExternalStorageDirectory();
+      } else {
+
+       var dir = await getExternalStorageDirectory();
         List values = await dir!.list().toList();
-        timer = Timer.periodic(Duration(seconds: 1), (_) {
+       timer = Timer.periodic(Duration(seconds: 1), (_) {
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
               timer!.cancel();
@@ -465,8 +458,20 @@ class _ImagePickersState extends State<ImagePickers>
             }
           }
         });
-      }*/
-    }else if(result.toString().contains('Error')){
+      }
+   /* if (result == null ||result.isEmpty) {
+      print('response in $result');
+
+      setState(() {
+        toastShow('Data not Found...');
+        isLoading=false;
+        percentage = animationController.value * 0;
+        animationController.value = 0;
+        _clearImage();
+      });
+
+    }
+    else if(result.toString().contains('Error')){
       setState(() {
         toastShow('$result...');
         isLoading=false;
@@ -476,8 +481,11 @@ class _ImagePickersState extends State<ImagePickers>
       });
     }
     else {
+      print('response at $result');
+
       var dir = await getExternalStorageDirectory();
       List values = await dir!.list().toList();
+      print('values $values');
       timer = Timer.periodic(Duration(seconds: 1), (_) {
         for (int i = 0; i < values.length; i++) {
           if (values[i].toString().contains(result.path.toString())) {
@@ -495,7 +503,7 @@ class _ImagePickersState extends State<ImagePickers>
           }
         }
       });
-    }
+    }*/
   }
 
   void _clearImage() {

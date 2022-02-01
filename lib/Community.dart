@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:lottie/lottie.dart';
 import 'package:marquee/marquee.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -33,7 +34,7 @@ class _CommunityState extends State<Community> {
   var data = [];
   bool isVisible = true, isDownloaded = false;
   bool isLoading = false;
-  var activeIndex = 0;
+  var activeIndex = 5;
   List<bool> isLiked = [];
   List<bool> isDescClick = [];
   List<int> isLikedCount = [];
@@ -54,15 +55,17 @@ class _CommunityState extends State<Community> {
       ],
       vid = [];
   List<BetterPlayerListVideoPlayerController>? controller = [];
+  bool isInterstitialAdReady = false;
+  InterstitialAd? _interstitialAd;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     isLoading = true;
-
+    _loadInterstitialAd();
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-     // getCommunity();
+      getCommunity();
     });
 
     indexes = List<int>.filled(values.length, 0);
@@ -71,16 +74,16 @@ class _CommunityState extends State<Community> {
     isLiked = List<bool>.filled(values.length, false);
     isDescClick = List<bool>.filled(values.length, false);
 
-    testingVideoLink();
+   // testingVideoLink();
   }
 
-  void testingVideoLink() async {
+  void testingVideoLink(links) async {
     String uriPrefix = 'https://wasisoft.page.link'; // https://topi.ai
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: uriPrefix,
       androidParameters: AndroidParameters(packageName: 'com.topi.ai',minimumVersion: 1),
-      link: /*Uri.parse(uriPrefix+'community?id=2'),*/
-      Uri.parse('https://www.tiktok.com/@awaisbalochh762/video/7054959096268672282?is_copy_url=1&is_from_webapp=v1'),
+      link: Uri.parse(uriPrefix+'community'),
+     // Uri.parse('https://www.tiktok.com/@awaisbalochh762/video/7054959096268672282?is_copy_url=1&is_from_webapp=v1'),
     );
 
     final ShortDynamicLink shortDynamicLink =
@@ -130,6 +133,9 @@ class _CommunityState extends State<Community> {
                 onPageChanged: (index) {
                   controller!.forEach((controllers) => controllers.pause());
                   controller![index].play();
+                  if(activeIndex==index){
+                    interAd();
+                  }
                 },
                 scrollDirection: Axis.vertical,
                 itemBuilder: (BuildContext context, int index) {
@@ -139,7 +145,7 @@ class _CommunityState extends State<Community> {
                     child: Container(
                       child: Stack(
                         children: [
-                          Container(
+                        Container(
                             child: BetterPlayerListVideoPlayer(
                               BetterPlayerDataSource(
                                   BetterPlayerDataSourceType.network,
@@ -198,7 +204,7 @@ class _CommunityState extends State<Community> {
                             leftMargin: 55,
                             ikon: CupertinoIcons.arrowshape_turn_up_right_fill,
                             onClick: () {
-                              _onShare(context, data[index]['video']);
+                             testingVideoLink(index);
                             },
                           ),
                           StackDesign(
@@ -281,140 +287,35 @@ class _CommunityState extends State<Community> {
     );
   }
 
-  /*    SizedBox(
-                        height: 4.0,
-                      ),
-                      Container(
-                        alignment: Alignment.topCenter,
-                        child: AnimatedSmoothIndicator(
-                          count: 1,
-                          activeIndex:
-                              1 */
-  /*int.parse(data[index]['media'][activeIndex])*/
-  /*,
-                          effect: WormEffect(
-                              offset: 8.0,
-                              spacing: 4.0,
-                              radius: 8.0,
-                              dotWidth: 8.0,
-                              dotHeight: 8.0,
-                              paintStyle: PaintingStyle.fill,
-                              strokeWidth: 1.0,
-                              dotColor: Colors.grey,
-                              activeDotColor: Colors.indigo),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isLiked[index] == true
-                                        ? isLiked[index] = false
-                                        : isLiked[index] = true;
-                                    isLiked[index] == true
-                                        ? isLikedCount[index]++
-                                        : isLikedCount[index]--;
-                                  });
-                                },
-                                icon: isLiked[index] == true
-                                    ? Icon(
-                                        CupertinoIcons.heart_fill,
-                                        color: Color(0xffd80000),
-                                      )
-                                    : Icon(CupertinoIcons.heart)),
-                          ),
-                          Expanded(
-                              child: IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.send))),
-                          Expanded(
-                              flex: 5,
-                              child: Padding(
-                                padding: EdgeInsets.only(right: 8.0),
-                                child: Text(
-                                  '${data[index]['likes']} likes',
-                                  textAlign: TextAlign.end,
-                                ),
-                              )),
-                        ],
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(
-                            right: 8.0, left: 8.0, bottom: 8.0),
-                        child: InkWell(
-                          child: RichText(
-                              maxLines:
-                                  isDescClick[index] == true ? null : 2,
-                              overflow: isDescClick[index] == true
-                                  ? TextOverflow.visible
-                                  : TextOverflow.ellipsis,
-                              text: TextSpan(
-                                  children: [
-                                TextSpan(
-                                    text: 'Topi ',
-                                    style: TextStyle(
-                                        fontSize: 12.0,
-                                        color: Color(0xff262626),
-                                        fontWeight: FontWeight.bold)),
-                                TextSpan(
-                                    text: '${data[index]['desc']}',
-                                    style: TextStyle(
-                                      fontSize: 10.0,
-                                      color: Color(0xff262626),
-                                    )),
-                              ]),),
-                          onTap: () {
-                            setState(() {
-                              isDescClick[index] == true
-                                  ? isDescClick[index] = false
-                                  : isDescClick[index] = true;
-                            });
-                          },
-                        ),
-                      ),*/
 
-  /*  Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: titleIcon('assets/topi.png', 16.0),
-                            ),
-                            Expanded(
-                              flex: 8,
-                              child: Text(
-                                'Topi',
-                                textAlign: TextAlign.start,
-                                maxLines: 2,
-                                style: TextStyle(
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xff262626)),
-                              ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTapDown: (TapDownDetails details) async {
-                                  await showMenuDialog(
-                                      context, details.globalPosition);
-                                  setState(() {
-                                    // isLoading = true;
-                                    // postApplicationStatus(listValue[index]['id'], value);
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.more_vert_sharp,
-                                  color: Color(0xff262626),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 4.0,
-                        ),*/
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+        adUnitId: SharedPref.getInterstitialAd(),
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(onAdLoaded: (ad) {
+          this._interstitialAd = ad;
+          ad.fullScreenContentCallback =
+              FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
+                //back screen call
+              });
+          isInterstitialAdReady = true;
+        }, onAdFailedToLoad: (err) {
+          print('Load Failed ${err.message}');
+          isInterstitialAdReady = false;
+        }));
+  }
+
+  interAd(){
+  if (isInterstitialAdReady) {
+    _interstitialAd?.show();
+    _loadInterstitialAd();
+      activeIndex=activeIndex+5;
+
+  } else {
+    toastShow('Ad not work');
+    _loadInterstitialAd();
+  }
+  }
   showMenuDialog(context, details) async {
     double left = details.dx;
     double top = details.dy;
