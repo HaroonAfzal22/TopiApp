@@ -80,7 +80,6 @@ class _ImagePickersState extends State<ImagePickers>
           }),
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          print('natty $NativeAd failedToLoad: $error');
           ad.dispose();
         },
       ),
@@ -106,7 +105,6 @@ class _ImagePickersState extends State<ImagePickers>
           });
           isInterstitialAdReady = true;
         }, onAdFailedToLoad: (err) {
-          print('Load Failed ${err.message}');
           isInterstitialAdReady = false;
         }));
   }
@@ -129,7 +127,6 @@ class _ImagePickersState extends State<ImagePickers>
             isRewardedAdReady = true;
           });
         }, onAdFailedToLoad: (err) {
-          print('Load Failed ${err.message}');
           isRewardedAdReady = false;
         }));
   }
@@ -158,7 +155,6 @@ class _ImagePickersState extends State<ImagePickers>
           toastShow('Ad not work');
           _loadInterstitialAd();
         }
-
       }
     });
 
@@ -429,7 +425,6 @@ class _ImagePickersState extends State<ImagePickers>
     };
     HttpRequest request = HttpRequest();
     var result = await request.predictNp(context,bodyMap, image);
-    print('result $result');
      if (result == 504 ||result == 500) {
         snackShow(context, '$result  Error try again later...');
         setState(() {
@@ -438,14 +433,13 @@ class _ImagePickersState extends State<ImagePickers>
           animationController.value = 0;
         });
       } else {
-
-       var dir = await getExternalStorageDirectory();
-        List values = await dir!.list().toList();
-       timer = Timer.periodic(Duration(seconds: 1), (_) {
+       timer = Timer.periodic(Duration(seconds: 1), (_)async {
+         var dir = await getExternalStorageDirectory();
+         List values = await dir!.list().toList();
           for (int i = 0; i < values.length; i++) {
             if (values[i].toString().contains(result.path.toString())) {
               timer!.cancel();
-              Future.delayed(Duration(seconds: 10), () {
+              Future.delayed(Duration(seconds: 5), () {
                 Navigator.pushNamed(context, '/video_players', arguments: {
                   'file': '${result.path}',
                 });

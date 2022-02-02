@@ -73,17 +73,15 @@ class _CommunityState extends State<Community> {
     isLikedCount = List<int>.filled(values.length, 0);
     isLiked = List<bool>.filled(values.length, false);
     isDescClick = List<bool>.filled(values.length, false);
-
-   // testingVideoLink();
   }
 
-  void testingVideoLink(links) async {
+  void testingVideoLink() async {
     String uriPrefix = 'https://wasisoft.page.link'; // https://topi.ai
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: uriPrefix,
-      androidParameters: AndroidParameters(packageName: 'com.topi.ai',minimumVersion: 1),
-      link: Uri.parse(uriPrefix+'community'),
-     // Uri.parse('https://www.tiktok.com/@awaisbalochh762/video/7054959096268672282?is_copy_url=1&is_from_webapp=v1'),
+      androidParameters:
+          AndroidParameters(packageName: 'com.topi.ai', minimumVersion: 1),
+      link: Uri.parse(uriPrefix + '/community'),
     );
 
     final ShortDynamicLink shortDynamicLink =
@@ -96,7 +94,7 @@ class _CommunityState extends State<Community> {
     HttpRequest request = HttpRequest();
     var result = await request.getCommunity(context);
     setState(() {
-      if (result == null ||result.isEmpty) {
+      if (result == null || result.isEmpty) {
         toastShow('Data not Found...');
         isLoading = false;
       } else if (result.toString().contains('Error')) {
@@ -133,7 +131,7 @@ class _CommunityState extends State<Community> {
                 onPageChanged: (index) {
                   controller!.forEach((controllers) => controllers.pause());
                   controller![index].play();
-                  if(activeIndex==index){
+                  if (index % 4 == 0) {
                     interAd();
                   }
                 },
@@ -145,7 +143,7 @@ class _CommunityState extends State<Community> {
                     child: Container(
                       child: Stack(
                         children: [
-                        Container(
+                          Container(
                             child: BetterPlayerListVideoPlayer(
                               BetterPlayerDataSource(
                                   BetterPlayerDataSourceType.network,
@@ -172,7 +170,46 @@ class _CommunityState extends State<Community> {
                               ),
                             ),
                           ),
-                          Positioned(
+                          Container(
+                            alignment: Alignment.bottomCenter,
+                            margin: EdgeInsets.only(bottom: 100),
+                            child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                    primary: Colors.deepOrange,
+                                    //background color of button
+                                    side: BorderSide(
+                                        width: 1, color: Colors.brown),
+                                    //border width and color
+                                    elevation: 3,
+                                    //elevation of button
+                                    shape: RoundedRectangleBorder(
+                                        //to set border radius to button
+                                        borderRadius:
+                                            BorderRadius.circular(30)),
+                                    padding: EdgeInsets.all(
+                                        20) //content padding inside button
+                                    ),
+                                onPressed: () async {
+                                  await SharedPref.setSongId(
+                                      data[index]['modal_id'].toString());
+                                  await SharedPref.setSongPremium(
+                                      data[index]['premium'].toString());
+                                  Navigator.pushNamed(
+                                      context, '/image_pickers');
+                                },
+                                icon: Icon(
+                                  FontAwesomeIcons.video,
+                                  size: 14,
+                                ),
+                                label: Text(
+                                  'Create this video',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                  ),
+                                )),
+                          )
+                          /* Positioned(
                               bottom: 420,
                               left: MediaQuery.of(context).size.width - 55,
                               child: Container(
@@ -204,7 +241,7 @@ class _CommunityState extends State<Community> {
                             leftMargin: 55,
                             ikon: CupertinoIcons.arrowshape_turn_up_right_fill,
                             onClick: () {
-                             testingVideoLink(index);
+                             testingVideoLink();
                             },
                           ),
                           StackDesign(
@@ -275,7 +312,7 @@ class _CommunityState extends State<Community> {
                                 velocity: 30,
                               ),
                             ),
-                          ),
+                          ),*/
                         ],
                       ),
                     ),
@@ -287,7 +324,6 @@ class _CommunityState extends State<Community> {
     );
   }
 
-
   void _loadInterstitialAd() {
     InterstitialAd.load(
         adUnitId: SharedPref.getInterstitialAd(),
@@ -296,8 +332,8 @@ class _CommunityState extends State<Community> {
           this._interstitialAd = ad;
           ad.fullScreenContentCallback =
               FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
-                //back screen call
-              });
+            //back screen call
+          });
           isInterstitialAdReady = true;
         }, onAdFailedToLoad: (err) {
           print('Load Failed ${err.message}');
@@ -305,17 +341,16 @@ class _CommunityState extends State<Community> {
         }));
   }
 
-  interAd(){
-  if (isInterstitialAdReady) {
-    _interstitialAd?.show();
-    _loadInterstitialAd();
-      activeIndex=activeIndex+5;
+  interAd() {
+    if (isInterstitialAdReady) {
+      _interstitialAd?.show();
+      _loadInterstitialAd();
+    } else {
+      toastShow('Ad not work');
+      _loadInterstitialAd();
+    }
+  }
 
-  } else {
-    toastShow('Ad not work');
-    _loadInterstitialAd();
-  }
-  }
   showMenuDialog(context, details) async {
     double left = details.dx;
     double top = details.dy;

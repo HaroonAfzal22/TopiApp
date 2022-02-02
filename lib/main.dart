@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:topi/AboutUs.dart';
 import 'package:topi/AppCategory.dart';
 import 'package:topi/CategoryList.dart';
 import 'package:topi/ChewiePlayer.dart';
+import 'package:topi/Community.dart';
 import 'package:topi/GetImage.dart';
 import 'package:topi/Google/GoogleAds.dart';
 import 'package:topi/InAppReview.dart';
@@ -74,6 +76,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
   @override
   void initState() {
     // TODO: implement initState
@@ -92,6 +95,8 @@ class _MyAppState extends State<MyApp> {
     });
 
   }
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -110,6 +115,7 @@ class _MyAppState extends State<MyApp> {
         '/about_us': (context) => AboutUs(),
         '/privacy_policy': (context) => PrivacyPolicy(),
         '/notification': (context) => Notifications(),
+        '/community': (context) => Community(),
       },
       home: AppCategory(),
     );

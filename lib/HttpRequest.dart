@@ -173,12 +173,10 @@ Future getPrivacyPolicy(BuildContext context)async{
     }
   }
 
-Future postFcmToken(BuildContext context, String? tokenFcm) async {
+Future postFcmToken(BuildContext context, Map tokenFcm) async {
     try {
       Uri uri = Uri.parse(HttpLinks.postFcmToken);
-      Response response = await post(uri, body: {
-        'token': tokenFcm,
-      });
+      Response response = await post(uri, body:tokenFcm);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {

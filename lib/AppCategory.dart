@@ -1,19 +1,17 @@
 import 'dart:io';
-
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:new_version/new_version.dart';
-import 'package:topi/ClassActivity.dart';
 import 'package:topi/Community.dart';
 import 'package:topi/HttpRequest.dart';
 import 'package:topi/Notifications.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
 import 'package:topi/constants.dart';
-import 'package:topi/test.dart';
-
 import 'NavigationDrawer.dart';
 
 class AppCategory extends StatefulWidget {
@@ -26,6 +24,7 @@ class _AppCategoryState extends State<AppCategory> {
   bool isLoading = false;
   int _page = 1;
   GlobalKey<CurvedNavigationBarState> _bottomsKey = GlobalKey();
+  FirebaseDynamicLinks dynamicLinks= FirebaseDynamicLinks.instance;
 
   final resultScreens = [
     Community(),
@@ -37,10 +36,23 @@ class _AppCategoryState extends State<AppCategory> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       getAds();
+      initDynamicLinks();
     });
     // _checkVersion();
+  }
+  void initDynamicLinks()async{
+    dynamicLinks.onLink.listen((linkData) {
+      final Uri uri = linkData.link;
+      final query= uri.queryParameters;
+     if(query.isNotEmpty){
+       Navigator.pushNamed(context, linkData.link.path);
+     }
+    });
+
+
   }
 
   void getAds() async {
@@ -68,7 +80,7 @@ class _AppCategoryState extends State<AppCategory> {
         versionStatus: status,
         dialogTitle: 'Update Available!!!',
         dialogText:
-            'A new Version of Topi.Ai is available! Which is  Version ${status.storeVersion} but your Version is ${status.localVersion}.\n\n Would you Like to update it now?',
+            'A new Version of Topi.Ai is available! Which Version is ${status.storeVersion} but your Version is ${status.localVersion}.\n\n Would you Like to update it now?',
         updateButtonText: 'Update Now',
       );
     }
@@ -153,12 +165,12 @@ class _AppCategoryState extends State<AppCategory> {
               height: 50,
               items: [
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Icon(
-                      CupertinoIcons.person_3_fill,
+                      FontAwesomeIcons.solidFileVideo,
                       color: Colors.white,
-                      size: 30,
+                      size: 25,
                     ),
                     Visibility(
                       visible: _page == 0 ? false : true,
@@ -174,7 +186,7 @@ class _AppCategoryState extends State<AppCategory> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(CupertinoIcons.music_note_2,
-                        color: Colors.white, size: 30),
+                        color: Colors.white, size: 25),
                     Visibility(
                         visible: _page == 1 ? false : true,
                         child: Text(
@@ -188,7 +200,7 @@ class _AppCategoryState extends State<AppCategory> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(CupertinoIcons.bell_solid,
-                        color: Colors.white, size: 30),
+                        color: Colors.white, size: 25),
                     Visibility(
                         visible: _page == 2 ? false : true,
                         child: Text(

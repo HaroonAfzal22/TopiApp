@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:better_player/better_player.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -11,28 +13,31 @@ import 'package:topi/Shared_Pref.dart';
 import 'package:topi/constants.dart';
 import 'package:video_player/video_player.dart';
 
-class chewiePlayer extends StatefulWidget {
-  late final VideoPlayerController videoPlayerController;
+class ChewiePlayer extends StatefulWidget {
+  late final String url;
   late final childView;
 
-  chewiePlayer({required this.videoPlayerController, required this.childView});
+  ChewiePlayer({required this.url, required this.childView});
 
   @override
-  _chewiePlayerState createState() => _chewiePlayerState();
+  _ChewiePlayerState createState() => _ChewiePlayerState();
 }
 
-class _chewiePlayerState extends State<chewiePlayer> {
+class _ChewiePlayerState extends State<ChewiePlayer> {
   late final ChewieController _chewieController;
+  late BetterPlayerListVideoPlayerController _controller;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    setData();
+    // setData();
+    _controller = BetterPlayerListVideoPlayerController();
   }
 
-  setData() async {
+  /* setData() async {
     _chewieController = ChewieController(
+      aspectRatio: 9/9,
         videoPlayerController: widget.videoPlayerController,
         autoPlay: true,
         errorBuilder: (context, error) {
@@ -43,17 +48,19 @@ class _chewiePlayerState extends State<chewiePlayer> {
             ),
           );
         });
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
           flex: 1,
           child: Container(
             child: Text(
               'Became a Star',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.orangeAccent,
                 fontSize: 30.0,
@@ -66,11 +73,28 @@ class _chewiePlayerState extends State<chewiePlayer> {
           flex: 3,
           child: Container(
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-              border: Border.all(color: Colors.white)
-            ),
-            child: Chewie(
-              controller: _chewieController,
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                border: Border.all(color: Colors.white)),
+            child: BetterPlayerListVideoPlayer(
+              BetterPlayerDataSource(
+                  BetterPlayerDataSourceType.file, '${widget.url}'),
+              playFraction: 0.8,
+              betterPlayerListVideoPlayerController: _controller,
+              configuration: BetterPlayerConfiguration(
+                expandToFill: true,
+                aspectRatio: 1.0,
+                controlsConfiguration: BetterPlayerControlsConfiguration(
+                    enableMute: false,
+                    enableOverflowMenu: false,
+                    enablePlayPause: false,
+                    enableFullscreen: false,
+                    enableSkips: false,
+                    showControlsOnInitialize: false,
+                    enableProgressText: false,
+                    playIcon: CupertinoIcons.play_arrow_solid,
+                    controlBarColor: Colors.transparent,
+                    enableProgressBar: false),
+              ),
             ),
           ),
         ),
@@ -85,8 +109,6 @@ class _chewiePlayerState extends State<chewiePlayer> {
   @override
   void dispose() {
     super.dispose();
-    widget.videoPlayerController.dispose();
-    _chewieController.dispose();
   }
 }
 
@@ -95,19 +117,21 @@ class VideoPlayers extends StatefulWidget {
   _VideoPlayersState createState() => _VideoPlayersState();
 }
 
-
 class _VideoPlayersState extends State<VideoPlayers> {
-
   late var imagePaths;
   bool isLoading = false;
   NativeAd? myNative;
   bool isAdLoaded = false;
-
+  BannerAd? myBanner = BannerAd(
+      size: AdSize.banner,
+      adUnitId: SharedPref.getBannerAd()??"",
+      listener: BannerAdListener(),
+      request: AdRequest());
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    myNative = NativeAd(
+  /*  myNative = NativeAd(
       adUnitId: SharedPref.getNativeAd(),
       factoryId: 'listTile',
       request: AdRequest(),
@@ -126,9 +150,11 @@ class _VideoPlayersState extends State<VideoPlayers> {
     );
     setState(() {
       myNative!.load();
+    });*/
+    myBanner!.load();
 
-    });
   }
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
@@ -155,9 +181,10 @@ class _VideoPlayersState extends State<VideoPlayers> {
                   child: spinkit,
                 )
               : Container(
-                  child: chewiePlayer(
-                    videoPlayerController:
-                        VideoPlayerController.file(File(imagePaths)),
+                  child: ChewiePlayer(
+                    url: '$imagePaths',
+                    /*videoPlayerController:
+                        VideoPlayerController.file(File(imagePaths)),*/
                     childView: Container(
                       child: Column(
                         children: [
@@ -167,11 +194,13 @@ class _VideoPlayersState extends State<VideoPlayers> {
                               children: [
                                 Expanded(
                                   child: Container(
-                                    margin: EdgeInsets.symmetric(horizontal: 8.0),
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 8.0),
                                     child: OutlinedButton(
                                       style: OutlinedButton.styleFrom(
                                         side: BorderSide(
-                                            width: 1.0, color: Colors.redAccent),
+                                            width: 1.0,
+                                            color: Colors.redAccent),
                                       ),
                                       onPressed: () {
                                         _onSave(context, imagePaths);
@@ -191,10 +220,12 @@ class _VideoPlayersState extends State<VideoPlayers> {
                                     child: OutlinedButton(
                                       style: OutlinedButton.styleFrom(
                                         side: BorderSide(
-                                            width: 1.0, color: Colors.redAccent),
+                                            width: 1.0,
+                                            color: Colors.redAccent),
                                       ),
                                       onPressed: () {
-                                        _onShare(context, imagePaths.toString());
+                                        _onShare(
+                                            context, imagePaths.toString());
                                       },
                                       child: Text(
                                         'Share',
@@ -206,20 +237,16 @@ class _VideoPlayersState extends State<VideoPlayers> {
                                     ),
                                   ),
                                 ),
-
                               ],
                             ),
                           ),
-
-                          isAdLoaded
-                              ?Container(
-                            color: Colors.white,
-                            height: 60,
+                        /*  Container(
                             width: MediaQuery.of(context).size.width,
+                            height: 60,
                             child: AdWidget(
-                              ad:myNative!,
+                              ad: myBanner!,
                             ),
-                          ) : Text('loading...')
+                          ),*/
                         ],
                       ),
                     ),
@@ -234,7 +261,7 @@ class _VideoPlayersState extends State<VideoPlayers> {
     if (await Permission.storage.request().isGranted &&
         await Permission.accessMediaLocation.request().isGranted) {
       File value = File('$image');
-    var paths=  await GallerySaver.saveVideo(value.path);
+      var paths = await GallerySaver.saveVideo(value.path);
       if (paths.toString().isNotEmpty) {
         toastShow('Video Saved in gallery!');
       }
@@ -252,6 +279,5 @@ class _VideoPlayersState extends State<VideoPlayers> {
       await Share.shareFiles(['$image'],
           sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     }
-
   }
 }
