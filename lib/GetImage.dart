@@ -298,7 +298,7 @@ class _ImagePickersState extends State<ImagePickers>
                     Container(
                       height: 300,
                       child: Lottie.asset('assets/upload.json',
-                          repeat: true, reverse: true, animate: true),
+                          repeat: true, animate: true),
                     ),
                     Container(
                       margin: EdgeInsets.symmetric(

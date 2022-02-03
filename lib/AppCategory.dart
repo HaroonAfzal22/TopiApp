@@ -39,16 +39,16 @@ class _AppCategoryState extends State<AppCategory> {
 
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       getAds();
-      initDynamicLinks();
+    //  initDynamicLinks();
     });
-    // _checkVersion();
+     _checkVersion();
   }
   void initDynamicLinks()async{
     dynamicLinks.onLink.listen((linkData) {
       final Uri uri = linkData.link;
       final query= uri.queryParameters;
      if(query.isNotEmpty){
-       Navigator.pushNamed(context, linkData.link.path);
+       Navigator.pushNamed(context, '/community');
      }
     });
 

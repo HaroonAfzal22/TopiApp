@@ -38,7 +38,7 @@ class HttpRequest {
       ).length}');
       request.fields.addAll(bodyMap);
       var response = await request.send();
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 ||response.statusCode==201) {
         final directory = await getExternalStorageDirectory();
         var file = File('${directory!.path}/video$count.mp4');
         var bytes = <int>[];
@@ -121,7 +121,7 @@ Future getCategories(BuildContext context)async{
       Response response= await get(uri,headers: {
         HttpHeaders.contentTypeHeader:'application/json',
       });
-      if(response.statusCode==200){
+      if(response.statusCode==200 ||response.statusCode==201){
         return jsonDecode(response.body);
       }else{
         return serverResponses(response.statusCode);
@@ -137,7 +137,7 @@ Future getSongsList(BuildContext context,int id)async{
       Response response= await get(uri,headers: {
         HttpHeaders.contentTypeHeader:'application/json',
       });
-      if(response.statusCode==200){
+      if(response.statusCode==200 ||response.statusCode==201){
         return jsonDecode(response.body);
       }else{
         return serverResponses(response.statusCode);
@@ -150,7 +150,7 @@ Future getAboutUs(BuildContext context)async{
     try{
       Uri uri = Uri.parse('${HttpLinks.aboutUs}');
       Response response= await get(uri);
-      if(response.statusCode==200){
+      if(response.statusCode==200||response.statusCode==201){
         return jsonDecode(response.body);
       }else{
         return serverResponses(response.statusCode);
@@ -163,7 +163,7 @@ Future getPrivacyPolicy(BuildContext context)async{
     try{
       Uri uri = Uri.parse('${HttpLinks.privacyPolicy}');
       Response response= await get(uri);
-      if(response.statusCode==200){
+      if(response.statusCode==200||response.statusCode==201){
         return jsonDecode(response.body);
       }else{
         return serverResponses(response.statusCode);
@@ -177,7 +177,7 @@ Future postFcmToken(BuildContext context, Map tokenFcm) async {
     try {
       Uri uri = Uri.parse(HttpLinks.postFcmToken);
       Response response = await post(uri, body:tokenFcm);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200||response.statusCode==201) {
         return jsonDecode(response.body);
       } else {
         print('status after post fcm ${response.statusCode}');
@@ -197,7 +197,7 @@ Future getCommunity(BuildContext context) async {
           HttpHeaders.contentTypeHeader: 'application/json',
         },
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200||response.statusCode==201) {
         return jsonDecode(response.body);
       } else {
         return serverResponses(response.statusCode);
@@ -213,7 +213,7 @@ Future getAds(BuildContext context) async {
       Response response = await get(uri, headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
       });
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200||response.statusCode==201) {
         return jsonDecode(response.body);
       } else {
         print(response.statusCode);
@@ -223,6 +223,25 @@ Future getAds(BuildContext context) async {
       print(e);
     }
   }
+
+  Future getNotifications(BuildContext context)async{
+    try{
+
+      Uri uri = Uri.parse(HttpLinks.notifications);
+      Response response= await get(uri,headers: {
+        HttpHeaders.contentTypeHeader:'application/json',
+      });
+      if(response.statusCode==200 ||response.statusCode==201){
+        return jsonDecode(response.body);
+      }else{
+        return serverResponses(response.statusCode);
+      }
+    }catch(e){
+      print('error $e');
+    }
+
+  }
+
 
 /*Future parentLogin(BuildContext context, String email, String password,
       String? tokenFcm) async {

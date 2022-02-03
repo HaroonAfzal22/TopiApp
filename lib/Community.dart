@@ -170,6 +170,15 @@ class _CommunityState extends State<Community> {
                               ),
                             ),
                           ),
+                          Positioned(
+                            bottom: 140,
+                            left: 130,
+                            child: Container(
+                              height: 120,
+                              child: Lottie.asset('assets/arrow.json',
+                                  repeat: true, animate: true),
+                            ),
+                          ),
                           Container(
                             alignment: Alignment.bottomCenter,
                             margin: EdgeInsets.only(bottom: 100),

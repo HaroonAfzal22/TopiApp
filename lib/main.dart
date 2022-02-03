@@ -39,7 +39,7 @@ FlutterLocalNotificationsPlugin();
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   RemoteNotification? notification = message.notification;
-  print('a bg message just show up:${message.data}');
+  print('a bg message just show up:${notification!.title}');
 }
 FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
@@ -86,12 +86,23 @@ class _MyAppState extends State<MyApp> {
         SharedPref.setUserFcmToken(value!);
       });
     });
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      /* RemoteNotification ?notification = message.notification;
-      AndroidNotification ?android = message.notification?.android;
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
-        Navigator.pushNamed(this.context, '/notifications');
-      }*/
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(channel.id, channel.name,
+                  color: Colors.amber[600],
+                  playSound: true,
+                  icon: '@mipmap/ic_launcher'),
+            ));
+      }
+      print('message is ${notification!.body}');
+
     });
 
   }

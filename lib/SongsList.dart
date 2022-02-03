@@ -217,9 +217,10 @@ class _SongsListState extends State<SongsList> {
     String? identity= await UniqueIdentifier.serial;
     Map map ={
       'imei':identity.toString(),
-      'fcm-token':SharedPref.getUserFcmToken().toString(),
+      'token':SharedPref.getUserFcmToken().toString(),
     };
     var result = await request.postFcmToken(context,map);
+
   }
 //b66bbba48c531a7a //b66bbba48c531a7a
   Future<void> getCategoryList() async {
