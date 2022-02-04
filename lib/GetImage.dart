@@ -143,6 +143,7 @@ class _ImagePickersState extends State<ImagePickers>
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
      percentage = animationController.value * 100;
@@ -157,7 +158,6 @@ class _ImagePickersState extends State<ImagePickers>
         }
       }
     });
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,

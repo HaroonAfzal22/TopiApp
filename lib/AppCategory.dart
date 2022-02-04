@@ -39,7 +39,7 @@ class _AppCategoryState extends State<AppCategory> {
 
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       getAds();
-    //  initDynamicLinks();
+      initDynamicLinks();
     });
      _checkVersion();
   }
@@ -47,9 +47,7 @@ class _AppCategoryState extends State<AppCategory> {
     dynamicLinks.onLink.listen((linkData) {
       final Uri uri = linkData.link;
       final query= uri.queryParameters;
-     if(query.isNotEmpty){
-       Navigator.pushNamed(context, '/community');
-     }
+       Navigator.pushNamed(context, linkData.link.path);
     });
 
 
@@ -73,7 +71,6 @@ class _AppCategoryState extends State<AppCategory> {
     final newVersion = NewVersion(androidId: "com.topi.ai");
     final status = await newVersion.getVersionStatus();
     await SharedPref.setAppVersion(status!.storeVersion);
-
     if (!status.storeVersion.contains(status.localVersion)) {
       newVersion.showUpdateDialog(
         context: context,

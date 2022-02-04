@@ -54,7 +54,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="http" android:host="wasisoft.page.link" />
-                <data android:scheme="https" />
+                <data android:scheme="https" android:host="wasisoft.page.link" />
             </intent-filter>
 
         </activity>

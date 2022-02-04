@@ -4,14 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/constants.dart';
-import 'package:video_player/video_player.dart';
 
 class ChewiePlayer extends StatefulWidget {
   late final String url;
@@ -24,14 +22,12 @@ class ChewiePlayer extends StatefulWidget {
 }
 
 class _ChewiePlayerState extends State<ChewiePlayer> {
-  late final ChewieController _chewieController;
   late BetterPlayerListVideoPlayerController _controller;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // setData();
     _controller = BetterPlayerListVideoPlayerController();
   }
 

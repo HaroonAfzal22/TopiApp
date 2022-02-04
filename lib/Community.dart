@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:marquee/marquee.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -56,8 +57,9 @@ class _CommunityState extends State<Community> {
       vid = [];
   List<BetterPlayerListVideoPlayerController>? controller = [];
   bool isInterstitialAdReady = false;
+  int? indexPoint;
   InterstitialAd? _interstitialAd;
-
+  PreloadPageController _pageController= PreloadPageController();
   @override
   void initState() {
     // TODO: implement initState
@@ -79,14 +81,13 @@ class _CommunityState extends State<Community> {
     String uriPrefix = 'https://wasisoft.page.link'; // https://topi.ai
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: uriPrefix,
-      androidParameters:
-          AndroidParameters(packageName: 'com.topi.ai', minimumVersion: 1),
+      androidParameters: AndroidParameters(packageName: 'com.topi.ai', minimumVersion: 0),
       link: Uri.parse(uriPrefix + '/community'),
     );
 
-    final ShortDynamicLink shortDynamicLink =
-        await FirebaseDynamicLinks.instance.buildShortLink(parameters);
-    Uri uri = shortDynamicLink.shortUrl;
+    //final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+    Uri uri =await FirebaseDynamicLinks.instance.buildLink(parameters);
+    //shortDynamicLink.shortUrl;
     Share.share(uri.toString(), subject: 'Topi.Ai Songs');
   }
 
@@ -128,7 +129,9 @@ class _CommunityState extends State<Community> {
             ? Center(child: spinkit)
             : PreloadPageView.builder(
                 preloadPagesCount: 5,
+                controller: _pageController,
                 onPageChanged: (index) {
+
                   controller!.forEach((controllers) => controllers.pause());
                   controller![index].play();
                   if (index % 4 == 0) {
@@ -137,7 +140,7 @@ class _CommunityState extends State<Community> {
                 },
                 scrollDirection: Axis.vertical,
                 itemBuilder: (BuildContext context, int index) {
-                  controller![0].play();
+                    controller![0].play();
                   return Container(
                     padding: EdgeInsets.only(bottom: 13.0),
                     child: Container(
@@ -153,6 +156,7 @@ class _CommunityState extends State<Community> {
                                   controller![index],
                               configuration: BetterPlayerConfiguration(
                                 expandToFill: true,
+                                autoDispose: false,
                                 aspectRatio: 1.0,
                                 controlsConfiguration:
                                     BetterPlayerControlsConfiguration(
@@ -170,7 +174,7 @@ class _CommunityState extends State<Community> {
                               ),
                             ),
                           ),
-                          Positioned(
+                          /*Positioned(
                             bottom: 140,
                             left: 130,
                             child: Container(
@@ -217,8 +221,8 @@ class _CommunityState extends State<Community> {
                                     fontSize: 14.0,
                                   ),
                                 )),
-                          )
-                          /* Positioned(
+                          )*/
+                           Positioned(
                               bottom: 420,
                               left: MediaQuery.of(context).size.width - 55,
                               child: Container(
@@ -236,18 +240,21 @@ class _CommunityState extends State<Community> {
                           StackDesign(
                             bottomMargin: 360.0,
                             leftMargin: 55,
+                            counts: 6,
                             ikon: CupertinoIcons.heart_solid,
                             onClick: () {},
                           ),
                           StackDesign(
                             bottomMargin: 290.0,
                             leftMargin: 55,
+                            counts: 35,
                             ikon: FontAwesomeIcons.commentDots,
                             onClick: () {},
                           ),
                           StackDesign(
                             bottomMargin: 220.0,
                             leftMargin: 55,
+                            counts: 40,
                             ikon: CupertinoIcons.arrowshape_turn_up_right_fill,
                             onClick: () {
                              testingVideoLink();
@@ -256,6 +263,7 @@ class _CommunityState extends State<Community> {
                           StackDesign(
                             bottomMargin: 150.0,
                             leftMargin: 60,
+                            counts: 15,
                             ikon: FontAwesomeIcons.download,
                             onClick: () {
                               _onSave(context, data[index]['video']);
@@ -307,8 +315,8 @@ class _CommunityState extends State<Community> {
                           ),
                           Positioned(
                             bottom: 80,
-                            right: MediaQuery.of(context).size.width - 100,
-                            left: MediaQuery.of(context).padding.left + 22,
+                            right: MediaQuery.of(context).size.width - 150,
+                            left: MediaQuery.of(context).padding.left + 30,
                             child: Container(
                               height: 15,
                               child: Marquee(
@@ -321,7 +329,7 @@ class _CommunityState extends State<Community> {
                                 velocity: 30,
                               ),
                             ),
-                          ),*/
+                          ),
                         ],
                       ),
                     ),
@@ -421,12 +429,13 @@ class _CommunityState extends State<Community> {
 }
 
 class StackDesign extends StatelessWidget {
-  final bottomMargin, leftMargin, ikon, onClick;
+  final bottomMargin, leftMargin, ikon, onClick,counts;
 
   StackDesign({
     required this.bottomMargin,
     required this.leftMargin,
     required this.ikon,
+    required this.counts,
     required this.onClick,
   });
 
@@ -437,29 +446,42 @@ class StackDesign extends StatelessWidget {
         left: MediaQuery.of(context).size.width - leftMargin,
         child: InsideStacks(
           icons: ikon,
-          onPress: onClick,
+          onPress: onClick, count: counts,
         ));
   }
 }
 
 class InsideStacks extends StatelessWidget {
-  final onPress, icons;
+  final onPress, icons,count;
 
   const InsideStacks({
     required this.icons,
+    required this.count,
     required this.onPress,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: IconButton(
-          onPressed: onPress,
-          icon: FaIcon(
-            icons,
+    return Column(
+      children: [
+        Container(
+          child: IconButton(
+              onPressed: onPress,
+              icon: FaIcon(
+                icons,
+                color: Colors.white,
+                size: 30,
+              )),
+        ),
+        Container(
+          child: Text('${NumberFormat.compact().format(count)}',
+            style: TextStyle(
+            fontSize: 14.0,
+            fontWeight: FontWeight.w700,
             color: Colors.white,
-            size: 30,
-          )),
+          ),),
+        ),
+      ],
     );
   }
 }
