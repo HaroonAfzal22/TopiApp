@@ -14,6 +14,7 @@ import 'package:topi/GetImage.dart';
 import 'package:topi/Google/GoogleAds.dart';
 import 'package:topi/InAppReview.dart';
 import 'package:topi/Notifications.dart';
+import 'package:topi/PremiumFeature.dart';
 import 'package:topi/PrivacyPolicy.dart';
 import 'package:topi/ShareFile.dart';
 import 'package:topi/Shared_Pref.dart';
@@ -122,6 +123,7 @@ class _MyAppState extends State<MyApp> {
         '/privacy_policy': (context) => PrivacyPolicy(),
         '/notification': (context) => Notifications(),
         '/community': (context) => Community(),
+        '/premium_feature': (context) => PremiumFeature(),
       },
       home: AppCategory(),
     );

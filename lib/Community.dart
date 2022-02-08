@@ -21,6 +21,8 @@ import 'package:topi/constants.dart';
 import 'package:topi/HttpRequest.dart';
 import 'package:topi/Shared_Pref.dart';
 
+import 'OutlineBtn.dart';
+
 class Community extends StatefulWidget {
   const Community({Key? key}) : super(key: key);
 
@@ -131,7 +133,6 @@ class _CommunityState extends State<Community> {
                 preloadPagesCount: 5,
                 controller: _pageController,
                 onPageChanged: (index) {
-
                   controller!.forEach((controllers) => controllers.pause());
                   controller![index].play();
                   if (index % 4 == 0) {
@@ -222,6 +223,30 @@ class _CommunityState extends State<Community> {
                                   ),
                                 )),
                           )*/
+                          Positioned(
+                            bottom: MediaQuery.of(context).size.height-150,
+                            right: MediaQuery.of(context).size.width * 0.01,
+                            child: Container(
+                            padding: const EdgeInsets.all(8.0),
+
+                            child: Visibility(
+                              visible:data[index]['premium']=='0'?true:false ,
+                              child: UnicornOutlineButton(
+                                strokeWidth: 1,
+                                radius: 10,
+                                gradient: LinearGradient(colors: [Colors.cyan, Colors.deepOrangeAccent]),
+                                child:  Text('Premium',style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.w700,
+                                    foreground: Paint()..shader = linearGradient
+                                ),),
+                                onPressed: (){
+                                  Navigator.pushNamed(context, '/premium_feature');
+
+                                },
+                              ),
+                            ),
+                          ),),
                            Positioned(
                               bottom: 420,
                               left: MediaQuery.of(context).size.width - 55,

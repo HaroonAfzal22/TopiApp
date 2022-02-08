@@ -145,8 +145,16 @@ class _SongsListState extends State<SongsList> {
                                         await SharedPref.setSongPremium(
                                             songsList[index]['premium'].toString());
                                       },
-                                      child: SongsLists(songsList: songsList,
-                                        selected: selected,clickIcon: clickIcon, index: index,),
+                                      child: SongsLists(
+                                        songsList: songsList,
+                                        selected: selected,
+                                        clickIcon: clickIcon,
+                                        index: index,
+                                        pClick: (){
+                                        debugPrint('click at p');
+                                        Navigator.pushNamed(context, '/premium_feature');
+                                        }, pVisible: songsList[index]['premium']=='0'?true:false,
+                                      ),
                                     );
                                   },
                                 ),
