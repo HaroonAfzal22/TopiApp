@@ -267,7 +267,9 @@ class _CommunityState extends State<Community> {
                             leftMargin: 55,
                             counts: 6,
                             ikon: CupertinoIcons.heart_solid,
-                            onClick: () {},
+                            onClick: () {
+
+                            },
                           ),
                           StackDesign(
                             bottomMargin: 290.0,
@@ -494,7 +496,7 @@ class InsideStacks extends StatelessWidget {
               onPressed: onPress,
               icon: FaIcon(
                 icons,
-                color: Colors.white,
+                color: Colors.red,
                 size: 30,
               )),
         ),

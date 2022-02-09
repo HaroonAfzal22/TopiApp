@@ -83,7 +83,7 @@ final Shader linearGradient = LinearGradient(
     Color(0xffFCCC44),
     Color(0xffDC3843),
     Color(0xffFC9425),],
-).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
+).createShader(Rect.fromLTWH(50.0, 100.0, 200.0, 70.0));
 
 String serverResponses(value){
   if(value==400){
