@@ -40,7 +40,7 @@ class _CommunityState extends State<Community> {
   var activeIndex = 5;
   List<bool> isLiked = [];
   List<bool> isDescClick = [];
-  List<int> isLikedCount = [];
+  List<int> isLikedCount = [], isCommentCount = [], isShareCount = [];
   var indexes = [],
       listing = [],
       values = [1, 2, 3, 4, 5],
@@ -61,7 +61,8 @@ class _CommunityState extends State<Community> {
   bool isInterstitialAdReady = false;
   int? indexPoint;
   InterstitialAd? _interstitialAd;
-  PreloadPageController _pageController= PreloadPageController();
+  PreloadPageController _pageController = PreloadPageController();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -75,22 +76,26 @@ class _CommunityState extends State<Community> {
     indexes = List<int>.filled(values.length, 0);
     listing = List<int>.filled(values.length, 0);
     isLikedCount = List<int>.filled(values.length, 0);
+    isCommentCount = List<int>.filled(values.length, 0);
     isLiked = List<bool>.filled(values.length, false);
     isDescClick = List<bool>.filled(values.length, false);
   }
 
-  void testingVideoLink() async {
+  void testingVideoLink(index) async {
     String uriPrefix = 'https://wasisoft.page.link'; // https://topi.ai
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: uriPrefix,
-      androidParameters: AndroidParameters(packageName: 'com.topi.ai', minimumVersion: 0),
+      androidParameters:
+          AndroidParameters(packageName: 'com.topi.ai', minimumVersion: 0),
       link: Uri.parse(uriPrefix + '/community'),
     );
 
     //final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
-    Uri uri =await FirebaseDynamicLinks.instance.buildLink(parameters);
+    Uri uri = await FirebaseDynamicLinks.instance.buildLink(parameters);
     //shortDynamicLink.shortUrl;
     Share.share(uri.toString(), subject: 'Topi.Ai Songs');
+
+    print('value of share ${isShareCount[index]}');
   }
 
   getCommunity() async {
@@ -108,6 +113,10 @@ class _CommunityState extends State<Community> {
           controller?.insert(i, BetterPlayerListVideoPlayerController());
         }
         data = result;
+        isLikedCount = List<int>.filled(data.length, 0);
+        isCommentCount = List<int>.filled(data.length, 0);
+        isShareCount = List<int>.filled(data.length, 0);
+        isLiked = List<bool>.filled(data.length, false);
         isLoading = false;
       }
     });
@@ -141,7 +150,7 @@ class _CommunityState extends State<Community> {
                 },
                 scrollDirection: Axis.vertical,
                 itemBuilder: (BuildContext context, int index) {
-                    controller![0].play();
+                  controller![0].play();
                   return Container(
                     padding: EdgeInsets.only(bottom: 13.0),
                     child: Container(
@@ -224,30 +233,38 @@ class _CommunityState extends State<Community> {
                                 )),
                           )*/
                           Positioned(
-                            bottom: MediaQuery.of(context).size.height-150,
+                            bottom: MediaQuery.of(context).size.height - 150,
                             right: MediaQuery.of(context).size.width * 0.01,
                             child: Container(
-                            padding: const EdgeInsets.all(8.0),
-
-                            child: Visibility(
-                              visible:data[index]['premium']=='0'?true:false ,
-                              child: UnicornOutlineButton(
-                                strokeWidth: 1,
-                                radius: 10,
-                                gradient: LinearGradient(colors: [Colors.cyan, Colors.deepOrangeAccent]),
-                                child:  Text('Premium',style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.w700,
-                                    foreground: Paint()..shader = linearGradient
-                                ),),
-                                onPressed: (){
-                                  Navigator.pushNamed(context, '/premium_feature');
-
-                                },
+                              padding: const EdgeInsets.all(8.0),
+                              child: Visibility(
+                                visible: data[index]['premium'] == '0'
+                                    ? true
+                                    : false,
+                                child: UnicornOutlineButton(
+                                  strokeWidth: 1,
+                                  radius: 10,
+                                  gradient: LinearGradient(colors: [
+                                    Colors.cyan,
+                                    Colors.deepOrangeAccent
+                                  ]),
+                                  child: Text(
+                                    'Premium',
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w700,
+                                        foreground: Paint()
+                                          ..shader = linearGradient),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, '/premium_feature');
+                                  },
+                                ),
                               ),
                             ),
-                          ),),
-                           Positioned(
+                          ),
+                          Positioned(
                               bottom: 420,
                               left: MediaQuery.of(context).size.width - 55,
                               child: Container(
@@ -265,26 +282,39 @@ class _CommunityState extends State<Community> {
                           StackDesign(
                             bottomMargin: 360.0,
                             leftMargin: 55,
-                            counts: 6,
+                            counts: isLikedCount.length,
+                            colors: isLiked[index] == true
+                                ? Colors.red
+                                : Colors.white,
                             ikon: CupertinoIcons.heart_solid,
                             onClick: () {
-
+                              if (isLiked[index] == true) {
+                                isLiked.removeAt(index);
+                                isLiked.insert(index, false);
+                              } else {
+                                isLiked.removeAt(index);
+                                isLiked.insert(index, true);
+                              }
                             },
                           ),
                           StackDesign(
                             bottomMargin: 290.0,
                             leftMargin: 55,
-                            counts: 35,
-                            ikon: FontAwesomeIcons.commentDots,
-                            onClick: () {},
+                            counts: isCommentCount.length,
+                            colors: Colors.white,
+                            ikon: FontAwesomeIcons.solidCommentDots,
+                            onClick: () {
+                              _settingModalBottomSheet(context);
+                            },
                           ),
                           StackDesign(
                             bottomMargin: 220.0,
                             leftMargin: 55,
-                            counts: 40,
+                            counts: isShareCount.length,
+                            colors: Colors.white,
                             ikon: CupertinoIcons.arrowshape_turn_up_right_fill,
                             onClick: () {
-                             testingVideoLink();
+                              testingVideoLink(index);
                             },
                           ),
                           StackDesign(
@@ -292,6 +322,7 @@ class _CommunityState extends State<Community> {
                             leftMargin: 60,
                             counts: 15,
                             ikon: FontAwesomeIcons.download,
+                            colors: Colors.white,
                             onClick: () {
                               _onSave(context, data[index]['video']);
                             },
@@ -445,6 +476,243 @@ class _CommunityState extends State<Community> {
     }
   }
 
+  //for modal bottom sheet to show children
+  void _settingModalBottomSheet(context) {
+    showModalBottomSheet(
+      backgroundColor: Color(0xffD7CCC8),
+      context: context,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      builder: (BuildContext bc) => Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(top: 9),
+                  child: Divider(
+                    thickness: 1.0,
+                    height: 0.5,
+                    indent: 10,
+                    endIndent: 10,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  '1000 comments',
+                  style: TextStyle(
+                      color: Color(0xff0a1829),
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(top: 9),
+                  child: Divider(
+                    thickness: 1.0,
+                    height: 0.5,
+                    indent: 10,
+                    endIndent: 10,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Card(
+                elevation: 8.0,
+                margin: EdgeInsets.symmetric(vertical: 8.0),
+                //   color: Color(int.parse('newColor')),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xff5454f6),
+                        Color(0xff09c5ec),
+                        Color(0xff1ce046),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  height: 120,
+                  width: 110,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text('1-Month',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.bold)),
+                      Text(
+                        'monthly',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Card(
+                elevation: 8.0,
+                margin: EdgeInsets.symmetric(vertical: 8.0),
+                //   color: Color(int.parse('newColor')),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xff85f20c),
+                        Color(0xffec6b09),
+                        Color(0xff1ca2e0),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  height: 120,
+                  width: 110,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text('6-Month',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.bold)),
+                      Text(
+                        'halfly',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Card(
+                elevation: 8.0,
+                margin: EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xff0cf268),
+                        Color(0xffd0be22),
+                        Color(0xff1c1fe0),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  height: 120,
+                  width: 110,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text('1-Year',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.bold)),
+                      Text(
+                        'yearly',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          InkWell(
+            child: AnimatedContainer(
+              duration: const Duration(
+                milliseconds: 200,
+              ),
+              decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    const BoxShadow(
+                      color: Colors.grey,
+                      offset: Offset(4, 4),
+                      blurRadius: 15,
+                      spreadRadius: 1,
+                    ),
+                    const BoxShadow(
+                      color: Colors.white,
+                      offset: Offset(-4, -4),
+                      blurRadius: 15,
+                      spreadRadius: 1,
+                    ),
+                  ]),
+              child: Row(
+                children: [
+                  Text('Subscribe with'),
+                  Icon(
+                    FontAwesomeIcons.googlePay,
+                    size: 28.0,
+                  )
+                ],
+              ),
+            ),
+          ),
+          /*  GridView.builder(
+            padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+            shrinkWrap: true,
+            itemBuilder: (context, index) => InkWell(
+              child: Card(
+                margin: EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+             //   color: Color(int.parse('newColor')),
+                child: ListTile(
+                  title: Text('name',
+                      style: TextStyle(color: Colors.orange)),
+                  subtitle: Text(
+                    '$monthly',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+              onTap: () async {
+                Navigator.of(context).pop();
+                toastShow('name selected');
+              },
+            ),
+            itemCount: 3, gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+          ),*/
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -456,12 +724,13 @@ class _CommunityState extends State<Community> {
 }
 
 class StackDesign extends StatelessWidget {
-  final bottomMargin, leftMargin, ikon, onClick,counts;
+  final bottomMargin, leftMargin, ikon, onClick, counts, colors;
 
   StackDesign({
     required this.bottomMargin,
     required this.leftMargin,
     required this.ikon,
+    required this.colors,
     required this.counts,
     required this.onClick,
   });
@@ -473,17 +742,20 @@ class StackDesign extends StatelessWidget {
         left: MediaQuery.of(context).size.width - leftMargin,
         child: InsideStacks(
           icons: ikon,
-          onPress: onClick, count: counts,
+          color: colors,
+          onPress: onClick,
+          count: counts,
         ));
   }
 }
 
 class InsideStacks extends StatelessWidget {
-  final onPress, icons,count;
+  final onPress, icons, count, color;
 
   const InsideStacks({
     required this.icons,
     required this.count,
+    required this.color,
     required this.onPress,
   });
 
@@ -496,17 +768,19 @@ class InsideStacks extends StatelessWidget {
               onPressed: onPress,
               icon: FaIcon(
                 icons,
-                color: Colors.red,
+                color: color,
                 size: 30,
               )),
         ),
         Container(
-          child: Text('${NumberFormat.compact().format(count)}',
+          child: Text(
+            '${NumberFormat.compact().format(count)}',
             style: TextStyle(
-            fontSize: 14.0,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),),
+              fontSize: 14.0,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
         ),
       ],
     );
