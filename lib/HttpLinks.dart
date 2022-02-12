@@ -1,3 +1,5 @@
+
+// api link url class
 class HttpLinks {
   static const String localUrl ='http://59.103.234.58:8002/create/video/with/image/demo';
   static const String localsUrl ='http://59.103.234.58:8002/demo_p';

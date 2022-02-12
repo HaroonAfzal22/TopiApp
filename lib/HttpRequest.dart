@@ -13,6 +13,7 @@ int count = 1;
 class HttpRequest {
   //for login link
 
+  // render image into video model function
   Future predictNp(BuildContext context,Map<String,String>bodyMap, var image) async {
     try {
       Uri uri = Uri.parse(HttpLinks.localUrl);
@@ -58,62 +59,7 @@ class HttpRequest {
     }
   }
 
-
- /* Future predictNp(BuildContext context,Map<String,String>bodyMap, var image) async {
-    try {
-      Uri uri = Uri.parse(HttpLinks.localUrl);
-     */
-  /* var stream = ByteStream(image.openRead());
-      print('uri $uri');
-
-      stream.cast();
-      var length = await image.length();
-      var request = MultipartRequest('POST', uri)
-        ..files.add(
-          MultipartFile(
-            'file1',
-            stream,
-            length,
-            filename: image.path,
-            contentType: MediaType('Content-Type', "multipart/form-data"),
-          ),);
-
-      request.fields.addAll(bodyMap);
-      var response = await request.send();*//*
-      Response response = await post(uri,
-          headers: {
-        HttpHeaders.contentTypeHeader:'application/x-www-form-urlencoded',
-      },
-          body:bodyMap);
-
-      if (response.statusCode == 200) {
-       */
-  /* final directory = await getExternalStorageDirectory();
-        var file = File('${directory!.path}/video$count.mp4');
-        var bytes = <int>[];
-        response.stream.listen((value) {
-          bytes.addAll(value);
-        }, onDone: () async {
-          count++;
-          await file.writeAsBytes(bytes);
-        });
-        print('fiile is $file');
-        return file;
-
-*//*
-        print("response ${response.body}");
-      } else if (response.statusCode == 401) {
-        // removeAccount(context);
-        toastShow('Authorization Failure');
-      } else {
-        print(response.statusCode);
-        return response.statusCode;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }*/
-
+  // get categories of type of songs
 Future getCategories(BuildContext context)async{
     try{
 
@@ -131,6 +77,8 @@ Future getCategories(BuildContext context)async{
   }
 
 }
+
+// get songs list according to  type
 Future getSongsList(BuildContext context,int id)async{
     try{
       Uri uri = Uri.parse('${HttpLinks.getCategories}/$id${HttpLinks.getSongs}');
@@ -146,6 +94,8 @@ Future getSongsList(BuildContext context,int id)async{
       print('error $e');
   }
 }
+
+// company profile function
 Future getAboutUs(BuildContext context)async{
     try{
       Uri uri = Uri.parse('${HttpLinks.aboutUs}');
@@ -159,6 +109,8 @@ Future getAboutUs(BuildContext context)async{
       print('error $e');
     }
   }
+
+  // company privacy policy function
 Future getPrivacyPolicy(BuildContext context)async{
     try{
       Uri uri = Uri.parse('${HttpLinks.privacyPolicy}');
@@ -173,6 +125,7 @@ Future getPrivacyPolicy(BuildContext context)async{
     }
   }
 
+  // post fcm token to show notifications
 Future postFcmToken(BuildContext context, Map tokenFcm) async {
     try {
       Uri uri = Uri.parse(HttpLinks.postFcmToken);
@@ -188,6 +141,7 @@ Future postFcmToken(BuildContext context, Map tokenFcm) async {
     }
   }
 
+  // get admin videos url
 Future getCommunity(BuildContext context) async {
     try {
       Uri uri = Uri.parse(HttpLinks.adminVideos);
@@ -207,6 +161,7 @@ Future getCommunity(BuildContext context) async {
     }
   }
 
+  // get ads id from url to set dynamic
 Future getAds(BuildContext context) async {
     try {
       Uri uri = Uri.parse('${HttpLinks.AdsUrl}');
@@ -224,6 +179,7 @@ Future getAds(BuildContext context) async {
     }
   }
 
+  // all notification list is set to be in url
   Future getNotifications(BuildContext context)async{
     try{
 
@@ -241,157 +197,5 @@ Future getAds(BuildContext context) async {
     }
 
   }
-
-
-/*Future parentLogin(BuildContext context, String email, String password,
-      String? tokenFcm) async {
-    try {
-      Uri uri = Uri.parse(HttpLinks.parentLoginUrl);
-      Response response = await post(uri, body: {
-        'username': email,
-        'password': password,
-        'fcm_token': tokenFcm,
-      });
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else if (response.statusCode == 401) {
-        removeAccount(context);
-        toastShow('Authorization Failure');
-      } else {
-        print(response.statusCode);
-        return response.statusCode;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  // for profile link
-
-
-  Future getSubjectsList(BuildContext context, String token, String sId) async {
-    try {
-      Uri uri = Uri.parse('${HttpLinks.Url}$sId${HttpLinks.subjectListUrl}');
-      Response response = await get(uri, headers: {
-        HttpHeaders.contentTypeHeader: 'application/json',
-        HttpHeaders.authorizationHeader: 'Bearer $token',
-      });
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else if (response.statusCode == 401) {
-        removeAccount(context);
-        toastShow('Authorization Failure');
-      } else {
-        print(response.statusCode);
-        return response.statusCode;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future getTestResult(BuildContext context,String sId, String id, String token) async {
-    try {
-      Uri uri = Uri.parse(
-          '${HttpLinks.Url}$sId${HttpLinks.subjectListUrl}/$id${HttpLinks.testResultUrl}');
-
-      print(uri);
-      Response response = await get(uri, headers: {
-        HttpHeaders.authorizationHeader: 'Bearer $token',
-        HttpHeaders.contentTypeHeader: 'application/json',
-      });
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else if (response.statusCode == 401) {
-        removeAccount(context);
-        toastShow('Authorization Failure');
-      } else {
-        print(response.statusCode);
-        return response.statusCode;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-//for student Attendance
-  Future studentAttendance(
-      BuildContext context, String token, String sId) async {
-    try {
-      Uri uri = Uri.parse('${HttpLinks.Url}$sId${HttpLinks.AttendanceUrl}');
-
-      Response response = await get(uri, headers: {
-        HttpHeaders.contentTypeHeader: 'application/json',
-        HttpHeaders.authorizationHeader: 'Bearer $token',
-      });
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else if (response.statusCode == 401) {
-        removeAccount(context);
-        toastShow('Authorization Failure');
-        return response.statusCode;
-      } else {
-        return response.statusCode;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-//for student time table
-  Future studentTimeTable(
-      BuildContext context, String token, String sId) async {
-    try {
-      Uri uri = Uri.parse('${HttpLinks.Url}$sId${HttpLinks.timeTableUrl}');
-
-      Response response = await get(uri, headers: {
-        HttpHeaders.contentTypeHeader: 'text/html',
-        HttpHeaders.authorizationHeader: 'Bearer $token',
-      });
-      if (response.statusCode == 200) {
-        return response.body;
-      } else if (response.statusCode == 401) {
-        removeAccount(context);
-        toastShow('Authorization Failure');
-        return response.statusCode;
-      } else {
-        return response.statusCode;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-//for student monthly exam report
-  Future studentMonthlyExamReport(
-      BuildContext context, String token, String sId, var date) async {
-    try {
-      Uri uri = Uri.parse(
-          '${HttpLinks.Url}$sId${HttpLinks.monthlyExamReportUrl}$date');
-      print(uri);
-      Response response = await get(uri, headers: {
-        HttpHeaders.contentTypeHeader: 'text/html',
-        HttpHeaders.authorizationHeader: 'Bearer $token',
-      });
-      if (response.statusCode == 200) {
-        return response.body;
-      } else if (response.statusCode == 401) {
-        removeAccount(context);
-        toastShow('Authorization Failure');
-        return response.statusCode;
-      } else {
-        return response.statusCode;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-//for remove shared_Pref error 401:
-  void removeAccount(context) {
-    SharedPref.removeData();
-    Navigator.pushReplacementNamed(context, '/');
-  }*/
 
 }

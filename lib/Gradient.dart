@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 
+
+//universal background design for any class
 class BackgroundGradient extends StatelessWidget {
   final childView;
   const BackgroundGradient({

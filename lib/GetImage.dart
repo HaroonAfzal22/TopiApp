@@ -44,8 +44,8 @@ class _ImagePickersState extends State<ImagePickers>
       request: AdRequest());
   int pos = 0;
   List userAnswer = [
-    'Now Image is Processing to do some Magic...',
     'Where you can see a lot of new features...',
+    'Now Image is Processing to do some Magic...',
     'Downloading your magical image to video creation...',
   ];
   Timer? _timer, timer;
@@ -93,6 +93,7 @@ class _ImagePickersState extends State<ImagePickers>
     setTimer();
   }
 
+  // initialize interstitial ad
   void _loadInterstitialAd() {
     InterstitialAd.load(
         adUnitId: SharedPref.getInterstitialAd(),
@@ -109,6 +110,7 @@ class _ImagePickersState extends State<ImagePickers>
         }));
   }
 
+  // initialize reward ad
   void _loadRewardedAd() {
     RewardedAd.load(
         adUnitId:SharedPref.getRewardedAd(),
@@ -131,6 +133,7 @@ class _ImagePickersState extends State<ImagePickers>
         }));
   }
 
+  // animation repeat process
   setTimer() {
     _timer = Timer.periodic(Duration(seconds: 3), (_) {
       setState(() {
@@ -325,7 +328,7 @@ class _ImagePickersState extends State<ImagePickers>
     );
   }
 
-
+// check file size
   static String getFileSizeString({required int bytes, int decimals = 0}) {
     if (bytes <= 0) return "0 Bytes";
     const suffixes = ["Bytes", "KB", "MB", "GB", "TB"];
@@ -333,6 +336,7 @@ class _ImagePickersState extends State<ImagePickers>
     return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) + suffixes[i];
   }
 
+  // pick image from gallery and set for post
   Future<Null> _pickImage() async {
     final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery,imageQuality: 50);
     imageFile = pickedImage != null ? File(pickedImage.path) : null;
@@ -393,6 +397,7 @@ class _ImagePickersState extends State<ImagePickers>
     }
   }
 
+  // for crop image
   Future<Null> _cropImage() async {
     File? croppedFile = await ImageCropper.cropImage(
       sourcePath: imageFile!.path,
@@ -414,6 +419,7 @@ class _ImagePickersState extends State<ImagePickers>
     }
   }
 
+  // for set image response after post
   predictSong(image) async {
     /*final bytes= File(imageFile!.path).readAsBytesSync();
     String base64Image = base64Encode(bytes);

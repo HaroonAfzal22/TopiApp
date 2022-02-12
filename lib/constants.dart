@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+
+// a file where all constants data saved here
+
 var kTestMargin = EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0);
 var kTestPadding = EdgeInsets.symmetric(horizontal: 12.0);
 

@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/constants.dart';
 
+
+// card category list solo,combo,group
 class CategoryList extends StatelessWidget {
 
 
@@ -12,7 +14,7 @@ class CategoryList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
-        brightness: Brightness.dark,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         elevation: 0.0,
         title: Image.asset('assets/topi.png',
           fit: BoxFit.contain,
@@ -32,7 +34,6 @@ class CategoryList extends StatelessWidget {
                 height: 200,
                 child: GestureDetector(
                   onTap: () {
-                    print('solo card click');
                     Navigator.pushNamed(context, '/songs_list');
                   },
                   child: Card(

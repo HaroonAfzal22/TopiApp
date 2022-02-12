@@ -14,7 +14,7 @@ class CategoryLists extends StatefulWidget {
   @override
   _CategoryListsState createState() => _CategoryListsState();
 }
-
+// to show list card category
 class _CategoryListsState extends State<CategoryLists> {
 
   @override

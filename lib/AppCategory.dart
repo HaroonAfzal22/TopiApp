@@ -43,16 +43,17 @@ class _AppCategoryState extends State<AppCategory> {
     });
      _checkVersion();
   }
+
+  // dynamic link initialize for sent unique link
   void initDynamicLinks()async{
     dynamicLinks.onLink.listen((linkData) {
-      final Uri uri = linkData.link;
-      final query= uri.queryParameters;
        Navigator.pushNamed(context, linkData.link.path);
     });
 
 
   }
 
+  // ads initialized
   void getAds() async {
     HttpRequest request = HttpRequest();
     var result = await request.getAds(context);
@@ -67,6 +68,8 @@ class _AppCategoryState extends State<AppCategory> {
       await SharedPref.setRewardedAd(result['reward_id']);
     }
   }
+
+  // check app version from playstore and local
   _checkVersion() async {
     final newVersion = NewVersion(androidId: "com.topi.ai");
     final status = await newVersion.getVersionStatus();
@@ -83,6 +86,7 @@ class _AppCategoryState extends State<AppCategory> {
     }
   }
 
+  // on back press app close notification
   Future<bool> _onWillPop() async {
     if (Platform.isIOS) {
       return await showDialog(

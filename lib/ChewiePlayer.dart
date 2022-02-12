@@ -20,7 +20,7 @@ class ChewiePlayer extends StatefulWidget {
   @override
   _ChewiePlayerState createState() => _ChewiePlayerState();
 }
-
+// video player to show response of api data
 class _ChewiePlayerState extends State<ChewiePlayer> {
   late BetterPlayerListVideoPlayerController _controller;
 
@@ -118,38 +118,8 @@ class _VideoPlayersState extends State<VideoPlayers> {
   bool isLoading = false;
   NativeAd? myNative;
   bool isAdLoaded = false;
-  BannerAd? myBanner = BannerAd(
-      size: AdSize.banner,
-      adUnitId: SharedPref.getBannerAd()??"",
-      listener: BannerAdListener(),
-      request: AdRequest());
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  /*  myNative = NativeAd(
-      adUnitId: SharedPref.getNativeAd(),
-      factoryId: 'listTile',
-      request: AdRequest(),
-      listener: NativeAdListener(
-        // Called when an ad is successfully received.
-        onAdLoaded: (Ad ad) => {
-          setState(() {
-            isAdLoaded = true;
-          }),
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          print('natty $NativeAd failedToLoad: $error');
-          ad.dispose();
-        },
-      ),
-    );
-    setState(() {
-      myNative!.load();
-    });*/
-    myBanner!.load();
 
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -253,6 +223,7 @@ class _VideoPlayersState extends State<VideoPlayers> {
     );
   }
 
+  // save video in gallery
   void _onSave(BuildContext context, image) async {
     if (await Permission.storage.request().isGranted &&
         await Permission.accessMediaLocation.request().isGranted) {
@@ -269,6 +240,7 @@ class _VideoPlayersState extends State<VideoPlayers> {
     }
   }
 
+  // share video file to another
   void _onShare(BuildContext context, image) async {
     final box = context.findRenderObject() as RenderBox?;
     if (image != null) {

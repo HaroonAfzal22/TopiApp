@@ -26,10 +26,13 @@ class _AboutUsState extends State<AboutUs> {
     pdfResponse();
   }
 String? filePath;
+
+  // get response of company profile
   void pdfResponse() async {
     HttpRequest request = HttpRequest();
 
     var value = await request.getAboutUs(context);
+
     Uri uri = Uri.parse(value['profile']);
     var response = await get(uri);
     var dir = await getTemporaryDirectory();
@@ -60,7 +63,7 @@ String? filePath;
             onError: (error) {
               print(error.toString());
               setState(() {
-                filePath='Data Not Found';
+                filePath='Data Not Found...';
               });
             },
           ),

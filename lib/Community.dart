@@ -398,7 +398,7 @@ class _CommunityState extends State<Community> {
       ),
     );
   }
-
+// load interstitial ad
   void _loadInterstitialAd() {
     InterstitialAd.load(
         adUnitId: SharedPref.getInterstitialAd(),
@@ -416,6 +416,7 @@ class _CommunityState extends State<Community> {
         }));
   }
 
+  // check if ad ready
   interAd() {
     if (isInterstitialAdReady) {
       _interstitialAd?.show();
@@ -426,6 +427,7 @@ class _CommunityState extends State<Community> {
     }
   }
 
+  // pop up menu dialog three dots
   showMenuDialog(context, details) async {
     double left = details.dx;
     double top = details.dy;
@@ -723,6 +725,7 @@ class _CommunityState extends State<Community> {
   }
 }
 
+// design classes for like,share etc
 class StackDesign extends StatelessWidget {
   final bottomMargin, leftMargin, ikon, onClick, counts, colors;
 
