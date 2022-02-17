@@ -29,14 +29,6 @@ class HttpRequest {
             filename: image.path,
             contentType: MediaType('Content-Type', "multipart/form-data"),
           ),);
-
-      print('request file ${ MultipartFile(
-        'file1',
-        stream,
-        length,
-        filename: image.path,
-        contentType: MediaType('Content-Type', "multipart/form-data"),
-      ).length}');
       request.fields.addAll(bodyMap);
       var response = await request.send();
       if (response.statusCode == 200 ||response.statusCode==201) {

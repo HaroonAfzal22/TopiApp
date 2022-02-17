@@ -77,6 +77,7 @@ class _SongsListState extends State<SongsList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       drawerScrimColor: Colors.transparent,
       floatingActionButton: isEnabled == true
           ? FloatingActionButton(

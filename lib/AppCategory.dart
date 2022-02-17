@@ -12,6 +12,8 @@ import 'package:topi/Notifications.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
 import 'package:topi/constants.dart';
+import 'package:topi/profile.dart';
+import 'package:topi/sign_in.dart';
 import 'NavigationDrawer.dart';
 
 class AppCategory extends StatefulWidget {
@@ -30,6 +32,7 @@ class _AppCategoryState extends State<AppCategory> {
     Community(),
     SongsList(),
     Notifications(),
+    Profile(),
   ];
 
   @override
@@ -155,8 +158,8 @@ class _AppCategoryState extends State<AppCategory> {
               ),
               centerTitle: true,
             ),
-            drawer: Drawers(),
-            backgroundColor: Colors.black87,
+      backgroundColor: Colors.black87,
+      drawer: Drawers(),
             extendBody: true,
             bottomNavigationBar: CurvedNavigationBar(
               index: _page,
@@ -206,6 +209,20 @@ class _AppCategoryState extends State<AppCategory> {
                         visible: _page == 2 ? false : true,
                         child: Text(
                           'Notification',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        )),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(CupertinoIcons.person_solid,
+                        color: Colors.white, size: 25),
+                    Visibility(
+                        visible: _page == 3 ? false : true,
+                        child: Text(
+                          'Me',
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.bold),
                         )),

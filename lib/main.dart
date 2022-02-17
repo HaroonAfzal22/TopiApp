@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
+import 'package:provider/provider.dart';
 import 'package:topi/AboutUs.dart';
+import 'package:topi/AddBio.dart';
 import 'package:topi/AppCategory.dart';
 import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/Community.dart';
@@ -20,6 +23,9 @@ import 'package:topi/ShareFile.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
 import 'package:topi/constants.dart';
+import 'package:topi/google_sign_in.dart';
+import 'package:topi/home_screen.dart';
+import 'package:topi/profile.dart';
 import 'package:topi/starter.dart';
 
 
@@ -124,8 +130,10 @@ class _MyAppState extends State<MyApp> {
         '/notification': (context) => Notifications(),
         '/community': (context) => Community(),
         '/premium_feature': (context) => PremiumFeature(),
+        '/profile': (context) => Profile(),
+        '/add_bio': (context) => AddBio(),
       },
-      home: AppCategory(),
+      home: HomePage(),
     );
   }
 }
