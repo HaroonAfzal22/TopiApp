@@ -12,6 +12,7 @@ import 'package:topi/Notifications.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
 import 'package:topi/constants.dart';
+import 'package:topi/google_sign_in.dart';
 import 'package:topi/profile.dart';
 import 'package:topi/sign_in.dart';
 import 'NavigationDrawer.dart';
@@ -40,6 +41,7 @@ class _AppCategoryState extends State<AppCategory> {
     // TODO: implement initState
     super.initState();
 
+    isLoading=false;
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       getAds();
       initDynamicLinks();
@@ -140,7 +142,6 @@ class _AppCategoryState extends State<AppCategory> {
   Widget build(BuildContext context) {
     return isLoading
         ? Container(
-            color: Colors.white,
             child: Center(
               child: spinkit, //declared in constants class
             ),
@@ -157,6 +158,19 @@ class _AppCategoryState extends State<AppCategory> {
                 height: 80,
               ),
               centerTitle: true,
+              actions: <Widget>[
+                PopupMenuButton<String>(
+                    onSelected: handleClick,
+                    offset: Offset(-20, 40),
+                    itemBuilder: (context) {
+                      return {'Logout'}.map((e) {
+                        return PopupMenuItem<String>(
+                          child: Text(e),
+                          value: e,
+                        );
+                      }).toList();
+                    }),
+              ],
             ),
       backgroundColor: Colors.black87,
       drawer: Drawers(),
@@ -235,9 +249,22 @@ class _AppCategoryState extends State<AppCategory> {
                 });
               },
             ),
-            body: WillPopScope(
+            body:isLoading?Center(child: spinkit,): WillPopScope(
                 onWillPop: _onWillPop, child: resultScreens[_page]),
           );
+
+
+  }
+  Future<void> handleClick(String value) async {
+    switch (value) {
+      case 'Logout':
+        setState(() {
+          isLoading=true;
+        });
+        GoogleSignInProvider provider= GoogleSignInProvider();
+        await provider.logout();
+        break;
+    }
   }
 
   @override

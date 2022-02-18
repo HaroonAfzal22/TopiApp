@@ -25,6 +25,7 @@ class SharedPref {
   static Future<void> setBannerAd(String userName) => _preferences.setString('banner_ad', userName);
   static Future<void> setInterstitialAd(String userName) => _preferences.setString('interstitial_ad', userName);
   static Future<void> setRewardedAd(String userName) => _preferences.setString('rewarded_ad', userName);
+  static Future<void> setBio(String userName) => _preferences.setString('bio', userName);
 
 
   static Future<void> setUserFcmToken(String userName) =>
@@ -42,6 +43,7 @@ class SharedPref {
   }
 
   static  getNativeAd() => _preferences.getString('native_ad');
+  static  getBio() => _preferences.getString('bio');
   static  getBannerAd() => _preferences.getString('banner_ad');
   static  getInterstitialAd() => _preferences.getString('interstitial_ad');
   static  getRewardedAd() => _preferences.getString('rewarded_ad');

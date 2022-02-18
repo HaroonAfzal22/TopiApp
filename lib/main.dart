@@ -13,6 +13,7 @@ import 'package:topi/AddBio.dart';
 import 'package:topi/AppCategory.dart';
 import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/Community.dart';
+import 'package:topi/EditProfile.dart';
 import 'package:topi/GetImage.dart';
 import 'package:topi/Google/GoogleAds.dart';
 import 'package:topi/InAppReview.dart';
@@ -22,6 +23,7 @@ import 'package:topi/PrivacyPolicy.dart';
 import 'package:topi/ShareFile.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
+import 'package:topi/ViewPhoto.dart';
 import 'package:topi/constants.dart';
 import 'package:topi/google_sign_in.dart';
 import 'package:topi/home_screen.dart';
@@ -132,6 +134,8 @@ class _MyAppState extends State<MyApp> {
         '/premium_feature': (context) => PremiumFeature(),
         '/profile': (context) => Profile(),
         '/add_bio': (context) => AddBio(),
+        '/edit_profile': (context) => EditProfile(),
+        '/view_photo': (context) => ViewPhoto(),
       },
       home: HomePage(),
     );

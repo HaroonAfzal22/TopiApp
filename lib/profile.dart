@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/OutlineBtn.dart';
+import 'package:topi/Shared_Pref.dart';
 import 'package:topi/constants.dart';
 
 import 'NavigationDrawer.dart';
@@ -19,6 +20,8 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final auth = FirebaseAuth.instance.currentUser;
+  String value='Tap to add bio';
+  bool isLoading=false;
 
   @override
   Widget build(BuildContext context) {
@@ -152,36 +155,40 @@ class _ProfileState extends State<Profile> {
                                 ..shader = linearGradient),
                         ),
                         onPressed: () {
-                          //Navigator.pushNamed(context, '/premium_feature');
+                          Navigator.pushNamed(context, '/edit_profile');
                         },
                       ),
                     ),
                     SizedBox(width: 6.0,),
                     Container(
                       height: 40,
-                      child: OutlinedButton.icon(
-                            style:OutlinedButton.styleFrom(
-                              shape:RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4.0)
-                              ),
-                              side: BorderSide(color: Colors.white70)
-                            ),
-                            onPressed: (){}, icon: FaIcon(
-                          FontAwesomeIcons.bookmark,
-                          color: Colors.white70,
-                        ), label: Text(''))
+                      child:OutlinedButton(
+                        style:OutlinedButton.styleFrom(
+                          shape:RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0)
+                          ),
+                          side: BorderSide(color: Colors.white70,width: 0.5)
+                      ),onPressed: () {  }, child: FaIcon(
+                        FontAwesomeIcons.bookmark,
+                        color: Colors.white70,
+                      ),),
                     ),
                   ],
                 ),
-
               ),
               Container(
                 margin: EdgeInsets.only(top: 8.0),
                 child: TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/add_bio');
+                  onPressed: ()async {
+                 var result=  await Navigator.pushNamed(context, '/add_bio');
+                 if(result!=null) {
+                   setState(() {
+                     value = result.toString();
+                   });
+                   await SharedPref.setBio(value);
+                 }
                   },
-                  child: Text('Tap to add bio',style: TextStyle(color: Colors.white70,fontSize: 16.0),),),
+                  child: Text(SharedPref.getBio()??value,style: TextStyle(color: Colors.white70,fontSize: 16.0),),),
               ),
             ],
           ),

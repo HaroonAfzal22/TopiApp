@@ -401,7 +401,7 @@ class _CommunityState extends State<Community> {
 // load interstitial ad
   void _loadInterstitialAd() {
     InterstitialAd.load(
-        adUnitId: SharedPref.getInterstitialAd(),
+        adUnitId: SharedPref.getInterstitialAd()??'',
         request: AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(onAdLoaded: (ad) {
           this._interstitialAd = ad;

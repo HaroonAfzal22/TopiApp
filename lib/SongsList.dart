@@ -152,7 +152,6 @@ class _SongsListState extends State<SongsList> {
                                         clickIcon: clickIcon,
                                         index: index,
                                         pClick: (){
-                                        debugPrint('click at p');
                                         Navigator.pushNamed(context, '/premium_feature');
                                         }, pVisible: songsList[index]['premium']=='0'?true:false,
                                       ),
@@ -235,9 +234,10 @@ class _SongsListState extends State<SongsList> {
   Future<void> getCategoryList() async {
     HttpRequest request = HttpRequest();
     var result = await request.getCategories(context);
+    print('result $result');
     setState(() {
       if(result==null ||result.isEmpty){
-        toastShow('Data List is Empty');
+        toastShow('Category List is Empty');
         isLoading=false;
       }else if(result.toString().contains('Error')) {
         toastShow('${result.toString()}');
@@ -257,7 +257,7 @@ class _SongsListState extends State<SongsList> {
 
     setState(() {
       if (songs ==null ||songs.isEmpty) {
-        toastShow('Data List is Empty ..');
+        toastShow('Songs List is Empty ..');
           isLoading = false;
       } else if(songs.toString().contains('Error')){
         toastShow('${songs.toString()}');

@@ -71,20 +71,20 @@ class _SignInState extends State<SignIn> {
                       minimumSize: Size(double.infinity, 50),
                     ),
                     onPressed: ()async {
-                       /* final providers= Provider.of<GoogleSignInProvider>(context,listen: false);
-                        providers.googleLogin();*/
+
                     GoogleSignInProvider provider= GoogleSignInProvider();
-                               var response=await provider.googleLogin();
-                               if(response!=null){
-                                Navigator.pushReplacementNamed(context, '/profile');
+                               await provider.googleLogin();
+                               /*if(response!=null){
+                             //   Navigator.pushReplacementNamed(context, '/profile');
                                }
                       print('response ${response}');
+                   */
                     },
                     icon: FaIcon(
                       FontAwesomeIcons.google,
                       color: Colors.red,
                     ),
-                    label: Text('Sign up with Google')),
+                    label: Text('Login with Google')),
                 SizedBox(
                   height: 40,
                 ),
