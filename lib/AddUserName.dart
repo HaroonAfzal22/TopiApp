@@ -2,17 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/Shared_Pref.dart';
+import 'package:topi/starter.dart';
 
-class AddBio extends StatefulWidget {
-  const AddBio({Key? key}) : super(key: key);
+class AddUserName extends StatefulWidget {
+  const AddUserName({Key? key}) : super(key: key);
 
   @override
-  State<AddBio> createState() => _AddBioState();
+  State<AddUserName> createState() => _AddUserNameState();
 }
 
-class _AddBioState extends State<AddBio> {
+class _AddUserNameState extends State<AddUserName> {
   String? value;
   NativeAd? myNative;
   bool isAdLoaded = false;
@@ -43,7 +45,6 @@ class _AddBioState extends State<AddBio> {
   }
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
@@ -68,11 +69,7 @@ class _AddBioState extends State<AddBio> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              if(args.containsValue('edit_profile')){
-                Navigator.of(context).pop(value);
-              }else{
-                Navigator.of(context).pop(value);
-              }
+              Navigator.of(context).pop(value);
             },
             child: Text(
               'Save',
@@ -94,18 +91,9 @@ class _AddBioState extends State<AddBio> {
               onChanged: (String? values) {
                 setState(() {
                   value = values;
+                  Provider.of<DataValueProvider>(context,listen: false).updateName(value!);
                 });
               },
-              buildCounter: (_,
-                      {required currentLength,
-                      maxLength,
-                      required isFocused}) =>
-                  Container(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        currentLength.toString() + "/" + maxLength.toString(),
-                        style: TextStyle(color: Colors.white70),
-                      )),
               style: TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 focusColor: Colors.white70,
@@ -120,11 +108,16 @@ class _AddBioState extends State<AddBio> {
                   borderRadius: BorderRadius.all(Radius.circular(4.0)),
                   borderSide: const BorderSide(color: Colors.white, width: 2.0),
                 ),
-                labelText: "Add bio",
+                labelText: "Add username",
               ),
-              maxLength: 80,
-              maxLines: 2,
+
             ),
+          ),
+          Container(
+            margin: EdgeInsets.all(8.0),
+            alignment: Alignment.centerLeft,
+            child: Text('www.topi.ai/@${Provider.of<DataValueProvider>(context).uName}',
+            style: TextStyle(color: Colors.white),),
           ),
           isAdLoaded
               ? Container(

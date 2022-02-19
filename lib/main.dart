@@ -10,6 +10,8 @@ import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:topi/AboutUs.dart';
 import 'package:topi/AddBio.dart';
+import 'package:topi/AddName.dart';
+import 'package:topi/AddUserName.dart';
 import 'package:topi/AppCategory.dart';
 import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/Community.dart';
@@ -106,38 +108,39 @@ class _MyAppState extends State<MyApp> {
                   icon: '@mipmap/ic_launcher'),
             ));
       }
-      print('message is ${notification!.body}');
-
     });
 
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/starter': (context) => StartScreen(),
-        '/songs_list': (context) => SongsList(),
-        '/image_pickers': (context) => ImagePickers(),
-        '/share_file': (context) => DemoApp(),
-        '/in_app_review': (context) => InAppReviews(),
-        '/video_players': (context) => VideoPlayers(),
-        '/google_ads': (context) => Googles(),
-        '/app_category': (context) => AppCategory(),
-        '/about_us': (context) => AboutUs(),
-        '/privacy_policy': (context) => PrivacyPolicy(),
-        '/notification': (context) => Notifications(),
-        '/community': (context) => Community(),
-        '/premium_feature': (context) => PremiumFeature(),
-        '/profile': (context) => Profile(),
-        '/add_bio': (context) => AddBio(),
-        '/edit_profile': (context) => EditProfile(),
-        '/view_photo': (context) => ViewPhoto(),
-      },
-      home: HomePage(),
+    return ChangeNotifierProvider(
+      create: (BuildContext context)=>DataValueProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/',
+        routes: {
+          '/songs_list': (context) => SongsList(),
+          '/image_pickers': (context) => ImagePickers(),
+          '/share_file': (context) => DemoApp(),
+          '/in_app_review': (context) => InAppReviews(),
+          '/video_players': (context) => VideoPlayers(),
+          '/google_ads': (context) => Googles(),
+          '/app_category': (context) => AppCategory(),
+          '/about_us': (context) => AboutUs(),
+          '/privacy_policy': (context) => PrivacyPolicy(),
+          '/notification': (context) => Notifications(),
+          '/community': (context) => Community(),
+          '/premium_feature': (context) => PremiumFeature(),
+          '/profile': (context) => Profile(),
+          '/add_bio': (context) => AddBio(),
+          '/add_name': (context) => AddName(),
+          '/user_name': (context) => AddUserName(),
+          '/edit_profile': (context) => EditProfile(),
+          '/view_photo': (context) => ViewPhoto(),
+        },
+        home: HomePage(),
+      ),
     );
   }
 }

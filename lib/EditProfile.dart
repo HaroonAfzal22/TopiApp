@@ -6,8 +6,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:topi/Gradient.dart';
+import 'package:topi/Shared_Pref.dart';
+import 'package:topi/constants.dart';
 
 import 'NavigationDrawer.dart';
 
@@ -18,9 +21,37 @@ class EditProfile extends StatefulWidget {
   _EditProfileState createState() => _EditProfileState();
 }
 
-class _EditProfileState extends State<EditProfile> {
+class _EditProfileState extends State<EditProfile>  with SingleTickerProviderStateMixin{
   final auth = FirebaseAuth.instance.currentUser;
-  File? imagePath;
+  File? imagePath=File(SharedPref.getProfileImage());
+  String name='Name',userName='Username',bio='Add a bio to your profile';
+  NativeAd? myNative;
+  bool isAdLoaded = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    myNative = NativeAd(
+      adUnitId: SharedPref.getNativeAd()??'',
+      factoryId: 'listTile',
+      request: AdRequest(),
+      listener: NativeAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (Ad ad) => {
+          setState(() {
+            isAdLoaded = true;
+          }),
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          ad.dispose();
+        },
+      ),
+    );
+    setState(() {
+      myNative!.load();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +67,18 @@ class _EditProfileState extends State<EditProfile> {
           height: 80,
         ),
         centerTitle: true,
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+                toastShow('Profile Updated...');
+                Navigator.pop(context);
+            },
+            child: Text(
+              'Save',
+              style: TextStyle(color: Colors.white70),
+            ),
+          ), //IconButton
+        ],
       ),
       drawer: Drawers(),
       body: SafeArea(
@@ -98,7 +141,7 @@ class _EditProfileState extends State<EditProfile> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 20,
-                      color: Colors.white70,
+                      color: Colors.white,
                       fontWeight: FontWeight.w500),
                 ),
               ),
@@ -114,7 +157,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 32.0,left: 16.0,right: 8),
+                margin: EdgeInsets.only(top: 32.0,left: 16.0,right: 4),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -125,14 +168,93 @@ class _EditProfileState extends State<EditProfile> {
                     Container(
                       child: TextButton.icon(
                         style: TextButton.styleFrom(padding: EdgeInsets.zero,),
-                          onPressed: (){}, icon:Text('Name',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600,
+                          onPressed: ()async{
+                          var result = await Navigator.pushNamed(context, '/add_name');
+                          setState(() {
+                          if(result!='null'){name=result.toString();}
+                          });
+                          }, icon:Text(name,style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w600,
                           fontSize: 14.0),) ,
                           label: Icon(CupertinoIcons.forward,color: Colors.white70,)),
                     ),
                   ],
                 ),
               ),
-
+              Container(
+                margin: EdgeInsets.only(top: 8.0,left: 16.0,right: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      child: Text('Username',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600,
+                      fontSize: 18.0),),
+                    ),
+                    Container(
+                      child: TextButton.icon(
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero,),
+                          onPressed: ()async{
+                          var result = await Navigator.pushNamed(context, '/user_name');
+                          setState(() {
+                            if(result!='null'){
+                              userName=result.toString();}
+                          });
+                          }, icon:Text(userName,style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w600,
+                          fontSize: 14.0),) ,
+                          label: Icon(CupertinoIcons.forward,color: Colors.white70,)),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                alignment: Alignment.centerRight,
+                margin: EdgeInsets.only(left: 16.0,right: 10),
+                child: TextButton.icon(
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero,),
+                    onPressed: (){
+                      Clipboard.setData(ClipboardData(text:'www.topi.ai/@$userName' ));
+                      snackShow(context, 'Link Copied');
+                    }, icon:Text('www.topi.ai/@$userName',style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w600,
+                    fontSize: 14.0),) ,
+                    label: Icon(CupertinoIcons.square_on_square,color: Colors.white70,size: 16.0,)),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 8.0,left: 16.0,right: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      child: Text('Bio',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600,
+                          fontSize: 18.0),),
+                    ),
+                    Container(
+                      child: TextButton.icon(
+                          style: TextButton.styleFrom(padding: EdgeInsets.zero,),
+                          onPressed: ()async{
+                            var result = await Navigator.pushNamed(context, '/add_bio',arguments: {
+                              'class':'edit_profile'
+                            });
+                            setState(() {
+                              if(result!=null){
+                                bio=result.toString();}
+                            });
+                          }, icon:Text(bio,style: TextStyle(color: Colors.white70,fontWeight: FontWeight.w600,
+                          fontSize: 14.0),) ,
+                          label: Icon(CupertinoIcons.forward,color: Colors.white70,)),
+                    ),
+                  ],
+                ),
+              ),
+              isAdLoaded
+                  ? Container(
+                alignment: Alignment.bottomCenter,
+                color: Colors.white,
+                width: MediaQuery.of(context).size.width,
+                height: 50,
+                child: AdWidget(
+                  ad: myNative!,
+                ),
+              )
+                  : Text('loading...')
             ],
           ),
         ),
@@ -155,7 +277,8 @@ class _EditProfileState extends State<EditProfile> {
                   Navigator.pop(context);
                   final pickedImage = await ImagePicker().pickImage(source: ImageSource.camera);
                   setState(() {
-                    imagePath = pickedImage != null ? File(pickedImage.path) : null;
+                    imagePath = (pickedImage != null ? File(pickedImage.path) : null)!;
+                    SharedPref.setProfileImage(imagePath!);
                   });
                 },
                 child: Text(
@@ -182,7 +305,9 @@ class _EditProfileState extends State<EditProfile> {
                   Navigator.pop(context);
                   final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
                   setState(() {
-                    imagePath = pickedImage != null ? File(pickedImage.path) : null;
+                    imagePath = (pickedImage != null ? File(pickedImage.path) : null)!;
+                    SharedPref.setProfileImage(imagePath!);
+
                   });
 
                 },

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +11,6 @@ import 'package:topi/OutlineBtn.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/constants.dart';
 
-import 'NavigationDrawer.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -22,7 +23,7 @@ class _ProfileState extends State<Profile> {
   final auth = FirebaseAuth.instance.currentUser;
   String value='Tap to add bio';
   bool isLoading=false;
-
+  File? imagePath = File(SharedPref.getProfileImage());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +48,7 @@ class _ProfileState extends State<Profile> {
             children: [
               Container(
                   margin: EdgeInsets.only(top: 12.0),
-                child: CachedNetworkImage(
+                child:imagePath==null? CachedNetworkImage(
                   fit: BoxFit.cover,
                   key: UniqueKey(),
                   imageUrl: '${auth!.photoURL}',
@@ -57,9 +58,21 @@ class _ProfileState extends State<Profile> {
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                              image: imageProvider,
-                              fit: BoxFit.contain))),
+                              image: imageProvider, fit: BoxFit.contain))),
+                ):
+                Container(
+                  foregroundDecoration: BoxDecoration(
+                    shape: BoxShape.circle,
                   ),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.deepOrange,
+                    radius: 60,
+                    child: CircleAvatar(
+                      radius: 60-1,
+                      backgroundImage: Image.file(imagePath!,fit: BoxFit.contain,).image,
+                    ),
+                  ),
+                ) ,
               ),
               Container(
                 margin: EdgeInsets.only(top: 8.0),
@@ -110,8 +123,8 @@ class _ProfileState extends State<Profile> {
                         ),
                       ]),
                     ),
-                    RichText(                       textAlign: TextAlign.center,
-
+                    RichText(
+                      textAlign: TextAlign.center,
                       text: TextSpan(
                           text: '0 \n\t',
                           style: TextStyle(
@@ -155,7 +168,7 @@ class _ProfileState extends State<Profile> {
                                 ..shader = linearGradient),
                         ),
                         onPressed: () {
-                          Navigator.pushNamed(context, '/edit_profile');
+                          Navigator.pushNamed(context, '/edit_profile',);
                         },
                       ),
                     ),
