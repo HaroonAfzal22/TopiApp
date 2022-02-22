@@ -16,6 +16,7 @@ class HttpLinks {
 
 
   static const String baseUrl = 'http://59.103.234.58:8005/api';
+  //static const String baseUrl = 'http://192.168.1.16:8001/api';
   static const String _baseUrl = 'http://59.103.234.58:8002/api';
   static const String getCategories = '$_baseUrl/categories';
   static const String getCategory = '$baseUrl/categories';
@@ -25,6 +26,7 @@ class HttpLinks {
   static const String privacyPolicy = '$baseUrl/privicy/policy';
   static const String adminVideos = '$baseUrl/admin/videos';
   static const String notifications = '$baseUrl/all/notifactions';
+  static const String likeApi = '$baseUrl/likes';
 
   static const String AdsUrl = 'http://59.103.234.58:8005/api/adds/unit/id';
 

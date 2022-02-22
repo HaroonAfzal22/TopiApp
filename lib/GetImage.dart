@@ -32,12 +32,12 @@ class _ImagePickersState extends State<ImagePickers>
     with SingleTickerProviderStateMixin {
   late AppState state;
   File? imageFile;
-  bool isLoading = false;
+  bool isLoading = false,isAnimate=false;
   bool isPlaying = false;
   bool isAdLoaded = false;
   var imagePaths;
   final AdSize adSize = AdSize(width: 320, height: 250);
-  BannerAd? myBanner= BannerAd(
+  BannerAd? myBanner = BannerAd(
       size: AdSize.mediumRectangle,
       adUnitId: SharedPref.getBannerAd(),
       listener: BannerAdListener(),
@@ -56,10 +56,13 @@ class _ImagePickersState extends State<ImagePickers>
   bool isInterstitialAdReady = false;
   bool isRewardedAdReady = false;
   late AnimationController animationController;
-      double? percentage;
+  double? percentage;
+
   @override
   void initState() {
     super.initState();
+
+    isPlaying = true;
     state = AppState.free;
     animationController = AnimationController(
       vsync: this,
@@ -88,9 +91,14 @@ class _ImagePickersState extends State<ImagePickers>
       myNative!.load();
     });
     myBanner!.load();
-     _loadInterstitialAd();
+    _loadInterstitialAd();
     _loadRewardedAd();
     setTimer();
+    Future.delayed(Duration(seconds: 3), () {
+      setState(() {
+        isPlaying = false;
+      });
+    });
   }
 
   // initialize interstitial ad
@@ -113,7 +121,7 @@ class _ImagePickersState extends State<ImagePickers>
   // initialize reward ad
   void _loadRewardedAd() {
     RewardedAd.load(
-        adUnitId:SharedPref.getRewardedAd(),
+        adUnitId: SharedPref.getRewardedAd(),
         request: AdRequest(),
         rewardedAdLoadCallback: RewardedAdLoadCallback(onAdLoaded: (ad) {
           this._rewardedAd = ad;
@@ -146,10 +154,37 @@ class _ImagePickersState extends State<ImagePickers>
     });
   }
 
-
+  showDialog(){
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black12.withOpacity(0.6), // Background color
+      barrierDismissible: false,
+      barrierLabel: 'Dialog',
+      transitionDuration: Duration(milliseconds: 400),
+      pageBuilder: (_, __, ___) {
+        return Column(
+          children: <Widget>[
+            Expanded(
+              flex: 5,
+              child: SizedBox.expand(child: FlutterLogo()),
+            ),
+            Expanded(
+              flex: 1,
+              child: SizedBox.expand(
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Dismiss'),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
-     percentage = animationController.value * 100;
+    percentage = animationController.value * 100;
     setState(() {
       if (percentage!.toStringAsFixed(0) == '100') {
         animationController.stop();
@@ -176,19 +211,26 @@ class _ImagePickersState extends State<ImagePickers>
       ),
       body: BackgroundGradient(
         childView: Center(
-          child: imageFile != null
+          child:isAnimate?Container(
+            child: Lottie.asset('assets/uploading.json',
+                repeat: true, reverse: true, animate: true),
+          ) :imageFile != null
               ? isLoading
                   ? Container(
-                      margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/4),
+                      margin: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height / 4),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          percentage!.toStringAsFixed(0) == '100'?
-                          Container(
-                            height: 350,
-                            child: Lottie.asset('assets/waiting.json',
-                                repeat: true, reverse: true, animate: true),
-                          ):Container(),
+                          percentage!.toStringAsFixed(0) == '100'
+                              ? Container(
+                                  height: 350,
+                                  child: Lottie.asset('assets/waiting.json',
+                                      repeat: true,
+                                      reverse: true,
+                                      animate: true),
+                                )
+                              : Container(),
                           percentage!.toStringAsFixed(0) == '100'
                               ? Container(
                                   margin: EdgeInsets.only(top: 8.0),
@@ -210,12 +252,15 @@ class _ImagePickersState extends State<ImagePickers>
                               : Container(),
                           percentage!.toStringAsFixed(0) != '100'
                               ? Container(
-                                  width: MediaQuery.of(context).size.width*0.7,
-                                  height: MediaQuery.of(context).size.height*0.3,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.3,
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 8.0, vertical: 8.0),
                                   child: LiquidCircularProgressIndicator(
-                                    value: double.parse('${animationController.value}'),
+                                    value: double.parse(
+                                        '${animationController.value}'),
                                     valueColor: AlwaysStoppedAnimation(
                                         Color(0xffFC9425)),
                                     center: Text(
@@ -260,31 +305,34 @@ class _ImagePickersState extends State<ImagePickers>
                           child: Lottie.asset('assets/upload.json',
                               repeat: true, reverse: true, animate: true),
                         ),
-                        Container(
+                       Container(
                           margin: EdgeInsets.symmetric(
                               vertical: 36.0, horizontal: 24.0),
-                          child: ElevatedButton.icon(
-                            style: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(24.0))),
-                                padding: MaterialStateProperty.all(
-                                    EdgeInsets.symmetric(vertical: 12.0)),
-                                backgroundColor: MaterialStateProperty.all(
-                                  Colors.deepOrange,
-                                )),
-                            label: Text(
-                              "Upload Image",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.0,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Visibility(
+                                visible: isPlaying,
+                                child: Center(
+                                  child: spinkit
+                                ),
                               ),
-                            ),
-                            onPressed: () {
-                              _pickImage();
-                            },
-                            icon: Icon(FontAwesomeIcons.upload),
+                              SizedBox(height: 8.0,),
+                              ElevatedButton.icon(
+                                style: imageBtnStyle,
+                                label:  Text(
+                                  "Upload Image",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                                onPressed: !isPlaying?() {
+                                  _pickImage();
+                                }:(){},
+                                icon: Icon(FontAwesomeIcons.upload),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -303,24 +351,37 @@ class _ImagePickersState extends State<ImagePickers>
                       child: Lottie.asset('assets/upload.json',
                           repeat: true, animate: true),
                     ),
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                          vertical: 36.0, horizontal: 24.0),
-                      child: ElevatedButton.icon(
-                        style:imageBtnStyle,
-                        label: Text(
-                          "Upload Image",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.0,
+                     Container(
+                            margin: EdgeInsets.symmetric(
+                                vertical: 36.0, horizontal: 24.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Visibility(
+                                  visible: isPlaying,
+                                  child: Center(
+                                    child: SizedBox( height: 25.0,
+                                        width: 25.0,child: CircularProgressIndicator(color: Colors.white,strokeWidth: 2.0,)),
+                                  ),
+                                ),
+                                SizedBox(height: 8.0,),
+                                ElevatedButton.icon(
+                                  style: imageBtnStyle,
+                                  label:Text(
+                                    "Upload Image",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14.0,
+                                    ),
+                                  ),
+                                  onPressed:!isPlaying?() {
+                                    _pickImage();
+                                  }:(){},
+                                  icon: Icon(FontAwesomeIcons.upload,),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        onPressed: () {
-                          _pickImage();
-                        },
-                        icon: Icon(FontAwesomeIcons.upload),
-                      ),
-                    ),
                   ],
                 ),
         ),
@@ -338,16 +399,18 @@ class _ImagePickersState extends State<ImagePickers>
 
   // pick image from gallery and set for post
   Future<Null> _pickImage() async {
-    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery,imageQuality: 50);
+    final pickedImage = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 50);
     imageFile = pickedImage != null ? File(pickedImage.path) : null;
-    print('image file size is ${getFileSizeString(bytes: imageFile!.lengthSync())}');
+    print(
+        'image file size is ${getFileSizeString(bytes: imageFile!.lengthSync())}');
     if (imageFile != null) {
       /*  var result = getFileSizeString(bytes: imageFile!.lengthSync());
       if (result.contains('KB')) {
         if (int.parse(result.substring(0, result.length - 2)) < 50) {
           _onWillPop('Image quality too low, kindly upload best quality image for better result...');
         }
-        *//*else if(int.parse(result.substring(0, result.length - 2)) > 800){
+        */ /*else if(int.parse(result.substring(0, result.length - 2)) > 800){
           var tempDir = await getTemporaryDirectory();
           final path = tempDir.path;
           int rand = Random().nextInt(10000);
@@ -358,7 +421,7 @@ class _ImagePickersState extends State<ImagePickers>
 
           print('compress image is kb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');
           predictSong(compressedImage);
-        }*//*
+        }*/ /*
         else {
           setState(() {
             isLoading = true;
@@ -382,17 +445,26 @@ class _ImagePickersState extends State<ImagePickers>
           ..writeAsBytesSync(Im.encodeJpg(image!,quality: 50));
 
         print('compress image is mb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');*/
+
+      setState(() {
+        isAnimate = true;
+        predictSong(imageFile);
+      });
+      Future.delayed(Duration(seconds: 7),(){
         setState(() {
-          isLoading = true;
-          predictSong(imageFile);
-          if (isRewardedAdReady ) {
-            _rewardedAd?.show(onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
+          isLoading=true;
+          isAnimate=false;
+          if (isRewardedAdReady) {
+            _rewardedAd?.show(
+                onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
           } else {
             toastShow('Ad not work');
             _loadRewardedAd();
           }
           animationController.forward();
         });
+      });
+
       //}
     }
   }
@@ -425,41 +497,41 @@ class _ImagePickersState extends State<ImagePickers>
     String base64Image = base64Encode(bytes);
     Uint8List base = base64Decode(base64Image);
     print('image decode ${Image.memory(base)}');*/
-    Map<String,String> bodyMap ={
-      'id':SharedPref.getSongId(),
-      'type':SharedPref.getSongPremium(),
+    Map<String, String> bodyMap = {
+      'id': SharedPref.getSongId(),
+      'type': SharedPref.getSongPremium(),
     };
     HttpRequest request = HttpRequest();
-    var result = await request.predictNp(context,bodyMap, image);
-     if (result == 504 ||result == 500) {
-        snackShow(context, '$result  Error try again later...');
-        setState(() {
-          isLoading = false;
-          percentage = animationController.value * 0;
-          animationController.value = 0;
-        });
-      } else {
-       timer = Timer.periodic(Duration(seconds: 1), (_)async {
-         var dir = await getExternalStorageDirectory();
-         List values = await dir!.list().toList();
-          for (int i = 0; i < values.length; i++) {
-            if (values[i].toString().contains(result.path.toString())) {
-              timer!.cancel();
-              Future.delayed(Duration(seconds: 5), () {
-                Navigator.pushNamed(context, '/video_players', arguments: {
-                  'file': '${result.path}',
-                });
-                setState(() {
-                  isLoading = false;
-                  percentage = animationController.value * 0;
-                   animationController.value = 0;
-                });
+    var result = await request.predictNp(context, bodyMap, image);
+    if (result == 504 || result == 500) {
+      snackShow(context, '$result  Error try again later...');
+      setState(() {
+        isLoading = false;
+        percentage = animationController.value * 0;
+        animationController.value = 0;
+      });
+    } else {
+      timer = Timer.periodic(Duration(seconds: 1), (_) async {
+        var dir = await getExternalStorageDirectory();
+        List values = await dir!.list().toList();
+        for (int i = 0; i < values.length; i++) {
+          if (values[i].toString().contains(result.path.toString())) {
+            timer!.cancel();
+            Future.delayed(Duration(seconds: 5), () {
+              Navigator.pushNamed(context, '/video_players', arguments: {
+                'file': '${result.path}',
               });
-            }
+              setState(() {
+                isLoading = false;
+                percentage = animationController.value * 0;
+                animationController.value = 0;
+              });
+            });
           }
-        });
-      }
-   /* if (result == null ||result.isEmpty) {
+        }
+      });
+    }
+    /* if (result == null ||result.isEmpty) {
       print('response in $result');
 
       setState(() {
@@ -513,12 +585,15 @@ class _ImagePickersState extends State<ImagePickers>
     });
   }
 
-  void _onWillPop(image) async {
+  /*void _onWillPop(image) async {
     if (Platform.isIOS) {
       await showDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
-                title: Text('Warning!!!',style: TextStyle(fontSize: 16.0),),
+                title: Text(
+                  'Warning!!!',
+                  style: TextStyle(fontSize: 16.0),
+                ),
                 content: Container(
                   child: Text('$image'),
                 ),
@@ -533,8 +608,10 @@ class _ImagePickersState extends State<ImagePickers>
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Warning!!!',style: TextStyle(fontSize: 16.0),),
-
+          title: Text(
+            'Warning!!!',
+            style: TextStyle(fontSize: 16.0),
+          ),
           backgroundColor: Color(0xffe8f6fa),
           actionsPadding: EdgeInsets.symmetric(horizontal: 24.0),
           content: Container(
@@ -543,8 +620,8 @@ class _ImagePickersState extends State<ImagePickers>
           actions: <Widget>[
             ElevatedButton(
               style: ButtonStyle(
-                backgroundColor:MaterialStateProperty.all(Colors.deepOrange)
-              ),
+                  backgroundColor:
+                      MaterialStateProperty.all(Colors.deepOrange)),
               onPressed: () => Navigator.of(context).pop(false),
               child: new Text('Ok'),
             ),
@@ -552,8 +629,7 @@ class _ImagePickersState extends State<ImagePickers>
         ),
       );
     }
-  }
-
+  }*/
 
   @override
   void dispose() {

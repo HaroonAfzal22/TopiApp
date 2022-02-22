@@ -153,6 +153,26 @@ Future getCommunity(BuildContext context) async {
     }
   }
 
+  // get like count
+Future getLikesCount(BuildContext context) async {
+    try {
+      Uri uri = Uri.parse('${HttpLinks.likeApi}');
+      Response response = await get(
+        uri,
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        },
+      );
+      if (response.statusCode == 200||response.statusCode==201) {
+        return jsonDecode(response.body);
+      } else {
+        return serverResponses(response.statusCode);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   // get ads id from url to set dynamic
 Future getAds(BuildContext context) async {
     try {

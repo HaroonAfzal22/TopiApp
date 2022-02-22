@@ -234,7 +234,6 @@ class _SongsListState extends State<SongsList> {
   Future<void> getCategoryList() async {
     HttpRequest request = HttpRequest();
     var result = await request.getCategories(context);
-    print('result $result');
     setState(() {
       if(result==null ||result.isEmpty){
         toastShow('Category List is Empty');

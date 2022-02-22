@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,7 +21,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:topi/constants.dart';
 import 'package:topi/HttpRequest.dart';
 import 'package:topi/Shared_Pref.dart';
-
+import 'package:collection/collection.dart';
 import 'OutlineBtn.dart';
 
 class Community extends StatefulWidget {
@@ -40,7 +41,7 @@ class _CommunityState extends State<Community> {
   var activeIndex = 5;
   List<bool> isLiked = [];
   List<bool> isDescClick = [];
-  List<int> isLikedCount = [], isCommentCount = [], isShareCount = [];
+  List isLikedCount = [], isCommentCount = [], isShareCount = [];
   var indexes = [],
       listing = [],
       values = [1, 2, 3, 4, 5],
@@ -101,6 +102,7 @@ class _CommunityState extends State<Community> {
   getCommunity() async {
     HttpRequest request = HttpRequest();
     var result = await request.getCommunity(context);
+    var likes= await request.getLikesCount(context);
     setState(() {
       if (result == null || result.isEmpty) {
         toastShow('Data not Found...');
@@ -113,7 +115,8 @@ class _CommunityState extends State<Community> {
           controller?.insert(i, BetterPlayerListVideoPlayerController());
         }
         data = result;
-        isLikedCount = List<int>.filled(data.length, 0);
+        print('result is $likes');
+        isLikedCount = likes['likes'];
         isCommentCount = List<int>.filled(data.length, 0);
         isShareCount = List<int>.filled(data.length, 0);
         isLiked = List<bool>.filled(data.length, false);
@@ -238,7 +241,7 @@ class _CommunityState extends State<Community> {
                             child: Container(
                               padding: const EdgeInsets.all(8.0),
                               child: Visibility(
-                                visible: data[index]['premium'] == '0'
+                                visible: data[index]['premium'] != '0'
                                     ? true
                                     : false,
                                 child: UnicornOutlineButton(
@@ -282,18 +285,21 @@ class _CommunityState extends State<Community> {
                           StackDesign(
                             bottomMargin: 360.0,
                             leftMargin: 55,
-                            counts: isLikedCount.length,
+                            counts: checkId(index),
                             colors: isLiked[index] == true
                                 ? Colors.red
                                 : Colors.white,
                             ikon: CupertinoIcons.heart_solid,
                             onClick: () {
+                              print('compare ${checkId(index)}');
+                              print('data ${data[index]['id']}');
+                              print('like ${isLikedCount[index]['video_id']}');
                               if (isLiked[index] == true) {
-                                isLiked.removeAt(index);
-                                isLiked.insert(index, false);
+                               // isLiked.removeAt(index);
+                                //isLiked.insert(index, false);
                               } else {
-                                isLiked.removeAt(index);
-                                isLiked.insert(index, true);
+                              //  isLiked.removeAt(index);
+                                //isLiked.insert(index, true);
                               }
                             },
                           ),
@@ -398,6 +404,25 @@ class _CommunityState extends State<Community> {
       ),
     );
   }
+
+  checkId(index){
+    //[for (final pair in IterableZip([a, b])) pair[0]["id"] == pair[1]["id"]];
+    for (int i=0;i<data.length;i++){
+      for(int j=0;j<isLikedCount.length;i++){
+      if(data[index]['id'].toString().contains(isLikedCount[index]['video_id'].toString())){
+        print('response ${data[index]['id']==isLikedCount[index]['video_id']}');
+
+        return isLikedCount[index]['like'];
+      }else {
+        print('response not ${data[index]['id'] ==
+            isLikedCount[index]['video_id']}');
+
+        return 0;
+      }
+      }
+    }
+  }
+
 // load interstitial ad
   void _loadInterstitialAd() {
     InterstitialAd.load(
