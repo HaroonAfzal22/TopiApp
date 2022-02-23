@@ -42,6 +42,11 @@ class _ImagePickersState extends State<ImagePickers>
       adUnitId: SharedPref.getBannerAd(),
       listener: BannerAdListener(),
       request: AdRequest());
+  BannerAd? myBanners = BannerAd(
+      size: AdSize.mediumRectangle,
+      adUnitId: SharedPref.getBannerAd(),
+      listener: BannerAdListener(),
+      request: AdRequest());
   int pos = 0;
   List userAnswer = [
     'Where you can see a lot of new features...',
@@ -91,6 +96,7 @@ class _ImagePickersState extends State<ImagePickers>
       myNative!.load();
     });
     myBanner!.load();
+    myBanners!.load();
     _loadInterstitialAd();
     _loadRewardedAd();
     setTimer();
@@ -101,87 +107,6 @@ class _ImagePickersState extends State<ImagePickers>
     });
   }
 
-  // initialize interstitial ad
-  void _loadInterstitialAd() {
-    InterstitialAd.load(
-        adUnitId: SharedPref.getInterstitialAd(),
-        request: AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(onAdLoaded: (ad) {
-          this._interstitialAd = ad;
-          ad.fullScreenContentCallback =
-              FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
-            //back screen call
-          });
-          isInterstitialAdReady = true;
-        }, onAdFailedToLoad: (err) {
-          isInterstitialAdReady = false;
-        }));
-  }
-
-  // initialize reward ad
-  void _loadRewardedAd() {
-    RewardedAd.load(
-        adUnitId: SharedPref.getRewardedAd(),
-        request: AdRequest(),
-        rewardedAdLoadCallback: RewardedAdLoadCallback(onAdLoaded: (ad) {
-          this._rewardedAd = ad;
-          ad.fullScreenContentCallback =
-              FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
-            //back screen call
-            setState(() {
-              isRewardedAdReady = false;
-            });
-            _loadRewardedAd();
-          });
-          setState(() {
-            isRewardedAdReady = true;
-          });
-        }, onAdFailedToLoad: (err) {
-          isRewardedAdReady = false;
-        }));
-  }
-
-  // animation repeat process
-  setTimer() {
-    _timer = Timer.periodic(Duration(seconds: 3), (_) {
-      setState(() {
-        if (pos < 2) {
-          pos++;
-        } else {
-          pos = 0;
-        }
-      });
-    });
-  }
-
-  showDialog(){
-    showGeneralDialog(
-      context: context,
-      barrierColor: Colors.black12.withOpacity(0.6), // Background color
-      barrierDismissible: false,
-      barrierLabel: 'Dialog',
-      transitionDuration: Duration(milliseconds: 400),
-      pageBuilder: (_, __, ___) {
-        return Column(
-          children: <Widget>[
-            Expanded(
-              flex: 5,
-              child: SizedBox.expand(child: FlutterLogo()),
-            ),
-            Expanded(
-              flex: 1,
-              child: SizedBox.expand(
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Dismiss'),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
   @override
   Widget build(BuildContext context) {
     percentage = animationController.value * 100;
@@ -211,9 +136,27 @@ class _ImagePickersState extends State<ImagePickers>
       ),
       body: BackgroundGradient(
         childView: Center(
-          child:isAnimate?Container(
-            child: Lottie.asset('assets/uploading.json',
-                repeat: true, reverse: true, animate: true),
+          child:isAnimate?Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  width: MediaQuery.of(context).size.width*0.5,
+                  height: MediaQuery.of(context).size.width*0.5,
+                  child: Lottie.asset('assets/uploading.json',
+                      repeat: true, reverse: true, animate: true),
+                ),
+              ),
+
+              Container(
+                alignment: Alignment.bottomCenter,
+                height: 250,
+                width: MediaQuery.of(context).size.width,
+                child: AdWidget(
+                  ad: myBanners!,
+                ),
+              ),
+            ],
           ) :imageFile != null
               ? isLoading
                   ? Container(
@@ -360,8 +303,8 @@ class _ImagePickersState extends State<ImagePickers>
                                 Visibility(
                                   visible: isPlaying,
                                   child: Center(
-                                    child: SizedBox( height: 25.0,
-                                        width: 25.0,child: CircularProgressIndicator(color: Colors.white,strokeWidth: 2.0,)),
+                                    child: SizedBox( height: 25.0, width: 25.0,
+                                        child: CircularProgressIndicator(color: Colors.white,strokeWidth: 2.0,)),
                                   ),
                                 ),
                                 SizedBox(height: 8.0,),
@@ -389,6 +332,153 @@ class _ImagePickersState extends State<ImagePickers>
     );
   }
 
+
+  // initialize interstitial ad
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+        adUnitId: SharedPref.getInterstitialAd(),
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(onAdLoaded: (ad) {
+          this._interstitialAd = ad;
+          ad.fullScreenContentCallback =
+              FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
+                //back screen call
+              });
+          isInterstitialAdReady = true;
+        }, onAdFailedToLoad: (err) {
+          isInterstitialAdReady = false;
+        }));
+  }
+
+  // initialize reward ad
+  void _loadRewardedAd() {
+    RewardedAd.load(
+        adUnitId: SharedPref.getRewardedAd(),
+        request: AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(onAdLoaded: (ad) {
+          this._rewardedAd = ad;
+          ad.fullScreenContentCallback =
+              FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
+                //back screen call
+                setState(() {
+                  isRewardedAdReady = false;
+                });
+                _loadRewardedAd();
+              });
+          setState(() {
+            isRewardedAdReady = true;
+          });
+        }, onAdFailedToLoad: (err) {
+          isRewardedAdReady = false;
+        }));
+  }
+
+  // animation repeat process
+  setTimer() {
+    _timer = Timer.periodic(Duration(seconds: 3), (_) {
+      setState(() {
+        if (pos < 2) {
+          pos++;
+        } else {
+          pos = 0;
+        }
+      });
+    });
+  }
+
+  showAlertDialog(){
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: 'Dialog',
+      transitionDuration: Duration(milliseconds: 400),
+      pageBuilder: (_, __, ___) {
+        return Scaffold(
+          backgroundColor: Colors.black87,
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 38.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Expanded(
+                    flex: 4,
+                    child:  SizedBox.expand(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 60.0),
+                        foregroundDecoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.deepOrange,
+                          radius: 120,
+                          child: CircleAvatar(
+                            radius: 120 - 1,
+                            backgroundImage: Image.file(
+                              imageFile!,
+                              fit: BoxFit.contain,
+                            ).image,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 60.0),
+
+                      margin: EdgeInsets.only(top: 20.0),
+                      child:  Text('Image Upload Successfully...',maxLines: 1,textAlign: TextAlign.center,style: TextStyle(
+                        color: Colors.deepOrange,fontSize: 18.0,
+                      ),),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      padding: EdgeInsets.all(60.0),
+                      margin: EdgeInsets.only(top: 20.0),
+                      child: ElevatedButton(
+                        style: imageBtnStyle,
+                        onPressed: () { Navigator.pop(context);
+                        setState(() {
+                          isLoading=true;
+                          if (isRewardedAdReady) {
+                            _rewardedAd?.show(onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
+                          } else {
+                            toastShow('Ad not work');
+                            _loadRewardedAd();
+                          }
+                          animationController.forward();
+                        });
+                          },
+                        child: Text('Create Video now'),
+                      ),
+                    ),
+                  ),
+                  isAdLoaded
+                      ? Expanded(
+                        child: Container(
+                    alignment: Alignment.bottomCenter,
+                    color: Colors.white,
+                    width: MediaQuery.of(context).size.width,
+                    height: 50,
+                    child: AdWidget(
+                        ad: myNative!,
+                    ),
+                  ),
+                      )
+                      : Text('loading...')
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
 // check file size
   static String getFileSizeString({required int bytes, int decimals = 0}) {
     if (bytes <= 0) return "0 Bytes";
@@ -402,8 +492,7 @@ class _ImagePickersState extends State<ImagePickers>
     final pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
     imageFile = pickedImage != null ? File(pickedImage.path) : null;
-    print(
-        'image file size is ${getFileSizeString(bytes: imageFile!.lengthSync())}');
+    print('image file size is ${getFileSizeString(bytes: imageFile!.lengthSync())}');
     if (imageFile != null) {
       /*  var result = getFileSizeString(bytes: imageFile!.lengthSync());
       if (result.contains('KB')) {
@@ -448,24 +537,13 @@ class _ImagePickersState extends State<ImagePickers>
 
       setState(() {
         isAnimate = true;
-        predictSong(imageFile);
+       // predictSong(imageFile);
       });
       Future.delayed(Duration(seconds: 7),(){
-        setState(() {
-          isLoading=true;
-          isAnimate=false;
-          if (isRewardedAdReady) {
-            _rewardedAd?.show(
-                onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
-          } else {
-            toastShow('Ad not work');
-            _loadRewardedAd();
-          }
-          animationController.forward();
-        });
+        isAnimate=false;
+          showAlertDialog();
       });
 
-      //}
     }
   }
 
@@ -585,7 +663,7 @@ class _ImagePickersState extends State<ImagePickers>
     });
   }
 
-  /*void _onWillPop(image) async {
+  void _onWillPop(image) async {
     if (Platform.isIOS) {
       await showDialog(
           context: context,
@@ -629,7 +707,7 @@ class _ImagePickersState extends State<ImagePickers>
         ),
       );
     }
-  }*/
+  }
 
   @override
   void dispose() {

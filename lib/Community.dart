@@ -39,7 +39,7 @@ class _CommunityState extends State<Community> {
   bool isVisible = true, isDownloaded = false;
   bool isLoading = false;
   var activeIndex = 5;
-  List<bool> isLiked = [];
+  late var isLiked ;
   List<bool> isDescClick = [];
   List isLikedCount = [], isCommentCount = [], isShareCount = [];
   var indexes = [],
@@ -73,13 +73,6 @@ class _CommunityState extends State<Community> {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       getCommunity();
     });
-
-    indexes = List<int>.filled(values.length, 0);
-    listing = List<int>.filled(values.length, 0);
-    isLikedCount = List<int>.filled(values.length, 0);
-    isCommentCount = List<int>.filled(values.length, 0);
-    isLiked = List<bool>.filled(values.length, false);
-    isDescClick = List<bool>.filled(values.length, false);
   }
 
   void testingVideoLink(index) async {
@@ -102,7 +95,8 @@ class _CommunityState extends State<Community> {
   getCommunity() async {
     HttpRequest request = HttpRequest();
     var result = await request.getCommunity(context);
-    var likes= await request.getLikesCount(context);
+    var likes = await request.getLikesCount(context);
+    var shares = await request.getSharesCount(context);
     setState(() {
       if (result == null || result.isEmpty) {
         toastShow('Data not Found...');
@@ -115,10 +109,9 @@ class _CommunityState extends State<Community> {
           controller?.insert(i, BetterPlayerListVideoPlayerController());
         }
         data = result;
-        print('result is $likes');
         isLikedCount = likes['likes'];
+        isShareCount = shares['share'];
         isCommentCount = List<int>.filled(data.length, 0);
-        isShareCount = List<int>.filled(data.length, 0);
         isLiked = List<bool>.filled(data.length, false);
         isLoading = false;
       }
@@ -148,7 +141,7 @@ class _CommunityState extends State<Community> {
                   controller!.forEach((controllers) => controllers.pause());
                   controller![index].play();
                   if (index % 4 == 0) {
-                    interAd();
+                    // interAd();
                   }
                 },
                 scrollDirection: Axis.vertical,
@@ -285,22 +278,19 @@ class _CommunityState extends State<Community> {
                           StackDesign(
                             bottomMargin: 360.0,
                             leftMargin: 55,
-                            counts: checkId(index),
+                            counts: likeId(index) ?? 0,
                             colors: isLiked[index] == true
                                 ? Colors.red
                                 : Colors.white,
                             ikon: CupertinoIcons.heart_solid,
                             onClick: () {
-                              print('compare ${checkId(index)}');
-                              print('data ${data[index]['id']}');
-                              print('like ${isLikedCount[index]['video_id']}');
-                              if (isLiked[index] == true) {
-                               // isLiked.removeAt(index);
-                                //isLiked.insert(index, false);
-                              } else {
-                              //  isLiked.removeAt(index);
-                                //isLiked.insert(index, true);
-                              }
+                             setState(() {
+                               if (isLiked[index] == true) {
+                                 isLiked[index]=false;
+                               } else {
+                                 isLiked[index]=true;
+                               }
+                             });
                             },
                           ),
                           StackDesign(
@@ -316,7 +306,7 @@ class _CommunityState extends State<Community> {
                           StackDesign(
                             bottomMargin: 220.0,
                             leftMargin: 55,
-                            counts: isShareCount.length,
+                            counts: shareId(index)?? 0 ,
                             colors: Colors.white,
                             ikon: CupertinoIcons.arrowshape_turn_up_right_fill,
                             onClick: () {
@@ -405,28 +395,33 @@ class _CommunityState extends State<Community> {
     );
   }
 
-  checkId(index){
-    //[for (final pair in IterableZip([a, b])) pair[0]["id"] == pair[1]["id"]];
-    for (int i=0;i<data.length;i++){
-      for(int j=0;j<isLikedCount.length;i++){
-      if(data[index]['id'].toString().contains(isLikedCount[index]['video_id'].toString())){
-        print('response ${data[index]['id']==isLikedCount[index]['video_id']}');
-
-        return isLikedCount[index]['like'];
-      }else {
-        print('response not ${data[index]['id'] ==
-            isLikedCount[index]['video_id']}');
-
-        return 0;
-      }
-      }
-    }
+  likeId(index) {
+    List value = [];
+    data.forEach((dates) {
+      isLikedCount.forEach((likes) {
+        if (dates['id'] == likes['video_id']) {
+          value.add(likes['like']);
+        }
+      });
+    });
+    return value[index];
+  }
+  shareId(index) {
+    List value = [];
+    data.forEach((dates) {
+      isShareCount.forEach((likes) {
+        if (dates['id'] == likes['video_id']) {
+          value.add(likes['share']);
+        }
+      });
+    });
+    return value[index];
   }
 
 // load interstitial ad
   void _loadInterstitialAd() {
     InterstitialAd.load(
-        adUnitId: SharedPref.getInterstitialAd()??'',
+        adUnitId: SharedPref.getInterstitialAd() ?? '',
         request: AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(onAdLoaded: (ad) {
           this._interstitialAd = ad;
