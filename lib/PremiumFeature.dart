@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pay/pay.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/NavigationDrawer.dart';
 import 'package:topi/OutlineBtn.dart';
@@ -323,6 +324,7 @@ class _PremiumFeatureState extends State<PremiumFeature> {
 
   //for modal bottom sheet to show children
   void _settingModalBottomSheet(context, monthly, halfly, yearly) {
+    final _amount=<PaymentItem>[monthly];
     showModalBottomSheet(
       backgroundColor: Color(0xffD7CCC8),
       context: context,
@@ -497,7 +499,20 @@ class _PremiumFeatureState extends State<PremiumFeature> {
               ),
             ],
           ),
-          InkWell(
+          GooglePayButton(
+            paymentConfigurationAsset: 'gpay.json',
+            paymentItems: _amount,
+            style: GooglePayButtonStyle.black,
+            type: GooglePayButtonType.subscribe,
+            margin: const EdgeInsets.only(top: 15.0),
+            onPaymentResult: (onGooglePayResult){
+              print(onGooglePayResult);
+              },
+            loadingIndicator: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+         /* InkWell(
             child: AnimatedContainer(
               duration:  const Duration(milliseconds: 200,),
               decoration: BoxDecoration(
@@ -529,7 +544,7 @@ class _PremiumFeatureState extends State<PremiumFeature> {
                 ],
               ),
             ),
-          ),
+          ),*/
           /*  GridView.builder(
             padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
             shrinkWrap: true,

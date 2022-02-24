@@ -109,8 +109,8 @@ class _CommunityState extends State<Community> {
           controller?.insert(i, BetterPlayerListVideoPlayerController());
         }
         data = result;
-        isLikedCount = likes['likes'];
-        isShareCount = shares['share'];
+        isLikedCount = List<int>.filled(data.length, 0);
+        isShareCount = List<int>.filled(data.length, 0);
         isCommentCount = List<int>.filled(data.length, 0);
         isLiked = List<bool>.filled(data.length, false);
         isLoading = false;
@@ -141,7 +141,7 @@ class _CommunityState extends State<Community> {
                   controller!.forEach((controllers) => controllers.pause());
                   controller![index].play();
                   if (index % 4 == 0) {
-                    // interAd();
+                     interAd();
                   }
                 },
                 scrollDirection: Axis.vertical,
@@ -180,7 +180,7 @@ class _CommunityState extends State<Community> {
                               ),
                             ),
                           ),
-                          /*Positioned(
+                          Positioned(
                             bottom: 140,
                             left: 130,
                             child: Container(
@@ -227,8 +227,8 @@ class _CommunityState extends State<Community> {
                                     fontSize: 14.0,
                                   ),
                                 )),
-                          )*/
-                          Positioned(
+                          )
+                         /* Positioned(
                             bottom: MediaQuery.of(context).size.height - 150,
                             right: MediaQuery.of(context).size.width * 0.01,
                             child: Container(
@@ -278,12 +278,13 @@ class _CommunityState extends State<Community> {
                           StackDesign(
                             bottomMargin: 360.0,
                             leftMargin: 55,
-                            counts: likeId(index) ?? 0,
+                            counts: 40,//likeId(index) ?? 0,
                             colors: isLiked[index] == true
                                 ? Colors.red
                                 : Colors.white,
                             ikon: CupertinoIcons.heart_solid,
-                            onClick: () {
+                            onClick: ()async {
+                              HttpRequest request = HttpRequest();
                              setState(() {
                                if (isLiked[index] == true) {
                                  isLiked[index]=false;
@@ -291,6 +292,17 @@ class _CommunityState extends State<Community> {
                                  isLiked[index]=true;
                                }
                              });
+                           *//*  if (isLiked[index] == true) {
+                               Map bodyMap={'video_id':data[index]['id'].toString(),'like':'0','method':'PUT'};
+                                var result = await request.postLikesCount(context, bodyMap);
+                                print('response false is $result');
+
+                             } else {
+                               Map bodyMap={'video_id':data[index]['id'].toString(),'like':'1','method':'PUT'};
+                               var result = await request.postLikesCount(context, bodyMap);
+                               print('response true is $result');
+
+                             }*//*
                             },
                           ),
                           StackDesign(
@@ -306,7 +318,7 @@ class _CommunityState extends State<Community> {
                           StackDesign(
                             bottomMargin: 220.0,
                             leftMargin: 55,
-                            counts: shareId(index)?? 0 ,
+                            counts: 52,//shareId(index)?? 0 ,
                             colors: Colors.white,
                             ikon: CupertinoIcons.arrowshape_turn_up_right_fill,
                             onClick: () {
@@ -383,7 +395,7 @@ class _CommunityState extends State<Community> {
                                 velocity: 30,
                               ),
                             ),
-                          ),
+                          ),*/
                         ],
                       ),
                     ),

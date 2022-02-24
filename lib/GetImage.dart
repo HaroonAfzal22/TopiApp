@@ -55,7 +55,7 @@ class _ImagePickersState extends State<ImagePickers>
   ];
   Timer? _timer, timer;
   var songs;
-  NativeAd? myNative;
+  NativeAd? myNative,myNatives;
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
   bool isInterstitialAdReady = false;
@@ -92,8 +92,25 @@ class _ImagePickersState extends State<ImagePickers>
         },
       ),
     );
+    myNatives = NativeAd(
+      adUnitId: SharedPref.getNativeAd(),
+      factoryId: 'listTile',
+      request: AdRequest(),
+      listener: NativeAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (Ad ad) => {
+          setState(() {
+            isAdLoaded = true;
+          }),
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          ad.dispose();
+        },
+      ),
+    );
     setState(() {
       myNative!.load();
+      myNatives!.load();
     });
     myBanner!.load();
     myBanners!.load();
@@ -147,15 +164,27 @@ class _ImagePickersState extends State<ImagePickers>
                       repeat: true, reverse: true, animate: true),
                 ),
               ),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 60.0),
 
-              Container(
-                alignment: Alignment.bottomCenter,
-                height: 250,
-                width: MediaQuery.of(context).size.width,
-                child: AdWidget(
-                  ad: myBanners!,
+                  margin: EdgeInsets.only(top: 20.0),
+                  child:  Text('Your image is uploading please wait...',maxLines: 2,textAlign: TextAlign.center,style: TextStyle(
+                    color: Colors.deepOrange,fontSize: 18.0,
+                  ),),
                 ),
               ),
+              isAdLoaded
+                  ? Container(
+                    alignment: Alignment.bottomCenter,
+                    color: Colors.white,
+                    width: MediaQuery.of(context).size.width,
+                    height: 50,
+                    child: AdWidget(
+                      ad: myNatives!,
+                    ),
+                  )
+                  : Text('loading...')
             ],
           ) :imageFile != null
               ? isLoading
@@ -423,7 +452,11 @@ class _ImagePickersState extends State<ImagePickers>
                       ),
                     ),
                   ),
+                  Expanded(child: Container(
+                      alignment: Alignment.center,
+                      child: FaIcon(FontAwesomeIcons.checkCircle,size: 50.0,color: Colors.green,))),
                   Expanded(
+                    flex: 2,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 60.0),
 
@@ -434,11 +467,11 @@ class _ImagePickersState extends State<ImagePickers>
                     ),
                   ),
                   Expanded(
-                    flex: 2,
+                    flex: 3,
                     child: Container(
                       padding: EdgeInsets.all(60.0),
                       margin: EdgeInsets.only(top: 20.0),
-                      child: ElevatedButton(
+                      child: ElevatedButton.icon(
                         style: imageBtnStyle,
                         onPressed: () { Navigator.pop(context);
                         setState(() {
@@ -452,22 +485,20 @@ class _ImagePickersState extends State<ImagePickers>
                           animationController.forward();
                         });
                           },
-                        child: Text('Create Video now'),
+                        label: Text('Create Video now',style: TextStyle(fontSize: 14.0),), icon:  Center(child: Icon(FontAwesomeIcons.upload)),
                       ),
                     ),
                   ),
                   isAdLoaded
-                      ? Expanded(
-                        child: Container(
+                      ? Container(
                     alignment: Alignment.bottomCenter,
                     color: Colors.white,
                     width: MediaQuery.of(context).size.width,
                     height: 50,
                     child: AdWidget(
-                        ad: myNative!,
+                      ad: myNative!,
                     ),
-                  ),
-                      )
+                  )
                       : Text('loading...')
                 ],
               ),
@@ -537,7 +568,7 @@ class _ImagePickersState extends State<ImagePickers>
 
       setState(() {
         isAnimate = true;
-       // predictSong(imageFile);
+        predictSong(imageFile);
       });
       Future.delayed(Duration(seconds: 7),(){
         isAnimate=false;

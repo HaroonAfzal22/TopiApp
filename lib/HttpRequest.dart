@@ -173,6 +173,27 @@ Future getLikesCount(BuildContext context) async {
     }
   }
 
+
+Future postLikesCount(BuildContext context,Map bodyMap) async {
+    try {
+      Uri uri = Uri.parse('${HttpLinks.likeApi}');
+      Response response = await post(
+        uri,
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        },
+        body: jsonEncode(bodyMap)
+      );
+      if (response.statusCode == 200||response.statusCode==201) {
+        return jsonDecode(response.body);
+      } else {
+        return serverResponses(response.statusCode);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   // get share count
   Future getSharesCount(BuildContext context) async {
     try {
