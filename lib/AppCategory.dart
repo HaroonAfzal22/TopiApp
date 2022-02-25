@@ -33,7 +33,7 @@ class _AppCategoryState extends State<AppCategory> {
     Community(),
     SongsList(),
     Notifications(),
-    Profile(),
+    //Profile(),
   ];
 
   @override
@@ -228,7 +228,7 @@ class _AppCategoryState extends State<AppCategory> {
                         )),
                   ],
                 ),
-                Column(
+               /* Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(CupertinoIcons.person_solid,
@@ -241,7 +241,7 @@ class _AppCategoryState extends State<AppCategory> {
                               color: Colors.white, fontWeight: FontWeight.bold),
                         )),
                   ],
-                ),
+                ),*/
               ],
               onTap: (index) {
                 setState(() {

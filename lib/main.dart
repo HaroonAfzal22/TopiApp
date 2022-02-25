@@ -72,7 +72,6 @@ Future<void> main() async{
         Brightness.light,
   ));
   runApp(MyApp());
-
   // color used code  #FCCC44 as like yellow, #FC9425 like orange,#DC3843 like red
 }
 
@@ -139,7 +138,7 @@ class _MyAppState extends State<MyApp> {
           '/edit_profile': (context) => EditProfile(),
           '/view_photo': (context) => ViewPhoto(),
         },
-        home: HomePage(),
+        home: AppCategory(),
       ),
     );
   }

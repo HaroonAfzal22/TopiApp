@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:topi/OutlineBtn.dart';
 import 'package:topi/constants.dart';
 
@@ -97,10 +98,11 @@ class _SongsListsState extends State<SongsLists> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(8.0),
-
                   child: Visibility(
                     visible: widget.pVisible,
-                    child: UnicornOutlineButton(
+                    child:IconButton(
+                        onPressed: widget.pClick, icon: FaIcon(FontAwesomeIcons.crown,color: Colors.yellow,
+                    size: 20.0,)) /*UnicornOutlineButton(
                       strokeWidth: 1,
                       radius: 10,
                       gradient: LinearGradient(colors: [Colors.cyan, Colors.deepOrangeAccent]),
@@ -110,7 +112,7 @@ class _SongsListsState extends State<SongsLists> {
                           foreground: Paint()..shader = linearGradient
                       ),),
                       onPressed: widget.pClick,
-                    ),
+                    ),*/
                   ),
                 ),
               )

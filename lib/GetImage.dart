@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:topi/Gradient.dart';
 import 'package:topi/HttpRequest.dart';
 import 'package:topi/Shared_Pref.dart';
@@ -32,7 +33,7 @@ class _ImagePickersState extends State<ImagePickers>
     with SingleTickerProviderStateMixin {
   late AppState state;
   File? imageFile;
-  bool isLoading = false,isAnimate=false;
+  bool isLoading = false, isAnimate = false;
   bool isPlaying = false;
   bool isAdLoaded = false;
   var imagePaths;
@@ -51,17 +52,23 @@ class _ImagePickersState extends State<ImagePickers>
   List userAnswer = [
     'Where you can see a lot of new features...',
     'Now Image is Processing to do some Magic...',
+    'Creating your magical image into video...',
+  ];
+  List imageDownload = [
     'Downloading your magical image to video creation...',
+    'Where you can see your singing selfie that\'s amazing ...',
+    'Just wait a little bit for ...',
   ];
   Timer? _timer, timer;
   var songs;
-  NativeAd? myNative,myNatives;
+  NativeAd? myNative, myNatives, nativeAd;
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
   bool isInterstitialAdReady = false;
   bool isRewardedAdReady = false;
   late AnimationController animationController;
   double? percentage;
+  String? responses;
 
   @override
   void initState() {
@@ -71,12 +78,28 @@ class _ImagePickersState extends State<ImagePickers>
     state = AppState.free;
     animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 60),
+      duration: Duration(seconds: 20),
     );
 
     animationController.addListener(() => setState(() {}));
 
     myNative = NativeAd(
+      adUnitId: SharedPref.getNativeAd(),
+      factoryId: 'listTile',
+      request: AdRequest(),
+      listener: NativeAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (Ad ad) => {
+          setState(() {
+            isAdLoaded = true;
+          }),
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          ad.dispose();
+        },
+      ),
+    );
+    nativeAd = NativeAd(
       adUnitId: SharedPref.getNativeAd(),
       factoryId: 'listTile',
       request: AdRequest(),
@@ -111,6 +134,7 @@ class _ImagePickersState extends State<ImagePickers>
     setState(() {
       myNative!.load();
       myNatives!.load();
+      nativeAd!.load();
     });
     myBanner!.load();
     myBanners!.load();
@@ -153,86 +177,102 @@ class _ImagePickersState extends State<ImagePickers>
       ),
       body: BackgroundGradient(
         childView: Center(
-          child:isAnimate?Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Container(
-                  width: MediaQuery.of(context).size.width*0.5,
-                  height: MediaQuery.of(context).size.width*0.5,
-                  child: Lottie.asset('assets/uploading.json',
-                      repeat: true, reverse: true, animate: true),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 60.0),
-
-                  margin: EdgeInsets.only(top: 20.0),
-                  child:  Text('Your image is uploading please wait...',maxLines: 2,textAlign: TextAlign.center,style: TextStyle(
-                    color: Colors.deepOrange,fontSize: 18.0,
-                  ),),
-                ),
-              ),
-              isAdLoaded
-                  ? Container(
-                    alignment: Alignment.bottomCenter,
-                    color: Colors.white,
-                    width: MediaQuery.of(context).size.width,
-                    height: 50,
-                    child: AdWidget(
-                      ad: myNatives!,
+          child: isAnimate
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        height: MediaQuery.of(context).size.width * 0.5,
+                        child: Lottie.asset('assets/uploading.json',
+                            repeat: true, reverse: true, animate: true),
+                      ),
                     ),
-                  )
-                  : Text('loading...')
-            ],
-          ) :imageFile != null
-              ? isLoading
-                  ? Container(
-                      margin: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height / 4),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          percentage!.toStringAsFixed(0) == '100'
-                              ? Container(
-                                  height: 350,
-                                  child: Lottie.asset('assets/waiting.json',
-                                      repeat: true,
-                                      reverse: true,
-                                      animate: true),
-                                )
-                              : Container(),
-                          percentage!.toStringAsFixed(0) == '100'
-                              ? Container(
-                                  margin: EdgeInsets.only(top: 8.0),
-                                  child: AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 900),
-                                    transitionBuilder: (Widget child,
-                                        Animation<double> animation) {
-                                      return ScaleTransition(
-                                          scale: animation, child: child);
-                                    },
-                                    child: Text(
-                                      '${userAnswer[pos]}',
-                                      key: ValueKey<String>(userAnswer[pos]),
-                                      style: TextStyle(
-                                          fontSize: 14, color: Colors.white),
-                                    ),
-                                  ),
-                                )
-                              : Container(),
-                          percentage!.toStringAsFixed(0) != '100'
-                              ? Container(
-                                  width:
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 60.0),
+                        margin: EdgeInsets.only(top: 20.0),
+                        child: Text(
+                          'Your image is uploading please wait...',
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.deepOrange,
+                            fontSize: 18.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    isAdLoaded
+                        ? Container(
+                            alignment: Alignment.bottomCenter,
+                            color: Colors.white,
+                            width: MediaQuery.of(context).size.width,
+                            height: 50,
+                            child: AdWidget(
+                              ad: myNatives!,
+                            ),
+                          )
+                        : Text('loading...')
+                  ],
+                )
+              : imageFile != null
+                  ? isLoading
+                      ? Container(
+                          margin: EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height / 5.5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              percentage!.toStringAsFixed(0) == '100'
+                                  ? Container(
+                                      height: 350,
+                                      child: Lottie.asset(
+                                          'assets/downloading.json',
+                                          repeat: true,
+                                          animate: true),
+                                    )
+                                  : Container(),
+                              percentage!.toStringAsFixed(0) == '100'
+                                  ? Container(
+                                      margin: EdgeInsets.only(top: 8.0),
+                                      child: AnimatedSwitcher(
+                                        duration: Duration(milliseconds: 900),
+                                        transitionBuilder: (Widget child,
+                                            Animation<double> animation) {
+                                          return ScaleTransition(
+                                              scale: animation, child: child);
+                                        },
+                                        child: Text(
+                                          '${userAnswer[pos]}',
+                                          key:
+                                              ValueKey<String>(userAnswer[pos]),
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                              percentage!.toStringAsFixed(0) != '100'
+                                  ? Container(
+                                      alignment: Alignment.center,
+                                      /* width:
                                       MediaQuery.of(context).size.width * 0.7,
                                   height:
-                                      MediaQuery.of(context).size.height * 0.3,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 8.0, vertical: 8.0),
-                                  child: LiquidCircularProgressIndicator(
-                                    value: double.parse(
-                                        '${animationController.value}'),
+                                      MediaQuery.of(context).size.height * 0.3,*/
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8.0,
+                                      ),
+                                      child: Container(
+                                          child: Lottie.network(
+                                              'https://assets5.lottiefiles.com/packages/lf20_mLnvYR.json',
+                                              frameRate: FrameRate.max,
+                                              repeat: true,
+                                              animate: true)
+                                          /* LiquidCircularProgressIndicator(
+                                    value: double.parse('${animationController.value}'),
                                     valueColor: AlwaysStoppedAnimation(
                                         Color(0xffFC9425)),
                                     center: Text(
@@ -245,24 +285,93 @@ class _ImagePickersState extends State<ImagePickers>
                                     ),
                                     direction: Axis.vertical,
                                     backgroundColor: Colors.grey.shade300,
+                                  ),*/
+                                          ))
+                                  : Container(),
+                              percentage!.toStringAsFixed(0) != '100'
+                                  ? Container(
+                                      margin: EdgeInsets.only(top: 8.0),
+                                      child: AnimatedSwitcher(
+                                        duration: Duration(milliseconds: 900),
+                                        transitionBuilder: (Widget child,
+                                            Animation<double> animation) {
+                                          return ScaleTransition(
+                                              scale: animation, child: child);
+                                        },
+                                        child: Text(
+                                          '${imageDownload[pos]}',
+                                          key: ValueKey<String>(
+                                              imageDownload[pos]),
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                              Expanded(child: Container()),
+                              isAdLoaded
+                                  ? Container(
+                                      alignment: Alignment.bottomCenter,
+                                      color: Colors.white,
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 50,
+                                      child: AdWidget(
+                                        ad: myNative!,
+                                      ),
+                                    )
+                                  : Text('loading...')
+                            ],
+                          ),
+                        )
+                      : ListView(
+                          children: [
+                            Container(
+                              height: 250,
+                              width: MediaQuery.of(context).size.width,
+                              child: AdWidget(
+                                ad: myBanner!,
+                              ),
+                            ),
+                            Container(
+                              height: 300,
+                              child: Lottie.asset('assets/upload.json',
+                                  repeat: true, reverse: true, animate: true),
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 36.0, horizontal: 24.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Visibility(
+                                    visible: isPlaying,
+                                    child: Center(child: spinkit),
                                   ),
-                                )
-                              : Container(),
-                          Expanded(child: Container()),
-                          isAdLoaded
-                              ? Container(
-                                  alignment: Alignment.bottomCenter,
-                                  color: Colors.white,
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 50,
-                                  child: AdWidget(
-                                    ad: myNative!,
+                                  SizedBox(
+                                    height: 8.0,
                                   ),
-                                )
-                              : Text('loading...')
-                        ],
-                      ),
-                    )
+                                  ElevatedButton.icon(
+                                    style: imageBtnStyle,
+                                    label: Text(
+                                      "Upload Image",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14.0,
+                                      ),
+                                    ),
+                                    onPressed: !isPlaying
+                                        ? () async {
+                                            await _showChoiceDialog(context);
+                                          }
+                                        : () {},
+                                    icon: Icon(FontAwesomeIcons.upload),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
                   : ListView(
                       children: [
                         Container(
@@ -275,9 +384,9 @@ class _ImagePickersState extends State<ImagePickers>
                         Container(
                           height: 300,
                           child: Lottie.asset('assets/upload.json',
-                              repeat: true, reverse: true, animate: true),
+                              repeat: true, animate: true),
                         ),
-                       Container(
+                        Container(
                           margin: EdgeInsets.symmetric(
                               vertical: 36.0, horizontal: 24.0),
                           child: Column(
@@ -286,81 +395,45 @@ class _ImagePickersState extends State<ImagePickers>
                               Visibility(
                                 visible: isPlaying,
                                 child: Center(
-                                  child: spinkit
+                                  child: SizedBox(
+                                      height: 25.0,
+                                      width: 25.0,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.0,
+                                      )),
                                 ),
                               ),
-                              SizedBox(height: 8.0,),
+                              SizedBox(
+                                height: 8.0,
+                              ),
                               ElevatedButton.icon(
                                 style: imageBtnStyle,
-                                label:  Text(
+                                label: Text(
                                   "Upload Image",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 14.0,
                                   ),
                                 ),
-                                onPressed: !isPlaying?() {
-                                  _pickImage();
-                                }:(){},
-                                icon: Icon(FontAwesomeIcons.upload),
+                                onPressed: !isPlaying
+                                    ? () async {
+                                        await _showChoiceDialog(context);
+                                      }
+                                    : () {},
+                                icon: Icon(
+                                  FontAwesomeIcons.upload,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ],
-                    )
-              : ListView(
-                  children: [
-                    Container(
-                      height: 250,
-                      width: MediaQuery.of(context).size.width,
-                      child: AdWidget(
-                        ad: myBanner!,
-                      ),
                     ),
-                    Container(
-                      height: 300,
-                      child: Lottie.asset('assets/upload.json',
-                          repeat: true, animate: true),
-                    ),
-                     Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 36.0, horizontal: 24.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Visibility(
-                                  visible: isPlaying,
-                                  child: Center(
-                                    child: SizedBox( height: 25.0, width: 25.0,
-                                        child: CircularProgressIndicator(color: Colors.white,strokeWidth: 2.0,)),
-                                  ),
-                                ),
-                                SizedBox(height: 8.0,),
-                                ElevatedButton.icon(
-                                  style: imageBtnStyle,
-                                  label:Text(
-                                    "Upload Image",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14.0,
-                                    ),
-                                  ),
-                                  onPressed:!isPlaying?() {
-                                    _pickImage();
-                                  }:(){},
-                                  icon: Icon(FontAwesomeIcons.upload,),
-                                ),
-                              ],
-                            ),
-                          ),
-                  ],
-                ),
         ),
       ),
     );
   }
-
 
   // initialize interstitial ad
   void _loadInterstitialAd() {
@@ -371,8 +444,8 @@ class _ImagePickersState extends State<ImagePickers>
           this._interstitialAd = ad;
           ad.fullScreenContentCallback =
               FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
-                //back screen call
-              });
+            //back screen call
+          });
           isInterstitialAdReady = true;
         }, onAdFailedToLoad: (err) {
           isInterstitialAdReady = false;
@@ -388,12 +461,12 @@ class _ImagePickersState extends State<ImagePickers>
           this._rewardedAd = ad;
           ad.fullScreenContentCallback =
               FullScreenContentCallback(onAdDismissedFullScreenContent: (ad) {
-                //back screen call
-                setState(() {
-                  isRewardedAdReady = false;
-                });
-                _loadRewardedAd();
-              });
+            //back screen call
+            setState(() {
+              isRewardedAdReady = false;
+            });
+            _loadRewardedAd();
+          });
           setState(() {
             isRewardedAdReady = true;
           });
@@ -415,7 +488,7 @@ class _ImagePickersState extends State<ImagePickers>
     });
   }
 
-  showAlertDialog(){
+  showAlertDialog() {
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
@@ -432,7 +505,7 @@ class _ImagePickersState extends State<ImagePickers>
                 children: <Widget>[
                   Expanded(
                     flex: 4,
-                    child:  SizedBox.expand(
+                    child: SizedBox.expand(
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 60.0),
                         foregroundDecoration: BoxDecoration(
@@ -452,18 +525,28 @@ class _ImagePickersState extends State<ImagePickers>
                       ),
                     ),
                   ),
-                  Expanded(child: Container(
-                      alignment: Alignment.center,
-                      child: FaIcon(FontAwesomeIcons.checkCircle,size: 50.0,color: Colors.green,))),
+                  Expanded(
+                      child: Container(
+                          alignment: Alignment.center,
+                          child: FaIcon(
+                            FontAwesomeIcons.checkCircle,
+                            size: 50.0,
+                            color: Colors.green,
+                          ))),
                   Expanded(
                     flex: 2,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 60.0),
-
                       margin: EdgeInsets.only(top: 20.0),
-                      child:  Text('Image Upload Successfully...',maxLines: 1,textAlign: TextAlign.center,style: TextStyle(
-                        color: Colors.deepOrange,fontSize: 18.0,
-                      ),),
+                      child: Text(
+                        'Image Upload Successfully...',
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.deepOrange,
+                          fontSize: 18.0,
+                        ),
+                      ),
                     ),
                   ),
                   Expanded(
@@ -473,32 +556,39 @@ class _ImagePickersState extends State<ImagePickers>
                       margin: EdgeInsets.only(top: 20.0),
                       child: ElevatedButton.icon(
                         style: imageBtnStyle,
-                        onPressed: () { Navigator.pop(context);
-                        setState(() {
-                          isLoading=true;
-                          if (isRewardedAdReady) {
-                            _rewardedAd?.show(onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
-                          } else {
-                            toastShow('Ad not work');
-                            _loadRewardedAd();
-                          }
-                          animationController.forward();
-                        });
-                          },
-                        label: Text('Create Video now',style: TextStyle(fontSize: 14.0),), icon:  Center(child: Icon(FontAwesomeIcons.upload)),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          setState(() {
+                            isLoading = true;
+                            if (isRewardedAdReady) {
+                              _rewardedAd?.show(
+                                  onUserEarnedReward:
+                                      (RewardedAd ad, RewardItem item) {});
+                            } else {
+                              toastShow('Ad not work');
+                              _loadRewardedAd();
+                            }
+                            animationController.forward();
+                          });
+                        },
+                        label: Text(
+                          'Create Video now',
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        icon: Center(child: Icon(FontAwesomeIcons.upload)),
                       ),
                     ),
                   ),
                   isAdLoaded
                       ? Container(
-                    alignment: Alignment.bottomCenter,
-                    color: Colors.white,
-                    width: MediaQuery.of(context).size.width,
-                    height: 50,
-                    child: AdWidget(
-                      ad: myNative!,
-                    ),
-                  )
+                          alignment: Alignment.bottomCenter,
+                          color: Colors.white,
+                          width: MediaQuery.of(context).size.width,
+                          height: 50,
+                          child: AdWidget(
+                            ad: nativeAd!,
+                          ),
+                        )
                       : Text('loading...')
                 ],
               ),
@@ -509,6 +599,53 @@ class _ImagePickersState extends State<ImagePickers>
     );
   }
 
+  //pick image from camera or gallery
+  _showChoiceDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              "Choose option",
+              style: TextStyle(color: Colors.orangeAccent),
+            ),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: [
+                  Divider(
+                    height: 1,
+                    color: Colors.orangeAccent,
+                  ),
+                  ListTile(
+                    onTap: () {
+                      _pickImage('gallery');
+                    },
+                    title: Text("Gallery"),
+                    leading: Icon(
+                      Icons.account_box,
+                      color: Colors.orangeAccent,
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: Colors.orangeAccent,
+                  ),
+                  ListTile(
+                    onTap: () {
+                      _pickImage('camera');
+                    },
+                    title: Text("Camera"),
+                    leading: Icon(
+                      Icons.camera,
+                      color: Colors.orangeAccent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
 
 // check file size
   static String getFileSizeString({required int bytes, int decimals = 0}) {
@@ -519,18 +656,21 @@ class _ImagePickersState extends State<ImagePickers>
   }
 
   // pick image from gallery and set for post
-  Future<Null> _pickImage() async {
-    final pickedImage = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 50);
-    imageFile = pickedImage != null ? File(pickedImage.path) : null;
-    print('image file size is ${getFileSizeString(bytes: imageFile!.lengthSync())}');
-    if (imageFile != null) {
-      /*  var result = getFileSizeString(bytes: imageFile!.lengthSync());
+  Future<Null> _pickImage(String data) async {
+    Navigator.pop(context);
+    if (data == 'camera') {
+      final pickedImage = await ImagePicker()
+          .pickImage(source: ImageSource.camera, imageQuality: 50);
+      imageFile = pickedImage != null ? File(pickedImage.path) : null;
+      if (imageFile != null) {
+
+        /*  var result = getFileSizeString(bytes: imageFile!.lengthSync());
       if (result.contains('KB')) {
         if (int.parse(result.substring(0, result.length - 2)) < 50) {
           _onWillPop('Image quality too low, kindly upload best quality image for better result...');
         }
-        */ /*else if(int.parse(result.substring(0, result.length - 2)) > 800){
+        */
+        /*else if(int.parse(result.substring(0, result.length - 2)) > 800){
           var tempDir = await getTemporaryDirectory();
           final path = tempDir.path;
           int rand = Random().nextInt(10000);
@@ -541,7 +681,8 @@ class _ImagePickersState extends State<ImagePickers>
 
           print('compress image is kb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');
           predictSong(compressedImage);
-        }*/ /*
+        }*/
+        /*
         else {
           setState(() {
             isLoading = true;
@@ -566,15 +707,73 @@ class _ImagePickersState extends State<ImagePickers>
 
         print('compress image is mb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');*/
 
-      setState(() {
-        isAnimate = true;
-        predictSong(imageFile);
-      });
-      Future.delayed(Duration(seconds: 7),(){
-        isAnimate=false;
-          showAlertDialog();
-      });
+        setState(() {
+          isAnimate = true;
+          predictSong(imageFile);
+        });
+        Future.delayed(Duration(seconds: 7), () {
+          isAnimate = false;
+          responses != '500' ? showAlertDialog() : null;
+        });
+      }
 
+    } else {
+      final pickedImage = await ImagePicker()
+          .pickImage(source: ImageSource.gallery, imageQuality: 50);
+      imageFile = pickedImage != null ? File(pickedImage.path) : null;
+      if (imageFile != null) {
+
+        /*  var result = getFileSizeString(bytes: imageFile!.lengthSync());
+      if (result.contains('KB')) {
+        if (int.parse(result.substring(0, result.length - 2)) < 50) {
+          _onWillPop('Image quality too low, kindly upload best quality image for better result...');
+        }
+        */
+        /*else if(int.parse(result.substring(0, result.length - 2)) > 800){
+          var tempDir = await getTemporaryDirectory();
+          final path = tempDir.path;
+          int rand = Random().nextInt(10000);
+
+          Im.Image? image = Im.decodeImage(imageFile!.readAsBytesSync());
+          var compressedImage = File('$path/img_r$rand.jpg')
+          ..writeAsBytesSync(Im.encodeJpg(image!,quality: 50));
+
+          print('compress image is kb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');
+          predictSong(compressedImage);
+        }*/
+        /*
+        else {
+          setState(() {
+            isLoading = true;
+            predictSong(imageFile);
+            if (isRewardedAdReady) {
+              _rewardedAd?.show(onUserEarnedReward: (RewardedAd ad, RewardItem item) {});
+            } else {
+              toastShow('Ad not work');
+              _loadRewardedAd();
+            }
+            animationController.forward();
+          });
+        }
+      } else {
+        var tempDir = await getTemporaryDirectory();
+        final path = tempDir.path;
+        int rand = Random().nextInt(10000);
+
+        Im.Image? image = Im.decodeImage(imageFile!.readAsBytesSync());
+        var compressedImage = File('$path/img_r$rand.jpg')
+          ..writeAsBytesSync(Im.encodeJpg(image!,quality: 50));
+
+        print('compress image is mb  ${getFileSizeString(bytes: compressedImage.lengthSync())}');*/
+        setState(() {
+          isAnimate = true;
+          predictSong(imageFile);
+        });
+        Future.delayed(Duration(seconds: 7), () {
+          isAnimate = false;
+          responses != '500' ? showAlertDialog() : null;
+        });
+      }
     }
   }
 
@@ -612,10 +811,16 @@ class _ImagePickersState extends State<ImagePickers>
     };
     HttpRequest request = HttpRequest();
     var result = await request.predictNp(context, bodyMap, image);
+
+    setState(() {
+      responses = result.toString();
+    });
+
     if (result == 504 || result == 500) {
-      snackShow(context, '$result  Error try again later...');
+      snackShow(context, '$result  try again later...');
       setState(() {
         isLoading = false;
+        isAnimate = false;
         percentage = animationController.value * 0;
         animationController.value = 0;
       });
@@ -747,5 +952,10 @@ class _ImagePickersState extends State<ImagePickers>
     timer?.cancel();
     _timer!.cancel();
     animationController.dispose();
+    myBanner!.dispose();
+    myBanners!.dispose();
+    myNative!.dispose();
+    myNatives!.dispose();
+    nativeAd!.dispose();
   }
 }

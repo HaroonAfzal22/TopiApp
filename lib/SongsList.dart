@@ -23,9 +23,8 @@ class SongsList extends StatefulWidget {
 }
 
 class _SongsListState extends State<SongsList> {
-  AudioPlayer audioPlayer = AudioPlayer();
   List europeanCountries = [],songsList = [];
-  int? categoryId;
+  int? categoryId,indexValue;
  /* final singersList = [
     'Artist: Gipsy Kings',
     'Artist: Naseebo Lal',
@@ -46,6 +45,8 @@ class _SongsListState extends State<SongsList> {
     Color(0xfffaaca8),
   ];*/
   bool isEnabled = false,isLoading = false;
+  AudioPlayer audioPlayer = AudioPlayer();
+
   List<bool> selected = [];
 
   fabColor() {
@@ -89,7 +90,10 @@ class _SongsListState extends State<SongsList> {
                   isClick = List.filled(songsList.length, false);
                   isEnabled = false;
                 });
-                Navigator.pushNamed(context, '/image_pickers');
+                if(songsList[indexValue!]['premium']!='0'){
+                  Navigator.pushNamed(context, '/premium_feature');
+                }else{
+                Navigator.pushNamed(context, '/image_pickers');}
               },
               child: Icon(FontAwesomeIcons.fileImport),
               tooltip: 'Upload Image',
@@ -140,6 +144,7 @@ class _SongsListState extends State<SongsList> {
                                             isEnabled = true;
                                            play(songsList[index]['audio'],index);
                                           }
+                                          indexValue=index;
                                         });
                                         await SharedPref.setSongId(
                                             songsList[index]['id'].toString());
@@ -153,7 +158,7 @@ class _SongsListState extends State<SongsList> {
                                         index: index,
                                         pClick: (){
                                         Navigator.pushNamed(context, '/premium_feature');
-                                        }, pVisible: songsList[index]['premium']=='0'?true:false,
+                                        }, pVisible: songsList[index]['premium']!='0'?true:false,
                                       ),
                                     );
                                   },
@@ -193,8 +198,7 @@ class _SongsListState extends State<SongsList> {
               isEnabled = false;
               stop();
             } else {
-              selected =
-                  List.filled(songsList.length, false);
+              selected = List.filled(songsList.length, false);
               selected[pos] = true;
               isEnabled = true;
             }
@@ -271,10 +275,13 @@ class _SongsListState extends State<SongsList> {
 
   }
 
+
   @override
-  void dispose() {
-    super.dispose();
+  void deactivate() {
+    // TODO: implement deactivate
+    super.deactivate();
     myBanner!.dispose();
     audioPlayer.stop();
   }
+
 }

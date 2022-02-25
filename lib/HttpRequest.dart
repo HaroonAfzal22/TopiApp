@@ -44,7 +44,7 @@ class HttpRequest {
         print('fiile is $file');
         return file;
       } else {
-          return serverResponses(response.statusCode);
+          return response.statusCode;
       }
     } catch (e) {
       print(e);
