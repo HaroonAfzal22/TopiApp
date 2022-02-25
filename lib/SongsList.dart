@@ -22,7 +22,7 @@ class SongsList extends StatefulWidget {
   _SongsListState createState() => _SongsListState();
 }
 
-class _SongsListState extends State<SongsList> {
+class _SongsListState extends State<SongsList> with WidgetsBindingObserver {
   List europeanCountries = [],songsList = [];
   int? categoryId,indexValue;
  /* final singersList = [
@@ -66,6 +66,7 @@ class _SongsListState extends State<SongsList> {
   @override
   void initState() {
     // TODO: implement initState
+    WidgetsBinding.instance?.addObserver(this);
     super.initState();
     isLoading = true;
     Future.delayed(Duration(seconds: 4), () {
@@ -73,6 +74,7 @@ class _SongsListState extends State<SongsList> {
     });
     myBanner!.load();
     getCategoryList();
+
   }
 
   @override
@@ -276,6 +278,9 @@ class _SongsListState extends State<SongsList> {
   }
 
 
+
+
+
   @override
   void deactivate() {
     // TODO: implement deactivate
@@ -283,5 +288,35 @@ class _SongsListState extends State<SongsList> {
     myBanner!.dispose();
     audioPlayer.stop();
   }
+
+
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async{
+    // TODO: implement didChangeAppLifecycleState
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("app in resumed");
+        //Play the Music
+        break;
+      case AppLifecycleState.inactive:
+        print("app in inactive");
+
+        //Stop the music
+        break;
+      case AppLifecycleState.paused:
+        print("app in paused");
+        await audioPlayer.stop();
+        await  audioPlayer.dispose();
+        break;
+      case AppLifecycleState.detached:
+        print("app in detached");
+        await audioPlayer.stop();
+        await  audioPlayer.dispose();
+        //Stop the music
+        break;
+    }
+  }
+
 
 }
