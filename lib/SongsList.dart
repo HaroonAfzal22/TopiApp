@@ -160,7 +160,7 @@ class _SongsListState extends State<SongsList> with WidgetsBindingObserver {
                                         index: index,
                                         pClick: (){
                                         Navigator.pushNamed(context, '/premium_feature');
-                                        }, pVisible: songsList[index]['premium']!='0'?true:false,
+                                        }, pVisible: songsList[index]['premium']=='0'?true:false,
                                       ),
                                     );
                                   },
@@ -276,10 +276,6 @@ class _SongsListState extends State<SongsList> with WidgetsBindingObserver {
     });
 
   }
-
-
-
-
 
   @override
   void deactivate() {

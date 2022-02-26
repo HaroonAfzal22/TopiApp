@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -321,10 +319,11 @@ class _PremiumFeatureState extends State<PremiumFeature> {
           false;
     }
   }
+  final _amount=<PaymentItem>[];
 
   //for modal bottom sheet to show children
   void _settingModalBottomSheet(context, monthly, halfly, yearly) {
-    final _amount=<PaymentItem>[monthly];
+    _amount.add(PaymentItem(amount: '$monthly',label: 'Monthly',status: PaymentItemStatus.final_price));
     showModalBottomSheet(
       backgroundColor: Color(0xffD7CCC8),
       context: context,
@@ -500,11 +499,13 @@ class _PremiumFeatureState extends State<PremiumFeature> {
             ],
           ),
           GooglePayButton(
+            width: MediaQuery.of(context).size.width,
+            height: 50,
             paymentConfigurationAsset: 'gpay.json',
             paymentItems: _amount,
             style: GooglePayButtonStyle.black,
             type: GooglePayButtonType.subscribe,
-            margin: const EdgeInsets.only(top: 15.0),
+            margin: const EdgeInsets.only(top: 15.0,right: 20,left: 20),
             onPaymentResult: (onGooglePayResult){
               print(onGooglePayResult);
               },
@@ -595,13 +596,13 @@ class _PremiumFeatureState extends State<PremiumFeature> {
                     ),
                     SizedBox(
                       width: 320.0,
-                      child: RaisedButton(
+                      child: ElevatedButton(
+                        style:ElevatedButton.styleFrom(primary: const Color(0xFF1BC0C5),),
                         onPressed: () {},
                         child: Text(
                           "Save",
                           style: TextStyle(color: Colors.white),
                         ),
-                        color: const Color(0xFF1BC0C5),
                       ),
                     )
                   ],

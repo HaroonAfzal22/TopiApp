@@ -10,12 +10,12 @@
         "tokenizationSpecification": {
           "type": "PAYMENT_GATEWAY",
           "parameters": {
-            "gateway": "example",
-            "gatewayMerchantId": "gatewayMerchantId"
+            "gateway": "aciworldwide",
+            "gatewayMerchantId": "46578687662507403"
           }
         },
         "parameters": {
-          "allowedCardNetworks": ["AMEX", "DISCOVER", "INTERAC", "JCB", "MASTERCARD", "MIR", "VISA"],
+          "allowedCardNetworks": ["MASTERCARD",  "VISA"],
           "allowedAuthMethods": ["PAN_ONLY", "CRYPTOGRAM_3DS"],
           "billingAddressRequired": true,
           "billingAddressParameters": {
@@ -26,8 +26,8 @@
       }
     ],
     "merchantInfo": {
-      "merchantId": "01234567890123456789",
-      "merchantName": "Example Merchant Name"
+      "merchantId": "46578687662507403",
+      "merchantName": "Topi AI"
     },
     "transactionInfo": {
       "countryCode": "US",
