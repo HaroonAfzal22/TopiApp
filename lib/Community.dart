@@ -227,8 +227,10 @@ class _CommunityState extends State<Community> {
                                     fontSize: 14.0,
                                   ),
                                 )),
-                          )
-                         /* Positioned(
+                          ),
+
+                          // Right Panel of Comunity
+                          /* Positioned(
                             bottom: MediaQuery.of(context).size.height - 150,
                             right: MediaQuery.of(context).size.width * 0.01,
                             child: Container(
@@ -292,7 +294,7 @@ class _CommunityState extends State<Community> {
                                  isLiked[index]=true;
                                }
                              });
-                           *//*  if (isLiked[index] == true) {
+                             if (isLiked[index] == true) {
                                Map bodyMap={'video_id':data[index]['id'].toString(),'like':'0','method':'PUT'};
                                 var result = await request.postLikesCount(context, bodyMap);
                                 print('response false is $result');
@@ -302,7 +304,7 @@ class _CommunityState extends State<Community> {
                                var result = await request.postLikesCount(context, bodyMap);
                                print('response true is $result');
 
-                             }*//*
+                             }
                             },
                           ),
                           StackDesign(

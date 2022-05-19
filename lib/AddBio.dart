@@ -43,7 +43,7 @@ class _AddBioState extends State<AddBio> {
   }
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map;
+   // final args = ModalRoute.of(context)!.settings.arguments as Map;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
@@ -68,11 +68,11 @@ class _AddBioState extends State<AddBio> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              if(args.containsValue('edit_profile')){
+             /* if(args.containsValue('edit_profile')){
                 Navigator.of(context).pop(value);
               }else{
                 Navigator.of(context).pop(value);
-              }
+              }*/
             },
             child: Text(
               'Save',

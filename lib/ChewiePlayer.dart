@@ -108,6 +108,7 @@ class _ChewiePlayerState extends State<ChewiePlayer> {
   }
 }
 
+
 class VideoPlayers extends StatefulWidget {
   @override
   _VideoPlayersState createState() => _VideoPlayersState();

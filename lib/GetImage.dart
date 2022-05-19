@@ -899,51 +899,6 @@ class _ImagePickersState extends State<ImagePickers>
     });
   }
 
-  void _onWillPop(image) async {
-    if (Platform.isIOS) {
-      await showDialog(
-          context: context,
-          builder: (context) => CupertinoAlertDialog(
-                title: Text(
-                  'Warning!!!',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                content: Container(
-                  child: Text('$image'),
-                ),
-                actions: <Widget>[
-                  CupertinoDialogAction(
-                    child: Text('Ok'),
-                    onPressed: () => Navigator.of(context).pop(false),
-                  ),
-                ],
-              ));
-    } else {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            'Warning!!!',
-            style: TextStyle(fontSize: 16.0),
-          ),
-          backgroundColor: Color(0xffe8f6fa),
-          actionsPadding: EdgeInsets.symmetric(horizontal: 24.0),
-          content: Container(
-            child: Text('$image'),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(Colors.deepOrange)),
-              onPressed: () => Navigator.of(context).pop(false),
-              child: new Text('Ok'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
 
   @override
   void dispose() {

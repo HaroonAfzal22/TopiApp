@@ -16,6 +16,7 @@ import 'package:topi/constants.dart';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:unique_identifier/unique_identifier.dart';
+List cList = [];
 
 class SongsList extends StatefulWidget {
   @override
@@ -51,7 +52,7 @@ class _SongsListState extends State<SongsList> with WidgetsBindingObserver {
 
   fabColor() {
     if (isEnabled) {
-      return Colors.deepOrange;
+      return Colors.white;
     } else {
       return Colors.grey;
     }
@@ -91,13 +92,19 @@ class _SongsListState extends State<SongsList> with WidgetsBindingObserver {
                   selected = List.filled(songsList.length, false);
                   isClick = List.filled(songsList.length, false);
                   isEnabled = false;
-                });
-                if(songsList[indexValue!]['premium']!='0'){
-                  Navigator.pushNamed(context, '/premium_feature');
-                }else{
+                });// here i need to add some thing
+                if(songsList[indexValue!]['premium']!='0' && cList.isEmpty){
+                  print('IF Is Empty');
+                  Navigator.pushNamed(context, '/PremiumFeature');
+                } else if (songsList[indexValue!]['premium']!='0' && cList.isNotEmpty){
+                  print('Else IF Is Empty');
+                  Navigator.pushNamed(context, '/image_pickers');
+                }
+                else{
+                  print('Else Is Empty');
                 Navigator.pushNamed(context, '/image_pickers');}
               },
-              child: Icon(FontAwesomeIcons.fileImport),
+              child: FaIcon(FontAwesomeIcons.folderPlus,color: Colors.orange,),
               tooltip: 'Upload Image',
             )
           : Container(),
@@ -120,12 +127,13 @@ class _SongsListState extends State<SongsList> with WidgetsBindingObserver {
                           children: [
                            CategoryLists(europeanCountries: europeanCountries, isLoading: isLoading, getSongsList: getSongsList),
                             SizedBox(
-                              height: MediaQuery.of(context).size.height,
+                              height: MediaQuery.of(context).size.height*0.60,
                               child: Container(
                                 child: ListView.builder(
                                   physics: BouncingScrollPhysics(),
                                   itemCount: songsList.length,
                                   itemBuilder: (context, index) {
+                                    // print ('Songs List printing ${songsList} ' + ' ${index}');
                                     return GestureDetector(
                                       onTap: () async {
                                         setState(() {
@@ -159,26 +167,27 @@ class _SongsListState extends State<SongsList> with WidgetsBindingObserver {
                                         clickIcon: clickIcon,
                                         index: index,
                                         pClick: (){
-                                        Navigator.pushNamed(context, '/premium_feature');
-                                        }, pVisible: songsList[index]['premium']=='0'?true:false,
+                                        Navigator.pushNamed(context, '/PremiumFeature');
+                                        },
+                                        pVisible: songsList[index]['premium']=='1'?true:false,
                                       ),
                                     );
                                   },
                                 ),
                               ),
                             ),
-
                           ],
                         ),
                       ),
                     ),
                     Positioned(
-                      bottom: 55.0,
+                      bottom: 50.0,
                       child: Container(
+                        padding: EdgeInsets.only(bottom: 5.0),
                         width: MediaQuery.of(context).size.width,
-                        height: 60,
+                        height: MediaQuery.of(context).size.height*0.10,
                         child: AdWidget(
-                          ad: myBanner!,
+                          ad:myBanner!,
                         ),
                       ),
                     ),
@@ -297,7 +306,6 @@ class _SongsListState extends State<SongsList> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.inactive:
         print("app in inactive");
-
         //Stop the music
         break;
       case AppLifecycleState.paused:

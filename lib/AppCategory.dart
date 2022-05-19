@@ -33,7 +33,7 @@ class _AppCategoryState extends State<AppCategory> {
     Community(),
     SongsList(),
     Notifications(),
-    //Profile(),
+     Profile(),
   ];
 
   @override

@@ -16,6 +16,8 @@ import 'package:topi/AppCategory.dart';
 import 'package:topi/ChewiePlayer.dart';
 import 'package:topi/Community.dart';
 import 'package:topi/EditProfile.dart';
+import 'package:topi/Firebase/login_page.dart';
+import 'package:topi/Firebase/signup_page.dart';
 import 'package:topi/GetImage.dart';
 import 'package:topi/Google/GoogleAds.dart';
 import 'package:topi/InAppReview.dart';
@@ -25,6 +27,7 @@ import 'package:topi/PrivacyPolicy.dart';
 import 'package:topi/ShareFile.dart';
 import 'package:topi/Shared_Pref.dart';
 import 'package:topi/SongsList.dart';
+import 'package:topi/Subscriptions/Subscription_screen.dart';
 import 'package:topi/ViewPhoto.dart';
 import 'package:topi/constants.dart';
 import 'package:topi/google_sign_in.dart';
@@ -32,7 +35,7 @@ import 'package:topi/home_screen.dart';
 import 'package:topi/profile.dart';
 import 'package:topi/starter.dart';
 
-
+//flutter pub upgrade fwfh_text_style run this
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel',
   'High Importance Notifications',
@@ -72,6 +75,7 @@ Future<void> main() async{
         Brightness.light,
   ));
   runApp(MyApp());
+  // runApp(PremiumFeature());
   // color used code  #FCCC44 as like yellow, #FC9425 like orange,#DC3843 like red
 }
 
@@ -117,7 +121,7 @@ class _MyAppState extends State<MyApp> {
       create: (BuildContext context)=>DataValueProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: '/',
+        initialRoute: '/PremiumFeature',
         routes: {
           '/songs_list': (context) => SongsList(),
           '/image_pickers': (context) => ImagePickers(),
@@ -130,7 +134,11 @@ class _MyAppState extends State<MyApp> {
           '/privacy_policy': (context) => PrivacyPolicy(),
           '/notification': (context) => Notifications(),
           '/community': (context) => Community(),
-          '/premium_feature': (context) => PremiumFeature(),
+          '/PremiumFeature': (context) => PremiumFeature(),
+          '/SignUpScreen': (context) => SignUpScreen(),
+          '/logInScreen': (context) => logInScreen(),
+
+
           '/profile': (context) => Profile(),
           '/add_bio': (context) => AddBio(),
           '/add_name': (context) => AddName(),
